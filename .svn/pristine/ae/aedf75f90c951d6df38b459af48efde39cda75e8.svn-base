@@ -1,0 +1,71 @@
+package com.bsi.ms.service.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.bsi.ms.mapper.AttachmentMapper;
+import com.bsi.ms.model.Attachment;
+import com.bsi.ms.service.AttachmentService; 
+
+/** 
+* @ClassName: AttachmentServiceImpl 
+* @Description: TODO(交付物实现service业务) 
+* @author wangxy
+* @date Mar 28, 2017 10:34:43 AM 
+*  
+*/
+@Service
+@Transactional
+public class AttachmentServiceImpl implements AttachmentService {
+	
+	@Autowired
+	private AttachmentMapper attachmentMapper;
+
+	@Override
+	public int deleteByPrimaryKey(Integer id) {
+		// TODO Auto-generated method stub
+		return attachmentMapper.deleteByPrimaryKey(id);
+	}
+    
+	@Override
+	public int insert(Attachment record) {
+		// TODO Auto-generated method stub
+		return attachmentMapper.insert(record);
+	}
+
+	@Override
+	public int insertSelective(Attachment record) {
+		// TODO Auto-generated method stub
+		return attachmentMapper.insertSelective(record);
+	}
+
+	@Override
+	public Attachment selectByPrimaryKey(Integer id) {
+		// TODO Auto-generated method stub
+		return attachmentMapper.selectByPrimaryKey(id);
+	}
+
+	@Override
+	public int updateByPrimaryKeySelective(Attachment record) {
+		// TODO Auto-generated method stub
+		return attachmentMapper.updateByPrimaryKeySelective(record);
+	}
+
+	@Override
+	public int updateByPrimaryKey(Attachment record) {
+		// TODO Auto-generated method stub
+		return attachmentMapper.updateByPrimaryKey(record);
+	}
+
+	@Override
+	public List<Attachment> selectByProject(Integer relatedId) {
+		// TODO Auto-generated method stub
+		return attachmentMapper.selectByProject(relatedId);
+	}
+	
+	 
+}

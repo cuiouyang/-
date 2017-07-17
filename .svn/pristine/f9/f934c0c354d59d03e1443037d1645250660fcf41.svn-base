@@ -1,0 +1,147 @@
+package com.bsi.ms.model;
+
+import java.util.Date;
+
+public class ProjectMilestone {
+    private Integer id;
+
+    private String milestoneId;
+
+    private Integer projectId;
+
+    private String milestoneNo;
+
+    private String milestoneName;
+
+    private Integer parentId;
+
+    
+    private Date planStartDate;
+
+    private Date planEndDate;
+
+    private Integer planHours;
+
+    private String inChargeAccount;
+
+    private String inChargeName;
+
+    private Date createTime;
+
+    private Date updateTime;
+    
+    //项目
+    private Project project;
+
+    //上级里程碑
+    private ProjectMilestone parentMilestone;
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getMilestoneId() {
+        return milestoneId;
+    }
+
+    public void setMilestoneId(String milestoneId) {
+        this.milestoneId = milestoneId == null ? null : milestoneId.trim();
+    }
+
+    public Integer getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(Integer projectId) {
+        this.projectId = projectId;
+    }
+    
+   
+    public String getMilestoneNo() {
+        return milestoneNo;
+    }
+
+    public void setMilestoneNo(String milestoneNo) {
+        this.milestoneNo = milestoneNo == null ? null : milestoneNo.trim();
+    }
+
+    public String getMilestoneName() {
+        return milestoneName;
+    }
+
+    public void setMilestoneName(String milestoneName) {
+        this.milestoneName = milestoneName == null ? null : milestoneName.trim();
+    }
+
+    public Integer getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Integer parentId) {
+        this.parentId = parentId;
+    }
+    public void setParenMilestone(ProjectMilestone parentMilestone) {
+        this.parentMilestone = parentMilestone;
+    }
+    public ProjectMilestone getParentMilestone() {
+    	return parentMilestone;
+    }
+    public Date getPlanStartDate() {
+        return planStartDate;
+    }
+
+    public void setPlanStartDate(Date planStartDate) {
+        this.planStartDate = planStartDate;
+    }
+
+    public Date getPlanEndDate() {
+        return planEndDate;
+    }
+
+    public void setPlanEndDate(Date planEndDate) {
+        this.planEndDate = planEndDate;
+    }
+
+    public Integer getPlanHours() {
+        return planHours;
+    }
+
+    public void setPlanHours(Integer planHours) {
+        this.planHours = planHours;
+    }
+
+    public String getInChargeAccount() {
+        return inChargeAccount;
+    }
+
+    public void setInChargeAccount(String inChargeAccount) {
+        this.inChargeAccount = inChargeAccount == null ? null : inChargeAccount.trim();
+    }
+
+    public String getInChargeName() {
+        return inChargeName;
+    }
+
+    public void setInChargeName(String inChargeName) {
+        this.inChargeName = inChargeName == null ? null : inChargeName.trim();
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
+}

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsi.ms.mapper.AttachmentMapper" >
+  <resultMap id="BaseResultMap" type="com.bsi.ms.model.Attachment" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="project_id" property="projectId" jdbcType="INTEGER" />
+    <result column="attachment_name" property="attachmentName" jdbcType="VARCHAR" />
+    <result column="attachment_url" property="attachmentUrl" jdbcType="VARCHAR" />
+    <result column="creator_account" property="creatorAccount" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="related_id" property="relatedId" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, project_id, attachment_name, attachment_url, creator_account, type, related_id, 
+    create_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from attachment
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  
+  <select id="selectByMilestone" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from attachment  
+    where  related_id = #{relatedId,jdbcType=VARCHAR} 
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from attachment
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.bsi.ms.model.Attachment" >
+    insert into attachment (id, project_id, attachment_name, 
+      attachment_url, creator_account, type, 
+      related_id, create_time)
+    values (#{id,jdbcType=INTEGER}, #{projectId,jdbcType=INTEGER}, #{attachmentName,jdbcType=VARCHAR}, 
+      #{attachmentUrl,jdbcType=VARCHAR}, #{creatorAccount,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, 
+      #{relatedId,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.bsi.ms.model.Attachment" >
+    insert into attachment
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="projectId != null" >
+        project_id,
+      </if>
+      <if test="attachmentName != null" >
+        attachment_name,
+      </if>
+      <if test="attachmentUrl != null" >
+        attachment_url,
+      </if>
+      <if test="creatorAccount != null" >
+        creator_account,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="relatedId != null" >
+        related_id,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="projectId != null" >
+        #{projectId,jdbcType=INTEGER},
+      </if>
+      <if test="attachmentName != null" >
+        #{attachmentName,jdbcType=VARCHAR},
+      </if>
+      <if test="attachmentUrl != null" >
+        #{attachmentUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="creatorAccount != null" >
+        #{creatorAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="relatedId != null" >
+        #{relatedId,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.bsi.ms.model.Attachment" >
+    update attachment
+    <set >
+      <if test="projectId != null" >
+        project_id = #{projectId,jdbcType=INTEGER},
+      </if>
+      <if test="attachmentName != null" >
+        attachment_name = #{attachmentName,jdbcType=VARCHAR},
+      </if>
+      <if test="attachmentUrl != null" >
+        attachment_url = #{attachmentUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="creatorAccount != null" >
+        creator_account = #{creatorAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="relatedId != null" >
+        related_id = #{relatedId,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.bsi.ms.model.Attachment" >
+    update attachment
+    set project_id = #{projectId,jdbcType=INTEGER},
+      attachment_name = #{attachmentName,jdbcType=VARCHAR},
+      attachment_url = #{attachmentUrl,jdbcType=VARCHAR},
+      creator_account = #{creatorAccount,jdbcType=VARCHAR},
+      type = #{type,jdbcType=INTEGER},
+      related_id = #{relatedId,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <insert id="insertAttachment" parameterType="Map">
+	  	INSERT INTO attachment (
+		attachment_name,
+		related_id,
+		project_id,
+		type
+	)
+	VALUES
+		(
+			#{attachment_name},
+			#{related_id},
+			#{project_id},
+			#{type}
+		)
+  </insert>
+</mapper>

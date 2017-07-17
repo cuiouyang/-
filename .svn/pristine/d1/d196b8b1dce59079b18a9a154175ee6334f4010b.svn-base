@@ -1,0 +1,29 @@
+package com.bsi.ms.mapper;
+
+import java.util.List;
+import java.util.Map;
+
+import com.bsi.ms.model.ProjectMilestone;
+
+public interface ProjectMilestoneMapper {
+
+	int deleteByPrimaryKey(Integer id);
+
+	int insert(ProjectMilestone record);
+
+	int insertSelective(ProjectMilestone record);
+
+	ProjectMilestone selectByPrimaryKey(Integer id);
+
+	List<ProjectMilestone> selectByProject(Map<String, Object> map);
+
+	int updateByPrimaryKeySelective(ProjectMilestone record);
+
+	int updateByPrimaryKey(ProjectMilestone record);
+
+	List<ProjectMilestone> getMilestoneNameOne(String id);
+
+	List<ProjectMilestone> getMilestoneName(String id);
+
+	int getChildCount(Integer id);
+}

@@ -1,0 +1,11 @@
+package com.bsi.ms.service;
+
+import java.util.List;
+
+import com.bsi.ms.model.Dict;
+
+public interface DictService {
+	// 获取全部的项目分类
+	List<Dict> getProjectType(int status);
+
+}

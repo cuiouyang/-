@@ -1,0 +1,598 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="OVIT Project Manage System" />
+<meta name="author" content="OVIT R&D" />
+<title>光谷信息项目管理系统</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Arimo:400,700,400italic">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/fonts/linecons/css/linecons.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/fonts/fontawesome/css/font-awesome.min.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/bootstrap.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/xenon-core.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/xenon-forms.css"> 
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/xenon-components.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/xenon-skins.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/custom.css">
+<script src="${pageContext.request.contextPath}/assets/js/jquery-1.11.1.min.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/jquery-form.js"></script>
+<script type="text/javascript" src ="${pageContext.request.contextPath}/assets/js/jquery.raty.js"></script>
+<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!--[if lt IE 9]>
+	<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+	<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+<![endif]-->
+ <style type="text/css">
+	table{
+   
+    table-layout:fixed;/* 只有定义了表格的布局算法为fixed，下面td的定义才能起作用。 */
+}
+ td{
+    width:100%;
+    word-break:keep-all;/* 不换行 */
+    white-space:nowrap;/* 不换行 */
+    overflow:hidden;/* 内容超出宽度时隐藏超出部分的内容 */
+    text-overflow:ellipsis;/* 当对象内文本溢出时显示省略标记(...) ；需与overflow:hidden;一起使用。*/
+}  
+ .table > caption + thead > tr:first-child > th, .table > colgroup + thead > tr:first-child > th, .table > thead:first-child > tr:first-child > th, .table > caption + thead > tr:first-child > td, .table > colgroup + thead > tr:first-child > td, .table > thead:first-child > tr:first-child > td {
+    border-top: 0;
+    width: 78px;
+    text-aign:center;
+} 
+</style>
+</head>
+<body class="page-body">
+	<%@ include file="../frame/setting.jsp" %>
+	<div class="page-container">
+		<%@ include file="../frame/left.jsp" %>
+		<div class="main-content">
+			<%@ include file="../frame/nav.jsp" %>
+		<div class="page-title">
+				<div class="title-env">
+					<h1 class="title">我的工作项</h1>
+					<p class="description">我的工作项详情</p>
+				</div>
+
+				<div class="breadcrumb-env">
+					<ol class="breadcrumb bc-1">
+						<li><a href="${pageContext.request.contextPath}/manageSystem/index"><i class="fa-home"></i>首页</a>
+						</li>
+						<li class="active"><strong>我承担的工作项</strong></li>
+					</ol>
+				</div>
+			</div>
+					<div class="panel panel-default">
+					
+				     <div class="panel-body">	
+				     	
+					<table class="" cellpadding="0" cellspacing="0" width="100%" border="0" style="margin-bottom:10px">
+						<tr>
+							<td width="50%">
+							<form id="searchFormTime" action="${pageContext.request.contextPath}//workItem/index" method="post">
+							
+				 			<table class="" cellpadding="0" cellspacing="0" width="100%" border="0" style="margin-bottom:10px">
+				 			
+				 				<tr>
+				 					<td width="2%">	
+				 						<select class="form-control" id="Time" style ="width:130px;height:40px;  ">
+											<option value="1">实际开始时间</option>
+											<option value="2">实际结束时间</option>
+											<option value="3">计划开始时间</option>
+											<option value="4">计划结束时间</option>				
+										</select></td>
+									<td width="35%" style="padding-left:20px">
+										<div class="daterange daterange-inline" data-format="YYYY-MM-DD" >
+											<i class="fa-calendar"></i>
+											<span id="dateTime">请选择日期范围</span>
+										</div>
+									</td>
+									<td width="5%">
+										<a href="javascript:void(0)" class="linecons-search" onclick="queryTime()" id="saveBtn"></a>
+									</td>
+								</tr>
+				 			</table>
+							
+				 		</form>
+							
+						</td>
+				 		<td width="50%">
+				 		<form id="searchForm" action="${pageContext.request.contextPath}/"  method="post">
+								<table class="" cellpadding="0" cellspacing="0" width="100%" border="0" style="margin-bottom:10px">
+									<tr>					
+										<td width="15%"> 
+											<select class="form-control" id="condition" style ="width:125px;height:40px;">
+												
+												<option value="1">工作项标题</option>
+												<option value="2">所属项目名称</option>
+												<option value="3">发起人</option>
+												<option value="4">状态</option>
+											</select>
+									    </td>
+										<td style="padding-left:20px">																	
+											<div class="form-control" id="key" style="padding-top:0px;width:120px;height:40px;">
+												<input type="text"  id="keyword"  maxlength="200" style="width:100px;height:30px;border-style:none;outline:medium;">	
+											</div>
+										 </td>
+										<td>
+										<a href="javascript:void(0)" class="linecons-search" onclick="queryFunc()"id="saveBtns"></a>
+										</td>	
+									</tr>	
+					  		</table> 
+						</form>
+				 		</td>
+				 	</tr>
+				 	
+				 </table>
+				 <div class="col-sm-2" float:right >
+								<button class="btn btn-info btn-sm " id="btnAdd">
+									<i class="fa-cloud"></i> <a href="${pageContext.request.contextPath}/workItem/addWorkItem">补登完成工作项</a>
+								</button>
+							</div>
+				 
+						<div id="staffTableDiv" >
+							<table width="100%" border="0" cellspacing="0" cellpadding="0">
+								<tr height="2">
+									<td class="tbtitlebg"></td>
+								</tr>
+								<tr>
+									<td>
+										<div class="panel-body" >
+						 					<div style="width:100%">
+											<table  class="table table-bordered table-striped "
+												id="table">
+												<thead>
+													<tr>
+														<th>工作项</th>
+														<th>所属项目名称</th>
+														<th>发起人</th>
+														<th>计划开始日期</th>
+														<th>计划结束日期</th>
+														<th>实际开始日期</th>
+														<th>实际结束日期</th>
+														<th>计划工时</th>
+														<th>实际工时</th>
+														<th>有效工时</th>
+														<th>评分</th>
+														<th>评价人</th>
+														<th>状态</th>
+													</tr>
+												</thead>
+
+												<tbody class="middle-align">
+ 													<c:forEach items="${list}" var="item"
+														varStatus="status">
+														<tr>
+															
+															<td align="center" title="${item.itemTopic}">
+																<c:out value='${item.itemTopic}' />&nbsp;</td>
+															<td align="center" title="${item.projectName}"><c:out
+																	value='${item.projectName}' />&nbsp;</td>
+															<td align="center" title="${item.sponsorName}"><c:out
+																	value='${item.sponsorName}' />&nbsp;</td>
+															<td align="center"><fmt:formatDate
+																	value='${item.planStartTime}'
+																	pattern='yyyy-MM-dd' />&nbsp;</td>
+															<td align="center"><fmt:formatDate
+																	value='${item.planEndTime}'
+																	pattern='yyyy-MM-dd' />&nbsp;</td>
+															<td align="center"><fmt:formatDate
+																	value='${item.actStartTime}'
+																	pattern='yyyy-MM-dd' />&nbsp;</td>
+															<td align="center"><fmt:formatDate
+																	value='${item.actEndTime}'
+																	pattern='yyyy-MM-dd' />&nbsp;</td>									
+															
+															<td align="center" title="${item.planHours}"><c:out
+																	value='${item.planHours}' />&nbsp;</td>
+															<td align="center" title="${item.actHours}"><c:out
+																	value='${item.actHours}' />&nbsp;</td>
+															<td align="center" title="${item.effectiveHours}"><c:out
+																	value='${item.effectiveHours}' />&nbsp;</td>
+															<td align="center" title="${item.point}">
+															<div id='star' data-score = "${item.point}"></div>
+															<%-- <c:out value='${item.point}' /> --%>&nbsp;</td>
+															<td align="center" title="${item.auditorName}"><c:out
+																	value='${item.auditorName}' />&nbsp;</td>
+															<td align="center" title="${item.status}">
+															<c:if test="${item.status eq 0}"><c:out value='草稿' /></c:if>
+															<c:if test="${item.status eq 1}"><c:out value='待审核' /></c:if>
+															<c:if test="${item.status eq 9}"><c:out value='已审核' /></c:if>
+															<c:if test="${item.status eq 3}"><c:out value='已退回' /></c:if>
+															<c:if test="${item.status eq 4}"><c:out value='已删除' /></c:if>
+															<c:if test="${item.status eq null}"><c:out value='' /></c:if>
+															&nbsp;</td>
+																													
+														</tr>
+													</c:forEach> 
+												</tbody>
+											</table>
+                                           </div>
+										</div>
+									</td>
+								</tr>
+							</table>
+							
+						</div>	
+						</div>	
+						</div>	
+						<script type="text/javascript">
+				jQuery(document).ready(function($)
+				{	
+					
+					  var table = $('#table').DataTable({
+							dom: "<'row'<'col-sm-5'l>"+
+							 "t"+
+							 "<'row'<'col-xs-6'i><'col-xs-6'p>>",
+						tableTools: {
+							sSwfPath: "assets/js/datatables/tabletools/copy_csv_xls_pdf.swf"
+						}, 
+						 "bLengthChange": false, //改变每页显示数据数量
+							"bFilter": false, //过滤功能		 
+					});  
+					  
+					  $("#table").find("div[id = 'star']").each(function(i,n){
+							$(this).raty({
+								readOnly: true,
+								hints: ['1', '2', '3', '4', '5'],
+								path:"${pageContext.request.contextPath}/assets/images/raty",
+								size:32,
+								click: function (score, evt) {
+									sc = score;
+								},
+								score:function() {
+								    return $(this).attr('data-score');
+								}
+							});
+						});
+					
+					
+					//绑定状态选项的时间 显示下拉选择框
+					$('#condition').change(function(){
+						var a=$("#condition").val();
+						if(a==4){
+						$('#key').children('#keyword').remove();
+						var data="";
+						data+="<select style='width:200px;height:40px;' id='state' ><option value='0'>"+"草稿"+"</option>";
+						data+="<option value='1'>"+"待审核"+"</option>";
+						data+="<option value='3'>"+"已退回"+"</option>";
+						data+="<option value='4'>"+"已删除"+"</option>";
+						data+="<option value='9'>"+"已审核"+"</option></select>";
+						$('#key').html(data);
+						
+						}
+						
+					})
+						
+					
+						 
+						            
+					
+					
+				});
+				//根据关键字查找对应工作项
+				function queryFunc(){
+					var itemTopic=null;
+					var projectName=null;
+					var sponsorName=null;
+					var status=null;
+					
+					var value=$("#condition").val();
+					if(value==1){
+						itemTopic=$("#keyword").val();
+					}
+					if(value==2){
+						projectName=$("#keyword").val();
+					}
+					if(value==3){
+						sponsorName=$("#keyword").val();
+					}
+					if(value==4){
+						status=$("#state option:selected").text();
+					}
+					
+					$.ajax({
+							url : '${pageContext.request.contextPath}/workItem/query',
+							type:'post',
+							data: ({
+								itemTopic:itemTopic,
+								projectName:projectName,
+							    sponsorName:sponsorName,
+								status:status
+								
+							}),
+							
+							success : function(result) {  
+								var a="";
+								$("#condition").val("1");
+								$('#key').children('#state').remove();
+								a+="<input type='text'  id='keyword'  maxlength='200' style='width:200px;height:30px;border-style:none;outline:medium;'>";	
+								$('#key').html(a);
+								statement(result.data);
+								var pageCount = result.pageNum;//取到pageCount的值(把返回数据转成object类型)
+					            var currentPage = result.currentPage;// //得到currentPage
+					            var options = {
+					                 bootstrapMajorVersion: 3, //版本
+					                 currentPage: currentPage, //当前页数
+					                 totalPages: pageCount, //总页数
+					                 itemTexts: function (type1, page, current) {
+					                     switch (type1) {
+					                       case "first":
+					                             return page;
+					                         case "prev":
+					                             return 'Previous';
+					                         case "next":
+					                             return 'Next';
+					                        case "last":
+					                             return page;
+					                         case "page":
+					                             return page;
+					                     }
+					                 },
+					                 pageUrl: function(type1, page, current){
+					                	 if (page==current) {
+					                         return "javascript:void(0)";
+					                     }
+					                 },
+					                 onPageClicked: function (event, originalEvent, type1, page) { //异步换页
+					                     $.post("${pageContext.request.contextPath}/workItem/query",{
+					                    	    itemTopic:itemTopic,
+												projectName:projectName,
+											    sponsorName:sponsorName,
+												status:status,
+												currentPage:page},function(d) {
+					                    	 statement(d.data);
+					                    	 start = d.totalCount==0?0:(d.currentPage -1 )*d.pagerSize+1;
+					                         end = d.currentPage*d.pagerSize < d.totalCount ?d.currentPage*d.pagerSize:d.totalCount;
+					                         $("#table_info").empty().append("Showing "+start+" to "+end+" of "+d.totalCount+" entries");
+					                     });
+					                 },
+					            };
+					            var start = result.totalCount == 0?0:(result.currentPage -1 )*result.pagerSize+1;
+					            var end = result.currentPage*result.pagerSize < result.totalCount ?result.currentPage*result.pagerSize:result.totalCount;
+					            $("#table_info").empty().append("Showing "+start+" to "+end+" of "+result.totalCount+" entries");
+					            $('#table_paginate .pagination').bootstrapPaginator(options);	
+							},
+							 failure : function(data) {
+								 layer.open({
+									  title: '操作提醒'
+									  ,content: '查询失败，请重新选择时间！'
+									});
+								
+							},
+							error:function(){
+								layer.open({
+									  title: '操作提醒'
+									  ,content: 'error.responseText'
+									});
+							} 
+					});
+				}	
+				
+				//根据时间查找工作项
+				function queryTime(){
+					var actStartTime=null;
+					var actEndTime=null;
+					var planStartTime=null;
+					var planEndTime=null;
+					
+					var value=$("#Time").val();
+					if(value==1){
+						actStartTime=$("#dateTime").text();
+					}
+					if(value==2){
+						actEndTime=$("#dateTime").text();
+					}
+					if(value==3){
+						planStartTime=$("#dateTime").text();
+					}
+					if(value==4){
+						planEndTime=$("#dateTime").text();
+					}
+				
+					$.ajax({
+							url : '${pageContext.request.contextPath}/workItem/queryTime',
+							type:'post',
+							data: ({
+								actStartTime:actStartTime,
+								actEndTime:actEndTime,
+								planStartTime:planStartTime,
+								planEndTime:planEndTime
+								
+							}),
+							success : function(result) {  
+								statement(result.data);
+								var pageCount = result.pageNum;//取到pageCount的值(把返回数据转成object类型)
+					            var currentPage = result.currentPage;// //得到currentPage
+					            var options = {
+					                 bootstrapMajorVersion: 3, //版本
+					                 currentPage: currentPage, //当前页数
+					                 totalPages: pageCount, //总页数
+					                 itemTexts: function (type1, page, current) {
+					                     switch (type1) {
+					                       case "first":
+					                             return page;
+					                         case "prev":
+					                             return 'Previous';
+					                         case "next":
+					                             return 'Next';
+					                        case "last":
+					                             return page;
+					                         case "page":
+					                             return page;
+					                     }
+					                 },
+					                 pageUrl: function(type1, page, current){
+					                	 if (page==current) {
+					                         return "javascript:void(0)";
+					                     }
+					                 },
+					                 onPageClicked: function (event, originalEvent, type1, page) { //异步换页
+					                     $.post("${pageContext.request.contextPath}/workItem/queryTime",{
+					                    	    actStartTime:actStartTime,
+												actEndTime:actEndTime,
+												planStartTime:planStartTime,
+												planEndTime:planEndTime,
+												currentPage:page},function(d) {
+					                    	 statement(d.data);
+					                    	 start = d.totalCount==0?0:(d.currentPage -1 )*d.pagerSize+1;
+					                         end = d.currentPage*d.pagerSize < d.totalCount ?d.currentPage*d.pagerSize:d.totalCount;
+					                         $("#table_info").empty().append("Showing "+start+" to "+end+" of "+d.totalCount+" entries");
+					                     });
+					                 },
+					            };
+					            var start = result.totalCount == 0?0:(result.currentPage -1 )*result.pagerSize+1;
+					            var end = result.currentPage*result.pagerSize < result.totalCount ?result.currentPage*result.pagerSize:result.totalCount;
+					            $("#table_info").empty().append("Showing "+start+" to "+end+" of "+result.totalCount+" entries");
+					            $('#table_paginate .pagination').bootstrapPaginator(options);	
+							},
+							 failure : function(data) {
+								 layer.open({
+									  title: '操作提醒'
+									  ,content: '查询失败，请重新选择时间！'
+									});
+								
+							},
+							error:function(){
+								 layer.open({
+									  title: '操作提醒'
+									  ,content: 'error.responseText'
+									});
+								
+							} 
+					});
+				}
+				//返回的毫秒数 转成统一格式
+				 function getMyDate(str){  
+			            var oDate = new Date(str),  
+			            oYear = oDate.getFullYear(),  
+			            oMonth = oDate.getMonth()+1,  
+			            oDay = oDate.getDate(),  
+			            /* oHour = oDate.getHours(),  
+			            oMin = oDate.getMinutes(),  
+			            oSen = oDate.getSeconds(),  */ 
+			            oTime = oYear +'-'+ getzf(oMonth) +'-'+ getzf(oDay) ;
+			            return oTime;  
+			        }
+			        //补0操作  
+			        function getzf(num){  
+			            if(parseInt(num) < 10){  
+			                num = '0'+num;  
+			            }  
+			            return num;  
+			        }  	
+				//异步请求后拼接html显示
+		function statement(data){
+				$(".middle-align").empty();
+				var datas="";
+				$(data).each(function(i,item){
+					datas+="<tr>"; 
+					
+					if(item.itemTopic !== null && item.itemTopic !== undefined && item.itemTopic !== ''){
+						datas+="<td align='center' title='"+item.itemTopic+"'>"+item.itemTopic+"</td>";
+					}else{datas+="<td align='center' title=''></td>";
+					}
+					if(item.projectName !== null && item.projectName !== undefined && item.projectName !== ''){
+						datas+="<td align='center' title='"+item.projectName+"'>"+item.projectName+"</td>";
+					}else{datas+="<td align='center' title=''></td>";
+					}
+					if(item.sponsorName !== null && item.sponsorName !== undefined && item.sponsorName !== ''){
+						datas+="<td align='center' title='"+item.sponsorName+"'>"+item.sponsorName+"</td>";
+					}else{datas+="<td align='center' title=''></td>";
+					}
+					if(item.planStartTime>0){
+						var planStart=getMyDate(item.planStartTime);
+						datas+="<td align='center' >"+planStart+"</td>";
+					}else{
+					datas+="<td align='center' ></td>";
+					}
+					 if(item.planEndTime>0){
+						var planEnd=getMyDate(item.planEndTime);
+						datas+="<td align='center' >"+planEnd+"</td>";
+					}else{
+						datas+="<td align='center' ></td>";
+						}
+					if(item.actStartTime>0){
+						var actStart=getMyDate(item.actStartTime);
+						datas+="<td align='center' >"+actStart+"</td>";
+					}else{
+						datas+="<td align='center' ></td>";
+						}
+					if(item.actEndTime>0){
+						var actEnd=getMyDate(item.actEndTime);
+						datas+="<td align='center' >"+actEnd+"</td>";	
+					}else{
+						datas+="<td align='center' ></td>";
+						}
+					if(item.planHours !== null && item.planHours !== undefined && item.planHours !== ''){
+						datas+="<td align='center' title='"+item.planHours+"'>"+item.planHours+"</td>";
+					}else{datas+="<td align='center' title=''></td>";
+					}
+					if(item.actHours !== null && item.actHours !== undefined && item.actHours !== ''){
+						datas+="<td align='center' title='"+item.actHours+"'>"+item.actHours+"</td>";
+					}else{datas+="<td align='center' title=''></td>";
+					}
+					if(item.effectiveHours !== null && item.effectiveHours !== undefined && item.effectiveHours !== ''){
+						datas+="<td align='center' title='"+item.effectiveHours+"'>"+item.effectiveHours+"</td>";
+					}else{datas+="<td align='center' title=''></td>";
+					}
+					if(item.point !== null && item.point !== undefined &&  item.point !== ''){
+						datas+="<td align='center' title='"+item.point+"'><div id='star' data-score = '"+item.point+"'></div></td>";
+					}else{datas+="<td align='center' title=''><div id='star' data-score = ''></div></td>";
+					}
+					if(item.auditorName !== null && item.auditorName !== undefined && item.auditorName !== ''){
+						datas+="<td align='center' title='"+item.auditorName+"'>"+item.auditorName+"</td>";
+					}else{datas+="<td align='center' title=''></td>";
+					}
+					var statuss="";
+					if(item.status==0){
+						statuss="草稿";
+					}
+					if(item.status==1){
+						statuss="待审核";
+					}
+					if(item.status==3){
+						statuss="已退回";
+					}
+					if(item.status==9){
+						statuss="已审核";
+					}
+					if(item.status==4){
+						statuss="已删除";
+					}
+					
+					datas+="<td align='center' title='"+item.status+"'> "+statuss+"</td></tr>";
+	
+				})
+				
+				$(".middle-align").html(datas);	
+			 	$("#table").find("div[id = 'star']").each(function(i,n){
+					$(this).raty({
+						readOnly: true,
+						hints: ['1', '2', '3', '4', '5'],
+						path:"${pageContext.request.contextPath}/assets/images/raty",
+						size:24,
+						click: function (score, evt) {
+							sc = score;
+						},
+						score:function() {
+						    return $(this).attr('data-score');
+						  }
+					});
+				});	
+				
+			} 	 
+			</script>            
+			
+			<!-- Main Footer -->
+			<%@ include file="../frame/footer.jsp" %>
+		</div>
+	</div>
+	<%@ include file="../frame/bottomScript.jsp" %>
+</body>
+</html>

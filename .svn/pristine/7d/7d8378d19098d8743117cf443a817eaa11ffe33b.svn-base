@@ -1,0 +1,42 @@
+package com.bsi.ms.service;
+
+import java.util.List;
+
+import com.bsi.ms.model.ProjectMember;
+
+/*
+ * 项目人员service
+*/
+public interface ProjectMemberService {
+    
+	//获取所有项目成员的id跟name
+    public List<ProjectMember> getAllMember();
+    
+    //通过id获取项目成员的account
+    public String getMemberAccount(String id);
+    
+    //通过id获取项目成员的name
+    public String getMemberName(String id);
+    
+    //根据项目id获取该项目的所有成员
+    public List<ProjectMember> getProjectMemberById(String id);
+    
+    //新增项目成员
+    public int addProjectMember(ProjectMember projectMember);
+    
+    //判断项目成员是否已存在 大于0为已存在
+    public int checkProjectMember(ProjectMember projectMember);
+    
+    //删除项目成员
+    public int deleteProjectMember(ProjectMember projectMember);
+    
+    //变更项目成员的角色
+	public int editProjectMemberRole(ProjectMember projectMember);
+	
+	//查询项目经理是否存在 大于0则存在
+	public int queryProjectManeger(ProjectMember projectMember);
+	
+	//通过项目id获取发起人与评价人
+	public List<ProjectMember> getSponsorOrAuditor(String projectId);
+
+}

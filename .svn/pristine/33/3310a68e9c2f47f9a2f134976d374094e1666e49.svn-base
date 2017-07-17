@@ -1,0 +1,178 @@
+package com.bsi.ms.service.impl;
+
+import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.bsi.ms.mapper.ProjectMemberMapper;
+import com.bsi.ms.model.ProjectMember;
+import com.bsi.ms.service.ProjectMemberService;
+
+/**
+ * @ClassName: ProjectMemberServiceImpl
+ * @Description: 项目成员impl文件
+ * @author chenqim
+ * @date Mar 28, 2017 10:32:42 AM
+ * 
+ */
+@Service
+public class ProjectMemberServiceImpl implements ProjectMemberService {
+
+	@Autowired
+	ProjectMemberMapper projectMemberMapper;
+
+	protected static Logger logger = LogManager.getLogger(ProjectMemberServiceImpl.class);
+	
+	/**
+	 * 获取所有项目成员的id跟name
+	 * 
+	 * @param 
+	 * 
+	 * @return List<ProjectMember>
+	 */
+	@Override
+	public List<ProjectMember> getAllMember() {
+		List<ProjectMember> list = projectMemberMapper.getAllMember();
+		logger.info("result:{}", list);
+		return list;
+	}
+	
+	/**
+	 * 通过id获取项目成员的account
+	 * 
+	 * @param id
+	 * 
+	 * @return String
+	 */
+	@Override
+	public String getMemberAccount(String id) {
+		logger.info("parameter:{}", id);
+		String name = projectMemberMapper.getMemberAccount(id);
+		logger.info("result:{}", name);
+		return name;
+	}
+	
+	/**
+	 * 通过id获取项目成员的name
+	 * 
+	 * @param id
+	 * 
+	 * @return String
+	 */
+	@Override
+	public String getMemberName(String id) {
+		logger.info("parameter:{}", id);
+		String name = projectMemberMapper.getMemberName(id);
+		logger.info("result:{}", name);
+		return name;
+	}
+	
+	/**
+	 * 根据项目id获取该项目的所有成员
+	 * 
+	 * @param id
+	 * 
+	 * @return List<ProjectMember>
+	 */
+	@Override
+	public List<ProjectMember> getProjectMemberById(String id) {
+		logger.info("parameter:{}", id);
+		List<ProjectMember> list = projectMemberMapper.getProjectMemberById(id);
+		logger.info("result:{}", list);
+		return list;
+	}
+	
+	/**
+	 * 新增项目成员
+	 * 
+	 * @param projectMember
+	 * 
+	 * @return int
+	 */
+	@Override
+	public int addProjectMember(ProjectMember projectMember) {
+		logger.info("parameter:{}", projectMember);
+		int i = projectMemberMapper.addProjectMember(projectMember);
+		logger.info("result:{}", i);
+		return i;
+	}
+	
+	/**
+	 * 判断项目成员是否已存在 大于0为已存在
+	 * 
+	 * @param projectMember
+	 * 
+	 * @return int
+	 */
+	@Override
+	public int checkProjectMember(ProjectMember projectMember) {
+		logger.info("parameter:{}", projectMember);
+		int i = projectMemberMapper.checkProjectMember(projectMember);
+		logger.info("result:{}", i);
+		return i;
+	}
+	
+	/**
+	 * 删除项目成员
+	 * 
+	 * @param projectMember
+	 * 
+	 * @return int
+	 */
+	@Override
+	public int deleteProjectMember(ProjectMember projectMember) {
+		logger.info("parameter:{}", projectMember);
+		int i = projectMemberMapper.deleteProjectMember(projectMember);
+		logger.info("result:{}", i);
+		return i;
+	}
+	
+	/**
+	 * 变更项目成员的角色
+	 * 
+	 * @param projectMember
+	 * 
+	 * @return int
+	 */
+	@Override
+	public int editProjectMemberRole(ProjectMember projectMember) {
+		logger.info("parameter:{}", projectMember);
+		int i = projectMemberMapper.editProjectMemberRole(projectMember);
+		logger.info("result:{}", i);
+		return i;
+	}
+	
+	/**
+	 * 查询项目经理是否存在 大于0则存在
+	 * 
+	 * @param projectMember
+	 * 
+	 * @return int
+	 */
+	@Override
+	public int queryProjectManeger(ProjectMember projectMember) {
+		logger.info("parameter:{}", projectMember);
+		int i = projectMemberMapper.queryProjectManager(projectMember);
+		logger.info("result:{}", i);
+		return i;
+	}
+	
+	/**
+	 * 通过项目id获取发起人与评价人
+	 * 
+	 * @param projectId
+	 * 
+	 * @return List<ProjectMember>
+	 */
+	@Override
+	public List<ProjectMember> getSponsorOrAuditor(String projectId) {
+		logger.info("parameter:{}", projectId);
+		List<ProjectMember> list = projectMemberMapper.getSponsorOrAuditor(projectId);
+		logger.info("result:{}", list);
+		return list;
+	}
+
+}

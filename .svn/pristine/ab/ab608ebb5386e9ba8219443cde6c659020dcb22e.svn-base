@@ -1,0 +1,235 @@
+package com.bsi.ms.controller;
+
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.bsi.ms.model.Dept;
+import com.bsi.ms.model.Dict;
+import com.bsi.ms.model.Project;
+import com.bsi.ms.model.User;
+import com.bsi.ms.service.CommonService;
+import com.bsi.ms.service.DictService;
+import com.bsi.ms.service.LdapService;
+import com.bsi.ms.service.ProjectService;
+
+@Controller
+public class ItemsManagement {
+	@Autowired
+	private CommonService commonService;
+	@Autowired
+	private LdapService ldapService;
+	@Autowired
+	private ProjectService projectService;
+	@Autowired
+	private DictService dictService;
+	//跳转新增页面
+	@RequestMapping(value = "/items/newAddItems", method = { RequestMethod.GET,RequestMethod.POST })
+	public String getSeriaNo(HttpServletRequest request,
+			HttpServletResponse response,
+			@RequestParam MultiValueMap<String, String> parameters, Model model){
+		
+		/*String seriaNo=commonService.getSequnce();
+		model.addAttribute("seriaNo", seriaNo);*/
+		return "project/addItems";
+		
+	}
+	//异步加载新增项目中的责任部门
+	@RequestMapping(value = "/items/dept", method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public List<Dept> getDept(HttpServletRequest request,
+			HttpServletResponse response,
+			@RequestParam MultiValueMap<String, String> parameters, Model model){
+		List<Dept> dept=ldapService.findDept("");
+		return dept;
+		
+	}
+	//异步加载项目类型
+	@RequestMapping(value = "/items/projectType", method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public List<Dict> getType(HttpServletRequest request,
+			HttpServletResponse response,
+			@RequestParam MultiValueMap<String, String> parameters, Model model){
+		 int status = 1;   
+		return dictService.getProjectType(status);
+		
+	}
+	//异步加载编辑项目中的项目经理
+	@RequestMapping(value = "items/getMember", method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public List<User> getMember(HttpServletRequest request,
+			HttpServletResponse response){
+		String dept=request.getParameter("dept");
+		List<User> list=ldapService.searchUsersByDept(dept);
+		return list;
+		
+	}
+	//验证新增项目时的项目名称和合同编号
+	@RequestMapping(value = "/items/saveValidate", method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public String newItemsvalidate(HttpServletRequest request,
+			HttpServletResponse response,
+			@RequestParam MultiValueMap<String, String> parameters, Model model){
+		Map<String, String> paramMap = parameters.toSingleValueMap();
+		String projectName=paramMap.get("projectName");
+		String contractNo=paramMap.get("contractNo");
+		String validate =projectService.newItemsValidate(projectName, contractNo);
+		return validate;
+	}
+	//保存新增的项目
+	@RequestMapping(value = "/items/save", method = { RequestMethod.GET,RequestMethod.POST })
+	
+	public String saveItems(HttpServletRequest request,
+			HttpServletResponse response,
+			@RequestParam MultiValueMap<String, String> parameters, Model model){
+		HttpSession session = request.getSession();
+		String inChargeAccount=session.getAttribute("loginUserAccount").toString();//账户
+	    String loginUserName=session.getAttribute("loginUserName").toString();//获取名字
+	    Map<String, String> paramMap = parameters.toSingleValueMap();
+		Project project=new Project();
+		project.setCreator(inChargeAccount);
+		project.setCreatorName(loginUserName);
+		String projectName =paramMap.get("projectName");
+		String contractNo=paramMap.get("contractNo");
+		String type=paramMap.get("projectType");
+		String dateTime=paramMap.get("dateTime");
+		String pmName=paramMap.get("pmName");
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+		String startTimes=dateTime.substring(0, 11);
+		String endTimes=dateTime.substring(13);
+		int projectType =Integer.parseInt(type);
+		String pmAccount=paramMap.get("pmAccount");
+		String respDeptName=paramMap.get("respDeptName");
+		String seriaNo=commonService.getSequnce();
+		Date stratTime;
+		Date endTime;
+		try {
+			endTime = sdf.parse(endTimes);
+			stratTime=sdf.parse(startTimes);
+			project.setStartTime(stratTime);
+			project.setEndTime(endTime);
+			project.setProjectName(projectName);
+			project.setContractNo(contractNo);
+			project.setProjectType(projectType);
+			project.setPmAccount(pmAccount);
+			project.setRespDeptName(respDeptName);
+			project.setSeriaNo(seriaNo);
+			project.setPmName(pmName);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		int retnum =projectService.insertProject(project);
+		
+		if(retnum>0){
+			return "redirect:/project/list";
+		}else{
+			return "redirect:/project/addItems";
+		
+		
+	}
+	
+
+	}
+	//编辑项目信息
+	@RequestMapping(value = "/items/edit", method = { RequestMethod.GET, RequestMethod.POST })
+	public ModelAndView edit(HttpServletRequest request,HttpServletResponse response, Integer id, ModelMap model) {
+		Project record;
+		//获取到需要编辑的项目的信息
+		record = projectService.selectByPrimaryKey(id);
+		//时间转换，转换成固定格式
+		Date sTime=record.getStartTime();
+		Date ETime=record.getEndTime();
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");  
+		String startTime=sdf.format(sTime);
+		startTime+=" -";
+		String EndTime=sdf.format(ETime);
+		//获取到项目的分类
+		int status = 1;   
+		List<Dict> dict= dictService.getProjectType(status);
+		model.addAttribute("startTime",startTime);
+		model.addAttribute("dict",dict);
+		model.addAttribute("endTime", EndTime);
+		model.addAttribute("record", record); 
+		return new ModelAndView("project/edit",model);
+		 
+	}
+	
+	@RequestMapping(value = "/edit/save", method = { RequestMethod.GET, RequestMethod.POST }) 
+	public String save(HttpServletRequest request, @RequestParam MultiValueMap<String, String> parameters, Model model) throws Exception{
+		
+		 
+		// 获取表单数据
+		
+	    Map<String, String> paramMap = parameters.toSingleValueMap();
+		Project project=new Project();
+		String projectName =paramMap.get("projectName");
+		String contractNo=paramMap.get("contractNo");
+		String type=paramMap.get("projectType");
+		String dateTime=paramMap.get("dateTime");
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+		String startTimes=dateTime.substring(0, 11);
+		String endTimes=dateTime.substring(13);
+		int projectType =Integer.parseInt(type);
+		String pmName=paramMap.get("pmName");
+		String pmAccount=paramMap.get("pmAccount");
+		String respDeptName=paramMap.get("respDeptName");
+		String seriaNo=commonService.getSequnce();
+		Date stratTime;
+		Date endTime;
+		try {
+			endTime = sdf.parse(endTimes);
+			stratTime=sdf.parse(startTimes);
+			project.setStartTime(stratTime);
+			project.setEndTime(endTime);
+			project.setProjectName(projectName);
+			project.setContractNo(contractNo);
+			project.setProjectType(projectType);
+			project.setPmName(pmName);
+			project.setRespDeptName(respDeptName);
+			project.setSeriaNo(seriaNo);
+			Date date=new Date();
+			project.setLastupdateTime(date);
+			project.setPmAccount(pmAccount);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		int i = -1;
+		//拿到要修改的项目id
+		int id = Integer.parseInt(paramMap.get("id"));  
+		project.setId(id); 
+		i = projectService.updateProject(project);
+		
+		
+		String msg = "";
+		if(i>0)
+		{
+			return "redirect:/project/list";
+		}
+		else
+		{
+			return "redirect:/milestone/list";
+		} 
+
+	}
+}

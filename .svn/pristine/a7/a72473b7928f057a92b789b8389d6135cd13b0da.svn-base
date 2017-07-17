@@ -1,0 +1,33 @@
+package com.bsi.ms.service;
+
+import java.util.Date;
+import java.util.List;
+
+import com.bsi.ms.model.ProjectMember;
+
+/*
+ * 项目人员service
+*/
+public interface ProjectMemberService {
+    
+    public List<ProjectMember> getAllMember();
+    
+    public String getMemberAccount(String id);
+    
+    public String getMemberName(String id);
+    
+    public List<ProjectMember> getProjectMemberById(String id);
+    
+    public int addProjectMember(ProjectMember projectMember);
+
+    public int checkProjectMember(ProjectMember projectMember);
+
+    public int deleteProjectMember(ProjectMember projectMember);
+
+	public int editProjectMemberRole(ProjectMember projectMember);
+
+	public int queryProjectManeger(ProjectMember projectMember);
+
+	public List<ProjectMember> getSponsorOrAuditor(String projectId);
+
+}

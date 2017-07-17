@@ -1,0 +1,244 @@
+package com.bsi.ms.controller;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+import com.bsi.ms.model.Dept;
+import com.bsi.ms.model.Dict;
+import com.bsi.ms.model.Project;
+import com.bsi.ms.model.ProjectMember;
+import com.bsi.ms.model.User;
+import com.bsi.ms.service.CommonService;
+import com.bsi.ms.service.DictService;
+import com.bsi.ms.service.LdapService;
+import com.bsi.ms.service.ProjectMemberService;
+import com.bsi.ms.service.ProjectService;
+
+@Controller
+public class ItemsManagement {
+	
+	protected static Logger logger = LogManager.getLogger(ItemsManagement.class);
+	
+	@Autowired
+	private CommonService commonService;
+	@Autowired
+	private LdapService ldapService;
+	@Autowired
+	private ProjectService projectService;
+	@Autowired
+	private DictService dictService;
+	@Autowired
+	private ProjectMemberService projectMemberService;
+
+	// 跳转新增页面
+	@RequestMapping(value = "/items/newAddItems", method = { RequestMethod.GET, RequestMethod.POST })
+	public ModelAndView getSeriaNo(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam MultiValueMap<String, String> parameters ,ModelMap model) {
+		List<User> listUser=ldapService.searchUsersByDept("");
+		model.addAttribute("listUser",listUser);
+		return  new ModelAndView("project/addItems", model);
+		
+	}
+
+	// 异步加载新增项目中的责任部门
+	@RequestMapping(value = "/items/dept", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public List<Dept> getDept(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam MultiValueMap<String, String> parameters) {
+		List<Dept> dept = ldapService.findDept("");
+		return dept;
+	}
+
+	// 异步加载项目类型
+	@RequestMapping(value = "/items/projectType", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public List<Dict> getType(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam MultiValueMap<String, String> parameters, Model model) {
+		int status = 1;
+		return dictService.getProjectType(status);
+	}
+
+	// 异步加载编辑项目中的项目经理
+	@RequestMapping(value = "items/getMember", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public List<User> getMember(HttpServletRequest request, HttpServletResponse response) {
+		String dept = request.getParameter("dept");
+		List<User> list = ldapService.searchUsersByDept(dept);
+		return list;
+	}
+
+	// 验证新增项目时的项目名称和合同编号
+	@RequestMapping(value = "/items/saveValidate", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public String newItemsvalidate(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam MultiValueMap<String, String> parameters) {
+		Map<String, String> paramMap = parameters.toSingleValueMap();
+		String projectName = paramMap.get("projectName");
+		String contractNo = paramMap.get("contractNo");
+		String validate = projectService.newItemsValidate(projectName, contractNo);
+		logger.info("新增验证结果：",validate );
+		return validate;
+	}
+
+	// 保存新增的项目
+	@RequestMapping(value = "/items/save", method = { RequestMethod.GET, RequestMethod.POST })
+	public String saveItems(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam MultiValueMap<String, String> parameters) {
+		logger.info("新增项目parameter:{}",parameters );
+		User loginUser  = (User) request.getSession().getAttribute("loginUser");
+		String inChargeAccount = loginUser.getAccount();// 账户
+		String loginUserName = loginUser.getName();// 获取名字
+		Map<String, String> paramMap = parameters.toSingleValueMap();
+		Project project = new Project();
+		project.setCreator(inChargeAccount);
+		project.setCreatorName(loginUserName);
+		String projectName = paramMap.get("projectName");
+		String contractNo = paramMap.get("contractNo");
+		String type = paramMap.get("projectType");
+		String salesName=paramMap.get("salesName");
+		String salesAccount=paramMap.get("salesAccount");
+		Integer plannedHrCost = Integer.parseInt(paramMap.get("plannedHrCost"));
+		String dateTime = paramMap.get("dateTime");
+		String pmName = paramMap.get("pmName");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		String startTimes = dateTime.substring(0, 11);
+		String endTimes = dateTime.substring(13);
+		int projectType = Integer.parseInt(type);
+		String pmAccount = paramMap.get("pmAccount");
+		String respDeptName = paramMap.get("respDeptName");
+		String seriaNo = commonService.getSequnce();
+		Date stratTime;
+		Date endTime;
+		try {
+			endTime = sdf.parse(endTimes);
+			stratTime = sdf.parse(startTimes);
+			project.setStartTime(stratTime);
+			project.setEndTime(endTime);
+			project.setProjectName(projectName);
+			project.setContractNo(contractNo);
+			project.setProjectType(projectType);
+			project.setPmAccount(pmAccount);
+			project.setRespDeptName(respDeptName);
+			project.setSeriaNo(seriaNo);
+			project.setPmName(pmName);
+			project.setPlannedHrCost(plannedHrCost);
+			project.setPigeonhole(0);
+			project.setSalesName(salesName);
+			project.setSalesAccount(salesAccount);
+		} catch (ParseException e) {
+			logger.error("新增项目时间格式转换错误"+e);
+		}
+		int retnum = projectService.insertProject(project);
+		if (retnum > 0) {
+			ProjectMember projectMember = projectService.getIdBySeriaNo(seriaNo);
+			projectMember.setRole("1");
+			projectMemberService.addProjectMember(projectMember);
+			
+			return "redirect:/project/list";
+		} else {
+			return "redirect:/project/addItems";
+		}
+	}
+
+	// 编辑项目信息
+	@RequestMapping(value = "/items/edit", method = { RequestMethod.GET, RequestMethod.POST })
+	public ModelAndView edit(HttpServletRequest request, HttpServletResponse response, Integer id, ModelMap model) {
+		// 获取到需要编辑的项目的信息
+		Project record = projectService.selectByPrimaryKey(id);
+		// 时间转换，转换成固定格式
+		Date sTime = record.getStartTime();
+		Date ETime = record.getEndTime();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		String startTime = sdf.format(sTime);
+		startTime += " -";
+		String EndTime = sdf.format(ETime);
+		// 获取到项目的分类
+		int status = 1;
+		List<Dict> dict = dictService.getProjectType(status);
+		logger.info("需要编辑的项目参数:{}", record);
+		model.addAttribute("startTime", startTime);
+		model.addAttribute("dict", dict);
+		model.addAttribute("endTime", EndTime);
+		model.addAttribute("record", record);
+		//拿到所有人（当值销售）
+		List<User> listUser=ldapService.searchUsersByDept("");
+		model.addAttribute("listUser",listUser);
+		return new ModelAndView("project/edit", model);
+	}
+
+	@RequestMapping(value = "/edit/save", method = { RequestMethod.GET, RequestMethod.POST })
+	public String save(HttpServletRequest request, @RequestParam MultiValueMap<String, String> parameters)
+			throws Exception {
+		logger.info("新增项目parameter:{}",parameters );
+		// 获取表单数据
+	    Map<String, String> paramMap = parameters.toSingleValueMap();
+		Project project=new Project();
+		String projectName =paramMap.get("projectName");
+		String contractNo=paramMap.get("contractNo");
+		String type=paramMap.get("projectType");
+		Integer plannedHrCost = Integer.parseInt(paramMap.get("plannedHrCost"));
+		String dateTime=paramMap.get("dateTime");
+		String pigeonhole= paramMap.get("pigeonhole");
+		String salesName=paramMap.get("salesName");
+		String salesAccount=paramMap.get("salesAccount");
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+		String startTimes=dateTime.substring(0, 11);
+		String endTimes=dateTime.substring(13);
+		int projectType =Integer.parseInt(type);
+		String pmName=paramMap.get("pmName");
+		String pmAccount=paramMap.get("pmAccount");
+		String respDeptName=paramMap.get("respDeptName");
+		String seriaNo=paramMap.get("seriaNo");
+		Date stratTime;
+		Date endTime;
+		try {
+			endTime = sdf.parse(endTimes);
+			stratTime = sdf.parse(startTimes);
+			project.setStartTime(stratTime);
+			project.setEndTime(endTime);
+			project.setProjectName(projectName);
+			project.setContractNo(contractNo);
+			project.setProjectType(projectType);
+			project.setPmName(pmName);
+			project.setRespDeptName(respDeptName);
+			project.setSeriaNo(seriaNo);
+			Date date = new Date();
+			project.setLastupdateTime(date);
+			project.setPmAccount(pmAccount);
+			project.setPlannedHrCost(plannedHrCost);
+			project.setPigeonhole(Integer.parseInt(pigeonhole));
+			project.setSalesName(salesName);
+			project.setSalesAccount(salesAccount);
+			
+		} catch (ParseException e) {
+			logger.error("编辑项目时间格式转换错误"+e);
+			
+		}
+		// 拿到要修改的项目id
+		int id = Integer.parseInt(paramMap.get("id"));
+		project.setId(id);
+		int i = projectService.updateProject(project);
+		if (i > 0) {
+			return "redirect:/project/list";
+		} else {
+			return "redirect:/milestone/list";
+		}
+	}
+}

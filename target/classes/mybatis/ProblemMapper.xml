@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsi.ms.mapper.ProblemMapper" >
+  <resultMap id="BaseResultMap" type="com.bsi.ms.model.Problem" >
+    <id column="problem_id" property="problemId" jdbcType="INTEGER" />
+    <result column="problem_type" property="problemType" jdbcType="INTEGER" />
+    <result column="course_name" property="courseName" jdbcType="VARCHAR" />
+    <result column="key_A" property="keyA" jdbcType="VARCHAR" />
+    <result column="key_B" property="keyB" jdbcType="VARCHAR" />
+    <result column="key_C" property="keyC" jdbcType="VARCHAR" />
+    <result column="key_D" property="keyD" jdbcType="VARCHAR" />
+    <result column="difficulty" property="difficulty" jdbcType="INTEGER" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.bsi.ms.model.ProblemWithBLOBs" extends="BaseResultMap" >
+    <result column="problem_title" property="problemTitle" jdbcType="LONGVARCHAR" />
+    <result column="solution" property="solution" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <resultMap id="ResultMapCourse" type="com.bsi.ms.model.Course">
+    <result column="course_name" property="courseName" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    problem_id, problem_type, course_name, key_A, key_B, key_C, key_D,difficulty
+  </sql>
+  <sql id="Blob_Column_List" >
+    problem_title, solution
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from problem
+    where problem_id = #{problemId,jdbcType=INTEGER}
+  </select>
+  <select id="selectByAll" resultMap="ResultMapWithBLOBs" parameterType="java.util.Map">
+  select
+  <include refid="Base_Column_List" />
+    ,
+   <include refid="Blob_Column_List" />
+    from problem
+    where true 
+   <if test="problemTitle != null and problemTitle !=''" >
+      and  problem_title like '%${problemTitle}%' 
+   </if>
+   <if test="problemType != null and problemType !=''" >
+      and  problem_type = #{problemType,jdbcType=INTEGER}
+   </if>
+   <if test="courseName != null and courseName != ''" >
+      and  course_name = #{courseName,jdbcType=VARCHAR}
+      </if>
+  </select>
+  
+  <select id="selectByAllCourse" resultMap="ResultMapCourse">
+  select course_name
+  from course
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from problem
+    where problem_id = #{problemId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.bsi.ms.model.ProblemWithBLOBs" >
+    insert into problem (problem_id, problem_type, course_name, 
+      key_A, key_B, key_C, key_D, 
+      problem_title, solution,difficulty)
+    values (#{problemId,jdbcType=INTEGER}, #{problemType,jdbcType=INTEGER}, #{courseName,jdbcType=VARCHAR}, 
+      #{keyA,jdbcType=VARCHAR}, #{keyB,jdbcType=VARCHAR}, #{keyC,jdbcType=VARCHAR}, #{keyD,jdbcType=VARCHAR}, 
+      #{problemTitle,jdbcType=LONGVARCHAR}, #{solution,jdbcType=LONGVARCHAR}),#{difficulty,jdbcType=INTEGER}
+  </insert>
+  <insert id="insertSelective" parameterType="com.bsi.ms.model.ProblemWithBLOBs" >
+    insert into problem
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="problemId != null" >
+        problem_id,
+      </if>
+      <if test="problemType != null" >
+        problem_type,
+      </if>
+      <if test="courseName != null" >
+        course_name,
+      </if>
+      <if test="keyA != null" >
+        key_A,
+      </if>
+      <if test="keyB != null" >
+        key_B,
+      </if>
+      <if test="keyC != null" >
+        key_C,
+      </if>
+      <if test="keyD != null" >
+        key_D,
+      </if>
+      <if test="problemTitle != null" >
+        problem_title,
+      </if>
+      <if test="solution != null" >
+        solution,
+      </if>
+       <if test="difficulty != null" >
+        difficulty,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="problemId != null" >
+        #{problemId,jdbcType=INTEGER},
+      </if>
+      <if test="problemType != null" >
+        #{problemType,jdbcType=INTEGER},
+      </if>
+      <if test="courseName != null" >
+        #{courseName,jdbcType=VARCHAR},
+      </if>
+      <if test="keyA != null" >
+        #{keyA,jdbcType=VARCHAR},
+      </if>
+      <if test="keyB != null" >
+        #{keyB,jdbcType=VARCHAR},
+      </if>
+      <if test="keyC != null" >
+        #{keyC,jdbcType=VARCHAR},
+      </if>
+      <if test="keyD != null" >
+        #{keyD,jdbcType=VARCHAR},
+      </if>
+      <if test="problemTitle != null" >
+        #{problemTitle,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="solution != null" >
+        #{solution,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="difficulty != null" >
+        #{difficulty,jdbcType=INTEGER}
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.bsi.ms.model.ProblemWithBLOBs" >
+    update problem
+    <set >
+      <if test="problemType != null" >
+        problem_type = #{problemType,jdbcType=INTEGER},
+      </if>
+      <if test="courseName != null" >
+        course_name = #{courseName,jdbcType=VARCHAR},
+      </if>
+      <if test="keyA != null" >
+        key_A = #{keyA,jdbcType=VARCHAR},
+      </if>
+      <if test="keyB != null" >
+        key_B = #{keyB,jdbcType=VARCHAR},
+      </if>
+      <if test="keyC != null" >
+        key_C = #{keyC,jdbcType=VARCHAR},
+      </if>
+      <if test="keyD != null" >
+        key_D = #{keyD,jdbcType=VARCHAR},
+      </if>
+      <if test="problemTitle != null" >
+        problem_title = #{problemTitle,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="solution != null" >
+        solution = #{solution,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="difficulty != null" >
+        difficulty = #{difficulty,jdbcType=INTEGER}
+      </if>
+    </set>
+    where problem_id = #{problemId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.bsi.ms.model.ProblemWithBLOBs" >
+    update problem
+    set problem_type = #{problemType,jdbcType=INTEGER},
+      course_name = #{courseName,jdbcType=VARCHAR},
+      key_A = #{keyA,jdbcType=VARCHAR},
+      key_B = #{keyB,jdbcType=VARCHAR},
+      key_C = #{keyC,jdbcType=VARCHAR},
+      key_D = #{keyD,jdbcType=VARCHAR},
+      problem_title = #{problemTitle,jdbcType=LONGVARCHAR},
+      solution = #{solution,jdbcType=LONGVARCHAR},
+      difficulty=  #{difficulty,jdbcType=INTEGER}
+    where problem_id = #{problemId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.bsi.ms.model.Problem" >
+    update problem
+    set problem_type = #{problemType,jdbcType=INTEGER},
+      course_name = #{courseName,jdbcType=VARCHAR},
+      key_A = #{keyA,jdbcType=VARCHAR},
+      key_B = #{keyB,jdbcType=VARCHAR},
+      key_C = #{keyC,jdbcType=VARCHAR},
+      key_D = #{keyD,jdbcType=VARCHAR},
+      difficulty=  #{difficulty,jdbcType=INTEGER}
+    where problem_id = #{problemId,jdbcType=INTEGER}
+  </update>
+</mapper>

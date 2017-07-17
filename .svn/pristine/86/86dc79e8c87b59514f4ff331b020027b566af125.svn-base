@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsi.ms.mapper.ProjectMemberMapper" >
+  <resultMap id="BaseResultMap" type="com.bsi.ms.model.ProjectMember" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="project_id" property="projectId" jdbcType="INTEGER" />
+    <result column="member_account" property="memberAccount" jdbcType="VARCHAR" />
+    <result column="member_name" property="memberName" jdbcType="VARCHAR" />
+    <result column="role" property="role" jdbcType="CHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="relese_time" property="releseTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, project_id, member_account, member_name, role, create_time, status, relese_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from project_member
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from project_member
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.bsi.ms.model.ProjectMember" >
+    insert into project_member (id, project_id, member_account, 
+      member_name, role, create_time, 
+      status, relese_time)
+    values (#{id,jdbcType=INTEGER}, #{projectId,jdbcType=INTEGER}, #{memberAccount,jdbcType=VARCHAR}, 
+      #{memberName,jdbcType=VARCHAR}, #{role,jdbcType=CHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{status,jdbcType=INTEGER}, #{releseTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.bsi.ms.model.ProjectMember" >
+    insert into project_member
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="projectId != null" >
+        project_id,
+      </if>
+      <if test="memberAccount != null" >
+        member_account,
+      </if>
+      <if test="memberName != null" >
+        member_name,
+      </if>
+      <if test="role != null" >
+        role,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="releseTime != null" >
+        relese_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="projectId != null" >
+        #{projectId,jdbcType=INTEGER},
+      </if>
+      <if test="memberAccount != null" >
+        #{memberAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="memberName != null" >
+        #{memberName,jdbcType=VARCHAR},
+      </if>
+      <if test="role != null" >
+        #{role,jdbcType=CHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="releseTime != null" >
+        #{releseTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.bsi.ms.model.ProjectMember" >
+    update project_member
+    <set >
+      <if test="projectId != null" >
+        project_id = #{projectId,jdbcType=INTEGER},
+      </if>
+      <if test="memberAccount != null" >
+        member_account = #{memberAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="memberName != null" >
+        member_name = #{memberName,jdbcType=VARCHAR},
+      </if>
+      <if test="role != null" >
+        role = #{role,jdbcType=CHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="releseTime != null" >
+        relese_time = #{releseTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.bsi.ms.model.ProjectMember" >
+    update project_member
+    set project_id = #{projectId,jdbcType=INTEGER},
+      member_account = #{memberAccount,jdbcType=VARCHAR},
+      member_name = #{memberName,jdbcType=VARCHAR},
+      role = #{role,jdbcType=CHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      status = #{status,jdbcType=INTEGER},
+      relese_time = #{releseTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="getAllMember" resultMap="BaseResultMap">
+      select id,member_name from project_member
+  </select>
+  
+  <select id="getMemberAccount" parameterType="String" resultType="String">
+  	  select member_account from project_member where id = #{id}
+  </select>
+  
+  <select id="getMemberName" parameterType="String" resultType="String">
+  	  select member_name from project_member where id = #{id}
+  </select>
+  
+  <select id="getProjectMemberById" parameterType="String" resultMap="BaseResultMap">
+  	  select id, member_name, member_account, role from project_member where project_id = #{id} and status = 1
+  </select>
+  
+  <insert id="addProjectMember" parameterType="com.bsi.ms.model.ProjectMember">
+      insert into project_member (project_id, member_account, member_name, status) values (#{projectId}, #{memberAccount}, #{memberName}, 1)
+  </insert>
+  
+  <select id="checkProjectMember" parameterType="com.bsi.ms.model.ProjectMember" resultType="Integer">
+  	  select count(*) from project_member where project_id = #{projectId} and member_account = #{memberAccount} and member_name = #{memberName} and status = 1
+  </select>
+  
+  <update id="deleteProjectMember" parameterType="com.bsi.ms.model.ProjectMember">
+  	  update project_member set status = 0, relese_time = #{releseTime} where id = #{id}
+  </update>
+  
+  <update id="editProjectMemberRole" parameterType="com.bsi.ms.model.ProjectMember">
+  	  update project_member set role = #{role} where id = #{id}
+  </update>
+  
+  <select id="queryProjectManager" parameterType="com.bsi.ms.model.ProjectMember" resultType="Integer">
+  	  select count(*) from project_member where project_id = #{projectId} and role = 1 and status = 1
+  </select>
+  
+  <select id="getSponsorOrAuditor" parameterType="String" resultMap="BaseResultMap">
+  	  select id, member_name from project_member where project_id = #{projectId} and (role = 1 or role = 2 or role = 3) and status = 1
+  </select>
+  
+</mapper>

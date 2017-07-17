@@ -1,0 +1,53 @@
+package com.bsi.ms.model;
+
+import java.io.Serializable;
+
+public class User implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	private String name;
+	private String account;
+	private String password;
+	private String distinguishedName;
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getAccount() {
+		return account;
+	}
+
+	public void setAccount(String account) {
+		this.account = account;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public String getDistinguishedName() {
+		return distinguishedName;
+	}
+
+	public void setDistinguishedName(String distinguishedName) {
+		this.distinguishedName = distinguishedName;
+	}
+
+	@Override
+	public String toString() {
+		return "User [name=" + name + ", account=" + account + ", password=" + password + ", distinguishedName="
+				+ distinguishedName + "]";
+	}
+}

@@ -1,0 +1,84 @@
+package com.bsi.ms.service.impl;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.PostConstruct;
+import javax.cache.Cache;
+import javax.cache.CacheManager;
+import javax.cache.Caching;
+import javax.cache.configuration.MutableConfiguration;
+import javax.cache.expiry.Duration;
+import javax.cache.expiry.ModifiedExpiryPolicy;
+import javax.cache.spi.CachingProvider;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.session.SqlSession;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.bsi.ms.service.CommonService;
+
+@Service
+@Transactional
+public class CommonServiceImpl implements CommonService {
+	@Autowired
+	private SqlSession session;
+
+	private CachingProvider cachingProvider = Caching.getCachingProvider();
+	private CacheManager cacheManager = cachingProvider.getCacheManager();
+	private MutableConfiguration<String, List<String>> onDayListConfig = new MutableConfiguration<String, List<String>>()
+			.setExpiryPolicyFactory(ModifiedExpiryPolicy.factoryOf(Duration.FIVE_MINUTES)).setStatisticsEnabled(true);
+	// 按部门缓存成员
+	private static Cache<String, List<String>> qaMembersCache;
+
+	@PostConstruct
+	public void defaultInitial() {
+		qaMembersCache = cacheManager.createCache("qaMembersCache", onDayListConfig);
+	}
+
+	@Override
+	public String getSequnce() {
+		String key = new SimpleDateFormat("yyyyMM").format(Calendar.getInstance().getTime());
+		int seq = 1;
+		String value = session.selectOne("CommonMapper.getSeq", key);
+		if (null != value) {
+			seq = Integer.parseInt(value);
+			seq++;
+		}
+		resetSequnce(key, seq);
+		String serialNo = key + "N" + String.format("%03d", seq);
+		return serialNo;
+	}
+
+	private void resetSequnce(String key, int value) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("key", key);
+		map.put("value", value);
+		session.insert("CommonMapper.insert", map);
+	}
+
+	@Override
+	public List<String> getQAMembers() {
+		List<String> lists = qaMembersCache.get("QA");
+		if (null == lists || lists.isEmpty()) {
+			String members = session.selectOne("CommonMapper.getQAMembers");
+			if (StringUtils.isNotBlank(members)) {
+				String[] array = members.split(",");
+				lists = new ArrayList<String>();
+				for (String account : array) {
+					lists.add(account);
+				}
+				qaMembersCache.put("QA", lists);
+			} else {
+				lists = new ArrayList<String>();
+			}
+		}
+		return lists;
+	}
+}

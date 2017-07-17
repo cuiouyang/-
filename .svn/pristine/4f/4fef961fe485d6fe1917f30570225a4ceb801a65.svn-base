@@ -1,0 +1,29 @@
+package com.bsi.ms.service;
+
+import java.util.List;
+import java.util.Map;
+
+import com.bsi.ms.model.ProjectMilestone;
+
+/*
+ 里程碑service
+*/
+public interface MilestoneService {
+	public List<ProjectMilestone> getList(Map<String, Object> map);
+
+	// 获取里程碑第一级的名字
+	public List<ProjectMilestone> getMilestoneNameOne(String id);
+
+	// 获取里程碑二三四级的名字
+	public List<ProjectMilestone> getMilestoneName(String id);
+
+	public ProjectMilestone selectByPrimaryKey(Integer id);
+
+	public int update(ProjectMilestone record);
+
+	public int insert(ProjectMilestone record);
+
+	public int delete(Integer id);
+
+	public int hasChild(Integer id);
+}

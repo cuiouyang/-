@@ -1,0 +1,167 @@
+package com.bsi.ms.service.impl;
+
+import java.util.Iterator;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+import javax.cache.Cache;
+import javax.cache.CacheManager;
+import javax.cache.Caching;
+import javax.cache.configuration.MutableConfiguration;
+import javax.cache.expiry.Duration;
+import javax.cache.expiry.ModifiedExpiryPolicy;
+import javax.cache.spi.CachingProvider;
+import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ldap.core.AttributesMapper;
+import org.springframework.ldap.core.ContextMapper;
+import org.springframework.ldap.core.DirContextOperations;
+import org.springframework.ldap.core.LdapTemplate;
+import org.springframework.ldap.core.support.AbstractContextMapper;
+import org.springframework.ldap.filter.AndFilter;
+import org.springframework.ldap.filter.EqualsFilter;
+import org.springframework.stereotype.Service;
+
+import com.bsi.ms.model.Dept;
+import com.bsi.ms.model.User;
+import com.bsi.ms.service.LdapService;
+
+@Service
+public class LdapServiceImpl implements LdapService {
+	@Autowired
+	private LdapTemplate ldapTemplate;
+	private final static String BASE_RDN = "OU=光谷信息,OU=组织结构";
+	// resolve a cache manager
+	private CachingProvider cachingProvider = Caching.getCachingProvider();
+	private CacheManager cacheManager = cachingProvider.getCacheManager();
+	private MutableConfiguration<String, List<User>> thirtyMinutesListConfig = new MutableConfiguration<String, List<User>>()
+			.setExpiryPolicyFactory(ModifiedExpiryPolicy.factoryOf(Duration.THIRTY_MINUTES)).setStatisticsEnabled(true);
+
+	// 按部门缓存成员
+	private static Cache<String, List<User>> userInfoCache;
+
+	@PostConstruct
+	public void defaultInitial() {
+		userInfoCache = cacheManager.createCache("deptMembersCache", thirtyMinutesListConfig);
+	}
+
+	@Override
+	public List<Dept> findDept(String dept) {
+		AndFilter filter = new AndFilter();
+		filter.and(new EqualsFilter("objectclass", "organizationalUnit"));
+		String path = BASE_RDN;
+		if (StringUtils.isNotBlank(dept)) {
+			path = "OU=" + dept + "," + BASE_RDN;
+		}
+		final String rdn = path;
+		filter.and(new EqualsFilter("objectclass", "organizationalUnit"));
+		List<Dept> list = this.ldapTemplate.search(rdn, filter.toString(), new AttributesMapper<Dept>() {
+			public Dept mapFromAttributes(Attributes attributes) throws NamingException {
+				if (attributes != null) {
+					Attribute idAttr = attributes.get("distinguishedName");
+					Attribute nameAttr = attributes.get("name");
+					if (idAttr != null && nameAttr != null) {
+						Dept dept = new Dept();
+						String distinguishedName = (String) idAttr.get();
+						String name = (String) nameAttr.get();
+						String tmp = "OU=" + name + "," + rdn + ",DC=51bsi,DC=com";
+						if (tmp.equals(distinguishedName)) {
+							dept.setName(name);
+							dept.setDistinguishedName(distinguishedName);
+						}
+						return dept;
+					}
+				}
+				return null;
+			}
+		});
+		for (Iterator<Dept> it = list.iterator(); it.hasNext();) {
+			if (StringUtils.isBlank(((Dept) it.next()).getName())) {
+				it.remove();
+			}
+		}
+		return list;
+	}
+
+	private static class PersonContextMapper extends AbstractContextMapper<User> {
+		public User doMapFromContext(DirContextOperations context) {
+			User user = new User();
+			user.setName(context.getStringAttribute("name"));
+			user.setAccount(context.getStringAttribute("userPrincipalName"));
+			user.setDistinguishedName(context.getStringAttribute("distinguishedName"));
+			return user;
+		}
+	}
+
+	protected ContextMapper<User> getContextMapper() {
+		return new PersonContextMapper();
+	}
+
+	@Override
+	public User findUserByName(String name) {
+		AndFilter filter = new AndFilter();
+		filter.and(new EqualsFilter("objectclass", "person")).and(new EqualsFilter("name", name));
+		List<User> lists = ldapTemplate.search(BASE_RDN, filter.toString(), getContextMapper());
+		return lists.isEmpty() ? null : lists.get(0);
+	}
+
+	@Override
+	public User findUserByAccount(String account) {
+		AndFilter filter = new AndFilter();
+		filter.and(new EqualsFilter("objectclass", "person")).and(new EqualsFilter("userPrincipalName", account));
+		List<User> lists = ldapTemplate.search(BASE_RDN, filter.toString(), getContextMapper());
+		return lists.isEmpty() ? null : lists.get(0);
+	}
+
+	@Override
+	public List<User> searchUsersByDept(String dept) {
+		List<User> list = userInfoCache.get(dept);
+		if (!(null == list || list.isEmpty())) {
+			return list;
+		}
+		AndFilter filter = new AndFilter();
+		filter.and(new EqualsFilter("objectclass", "person"));
+		String path = BASE_RDN;
+		if (StringUtils.isNotBlank(dept) && !"root".equals(dept)) {
+			path = "OU=" + dept + "," + BASE_RDN;
+		}
+		final String rdn = path;
+		list = this.ldapTemplate.search(rdn, filter.toString(), new AttributesMapper<User>() {
+			public User mapFromAttributes(Attributes attributes) throws NamingException {
+				User user = new User();
+				if (attributes != null) {
+					Attribute idAttr = attributes.get("userPrincipalName");
+					if (idAttr != null) {
+						user.setAccount((String) idAttr.get());
+					}
+					Attribute nameAttr = attributes.get("name");
+					if (nameAttr != null) {
+						user.setName((String) nameAttr.get());
+					}
+					Attribute dsnAttr = attributes.get("distinguishedName");
+					if (idAttr != null) {
+						user.setDistinguishedName((String) dsnAttr.get());
+					}
+				}
+				return user;
+			}
+		});
+		if (!(null == list || list.isEmpty())) {
+			userInfoCache.put(dept, list);
+		}
+		return list;
+	}
+
+	@Override
+	public boolean authenticate(String account, String password) {
+		AndFilter filter = new AndFilter();
+		filter.and(new EqualsFilter("objectclass", "person"));
+		filter.and(new EqualsFilter("userPrincipalName", account));
+		return this.ldapTemplate.authenticate(BASE_RDN, filter.toString(), password);
+	}
+
+}

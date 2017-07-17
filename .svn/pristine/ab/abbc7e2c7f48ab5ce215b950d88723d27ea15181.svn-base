@@ -1,0 +1,23 @@
+package com.bsi.ms.service;
+
+
+
+import java.util.List;
+import java.util.Map;
+
+import com.bsi.ms.model.WorkItem;
+
+
+public interface MyItemsService {
+	public abstract List<WorkItem>  getMyWorkList( WorkItem parameters);
+	public abstract List<WorkItem>  getMyWorkByStatus( Integer status);
+	public abstract List<WorkItem>  getMyWorkByActStart(Map<String,Object> map);
+	public abstract List<WorkItem>  getMyWorkByActEnd(Map<String,Object> map);
+	public abstract List<WorkItem>  getMyWorkByPlanStart(Map<String,Object> map);
+	public abstract List<WorkItem>  getMyWorkByPlanEnd(Map<String,Object> map);
+	
+	
+	
+		
+	
+}

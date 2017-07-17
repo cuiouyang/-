@@ -1,0 +1,82 @@
+package com.bsi.ms.service;
+
+import java.util.List;
+import java.util.Map;
+
+import com.bsi.ms.model.Project;
+import com.bsi.ms.model.ProjectMilestone;
+import com.bsi.ms.model.User;
+
+public interface ProjectService {
+
+	/**
+	 * 根据搜索框输入内容查询数据
+	 * 
+	 * @param record 
+	 * 
+	 * @return
+	 */
+	public  List<Project> queryByTerm(Project record);
+	
+	/**
+     * 获取项目id和名称
+     * 
+     * @param 
+     * 
+     * @return List<Project>
+     */ 
+	public List<Project> getProjectName();
+	
+	/**
+	 * 根据项目开始时间查询数据
+	 * 
+	 * @param map 
+	 * 
+	 * @return
+	 */	
+	public List<Project> queryByStTime(Map<String,Object> map);
+	
+	/**
+	 * 根据项目计划结束时间查询数据
+	 * 
+	 * @param map 
+	 * 
+	 * @return
+	 */	
+	public List<Project> queryByEndTime(Map<String,Object> map);
+	
+	/**
+	 * 查询项目开始时间和结束时间
+	 * 
+	 * @return
+	 */	
+	public List<Project> selectTime();
+	
+	public abstract Project getItemDetailsById(int id);
+	/**
+	 * 根据项目id 查询项目详情
+	 * 
+	 * @param map 
+	 * @return
+	 */	
+	  //查询所有项目
+	 List<Project> selectByProject(Map<String,Object> map);
+	
+	 //插入项目
+	 int insertProject(Project record);
+	
+	 //修改项目
+	  int updateProject(Project record);
+	  
+	  int deleteProject(Integer id);
+	  
+	  Project selectByPrimaryKey(Integer id);
+	  public String newItemsValidate(String projectName,String contractNo);
+		/**
+		 * 根据新增项目输入的项目名称和合同编号进行校验
+		 * 
+		 * @param map 
+		 * @return
+		 */	
+	  
+}

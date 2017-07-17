@@ -1,0 +1,206 @@
+package com.bsi.ms.model;
+
+import java.util.Date;
+
+public class Project {
+    private Integer id;
+
+    private String projectName;
+
+    private String contractNo;
+
+    private String seriaNo;
+
+    private String projectFullName;
+
+    private Integer projectType;
+
+    private Integer respDeptId;
+
+    private String respDeptName;
+
+    private Integer pigeonhole;
+
+    private String pmAccount;
+
+    private String pmName;
+
+    private Integer status;
+
+    private String creator;
+    private String creatorName;
+
+    private Date startTime;
+    
+    private Date endTime;
+    
+	private Date createTime;
+
+    private Date lastupdateTime;
+    
+    private Integer noEvaLuateCount;
+    
+    private String progressBar;
+
+
+	public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public void setProjectName(String projectName) {
+        this.projectName = projectName == null ? null : projectName.trim();
+    }
+
+    public String getContractNo() {
+        return contractNo;
+    }
+
+    public void setContractNo(String contractNo) {
+        this.contractNo = contractNo == null ? null : contractNo.trim();
+    }
+
+    public String getSeriaNo() {
+        return seriaNo;
+    }
+
+    public void setSeriaNo(String seriaNo) {
+        this.seriaNo = seriaNo == null ? null : seriaNo.trim();
+    }
+
+    public String getProjectFullName() {
+        return projectFullName;
+    }
+
+    public void setProjectFullName(String projectFullName) {
+        this.projectFullName = projectFullName == null ? null : projectFullName.trim();
+    }
+
+    public Integer getProjectType() {
+        return projectType;
+    }
+
+    public void setProjectType(Integer projectType) {
+        this.projectType = projectType;
+    }
+
+    public Integer getRespDeptId() {
+        return respDeptId;
+    }
+
+    public void setRespDeptId(Integer respDeptId) {
+        this.respDeptId = respDeptId;
+    }
+
+    public String getRespDeptName() {
+        return respDeptName;
+    }
+
+    public void setRespDeptName(String respDeptName) {
+        this.respDeptName = respDeptName == null ? null : respDeptName.trim();
+    }
+
+    public Integer getPigeonhole() {
+        return pigeonhole;
+    }
+
+    public void setPigeonhole(Integer pigeonhole) {
+        this.pigeonhole = pigeonhole;
+    }
+
+    public String getPmAccount() {
+        return pmAccount;
+    }
+
+    public void setPmAccount(String pmAccount) {
+        this.pmAccount = pmAccount == null ? null : pmAccount.trim();
+    }
+
+    public String getPmName() {
+        return pmName;
+    }
+
+    public void setPmName(String pmName) {
+        this.pmName = pmName == null ? null : pmName.trim();
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public String getCreator() {
+        return creator;
+    }
+
+    public void setCreator(String creator) {
+        this.creator = creator == null ? null : creator.trim();
+    }
+
+    public Date getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(Date startTime) {
+		this.startTime = startTime;
+	}
+
+	public Date getEndTime() {
+		return endTime;
+	}
+
+	public void setEndTime(Date endTime) {
+		this.endTime = endTime;
+	}
+    
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public Date getLastupdateTime() {
+        return lastupdateTime;
+    }
+
+    public void setLastupdateTime(Date lastupdateTime) {
+        this.lastupdateTime = lastupdateTime;
+    }
+
+	public Integer getNoEvaLuateCount() {
+		return noEvaLuateCount;
+	}
+
+	public void setNoEvaLuateCount(Integer noEvaLuateCount) {
+		this.noEvaLuateCount = noEvaLuateCount;
+	}
+
+	public String getProgressBar() {
+		return progressBar;
+	}
+	
+	public void setProgressBar(String progressBar) {
+		this.progressBar = progressBar;
+	}
+
+	public String getCreatorName() {
+		return creatorName;
+	}
+
+	public void setCreatorName(String creatorName) {
+		this.creatorName = creatorName;
+	}
+
+}

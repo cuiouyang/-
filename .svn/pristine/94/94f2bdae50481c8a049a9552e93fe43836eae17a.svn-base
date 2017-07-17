@@ -1,0 +1,64 @@
+package test;
+
+import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import com.bsi.ms.model.Dept;
+import com.bsi.ms.model.User;
+import com.bsi.ms.service.CommonService;
+import com.bsi.ms.service.LdapService;
+
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations="classpath:spring/application-context.xml")
+public class LdapTest extends AbstractJUnit4SpringContextTests  {
+	@Autowired
+	private LdapService ldapService;
+	
+	@Autowired
+	private CommonService commonService;
+	
+	private static Logger logger = LogManager.getLogger(LdapTest.class);
+	@Test
+	public void testFind() {
+		List<Dept> depts = ldapService.findDept("研发中心");
+		logger.debug(depts.size());
+		for(Dept dept : depts ){
+			logger.debug(dept);
+		}
+	}
+
+	// 批量查询
+	@Test
+	public void testSearch() {
+		List<User> lists = ldapService.searchUsersByDept("");
+		for(User u :lists){
+			logger.debug(u.getName());
+		}
+	}
+	@Test
+	public void testAuth(){
+		boolean b = ldapService.authenticate("ldap@51bsi.com", "liubin@51bsi.com");
+		logger.debug(b);
+	}
+	@Test
+	public void testSearchUser() {
+		User user = ldapService.findUserByName("杨小林");
+		logger.debug(user);
+		user = ldapService.findUserByAccount("yangxl@51bsi.com");
+		logger.debug(user);
+	}
+	@Test
+	public void getSeq() {
+		 String serialNo =commonService.getSequnce();
+		 logger.debug(serialNo);
+	}
+}

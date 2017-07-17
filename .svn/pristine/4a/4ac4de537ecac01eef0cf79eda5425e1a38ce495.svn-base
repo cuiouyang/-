@@ -1,0 +1,130 @@
+package com.bsi.ms.service.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import com.bsi.ms.mapper.ProjectMapper;
+import com.bsi.ms.model.Project;
+import com.bsi.ms.service.ProjectService;
+
+@Service
+@Transactional
+public class ProjectServiceImpl implements ProjectService {
+	public final static Logger logger = LogManager.getLogger(ProjectServiceImpl.class);
+	@Autowired
+	private ProjectMapper projectMapper;
+	
+	//protected static Logger logger = LogManager.getLogger(ProjectServiceImpl.class);
+	
+	/**
+	 * 根据条件查询数据
+	 * 
+	 * @param map 
+	 * 
+	 * @return
+	 */
+	@Override
+	public List<Project> queryByTerm(Map<String, Object> map) {
+		List<Project> pro = projectMapper.queryByTerm(map);
+		return pro;
+	}
+
+	/**
+	 * 根据登录用户的帐号查询相应的项目
+	 * 
+	 * @param account 
+	 * 
+	 * @return List<Project>
+	 */
+    @Override
+    public List<Project> getProjectName(String account) {
+    	logger.info("parameter:{}", account);
+		List<Project> list = projectMapper.getProjectName(account);
+		logger.info("result:{}", list);
+        return list;
+    }
+
+	@Override
+	public Project getItemDetailsById(int id) {
+		// TODO Auto-generated method stub
+		return projectMapper.selectByPrimaryKey(id);
+	}
+	
+	@Override
+	public List<Project> selectByProject(Map<String,Object> map)
+	 {
+		  return projectMapper.selectByProject(map);
+	 
+	 }
+
+	@Override
+	public int insertProject(Project record) {
+		// TODO Auto-generated method stub
+		return projectMapper.insertSelective(record);
+	}
+
+	@Override
+	public int updateProject(Project record) {
+		// TODO Auto-generated method stub
+		return projectMapper.updateByPrimaryKeySelective(record);
+	}
+
+	@Override
+	public int deleteProject(Integer id) {
+		// TODO Auto-generated method stub
+		return projectMapper.deleteByPrimaryKey(id);
+	}
+
+	@Override
+	public Project selectByPrimaryKey(Integer id) {
+		// TODO Auto-generated method stub
+		return projectMapper.selectByPrimaryKey(id);
+	}
+
+	@Override
+	public String newItemsValidate(String projectName, String contractNo) {
+		int name =projectMapper.newItemsValidateName(projectName);
+		int contractoNo=projectMapper.newItemsValidateContractNo(contractNo);
+		if(name>0){
+			return"01";
+		}
+		if(contractoNo>0){
+			return"02";
+		}
+		return "03";
+	}
+	
+	/**   
+	* <p>Title: 判断项目包含里程碑等信息</p>  
+	* @param id
+	* @return 
+	* @see com.bsi.ms.service.ProjectService#ChargeProject(java.lang.Integer) 
+	*/
+	@Override
+	public int ChargeProject(Integer id)
+	{
+		int tag=501;//默认为1
+		 int count=projectMapper.HasMember(id);
+		 if(count<=0)
+		 {
+			 count=projectMapper.HasMiletone(id);
+			 if(count<=0)
+			 {
+				 tag=0;
+			 }
+			 else
+			 {
+				 tag=502;
+			 }
+		 } 
+		return tag;
+	 
+	}
+
+	 
+}

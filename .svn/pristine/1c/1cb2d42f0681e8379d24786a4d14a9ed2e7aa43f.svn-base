@@ -1,0 +1,74 @@
+package com.bsi.ms.service;
+
+import java.util.List;
+import java.util.Map;
+
+import com.bsi.ms.model.StatusCount;
+import com.bsi.ms.model.WorkItem;
+import com.bsi.ms.model.WorkItemWithBLOBs;
+
+public interface WorkItemService {
+
+	/**
+	 * 查询各种状态下工作项的数量
+	 * 
+	 * @param record
+	 * 
+	 * @return
+	 */
+	public List<StatusCount> selectStaNum(WorkItem record);
+
+	/**
+	 * 根据条件查询工作项评价数据
+	 * 
+	 * @param record
+	 * 
+	 * @return
+	 */
+	public List<WorkItemWithBLOBs> selectByTerm(Map<String, Object> map);
+
+	/**
+	 * 点击项目标题进入项目详情
+	 * 
+	 * @param id
+	 * 
+	 * @return
+	 */
+	public WorkItemWithBLOBs selectById(Integer id);
+
+	/**
+	 * 根据id修改已评价的工作项
+	 * 
+	 * @param id
+	 * 
+	 * @return
+	 */
+	public int updateByPrimaryKeySelective(WorkItemWithBLOBs record);
+
+	/**
+	 * 获取对应项目已评价工作项的有效工时
+	 * 
+	 * @param status
+	 * @param projectId
+	 * 
+	 * @return
+	 */
+	public List<WorkItem> getEffHList();
+
+	/**
+	 * 获取对应项目的计划工时
+	 * 
+	 *
+	 * @return
+	 */
+	public List<WorkItem> getHoursList();
+
+	/**
+	 * 保存工作项
+	 * 
+	 * @param workItem
+	 * 
+	 * @return
+	 */
+	public int saveWorkItem(WorkItemWithBLOBs workItem);
+}

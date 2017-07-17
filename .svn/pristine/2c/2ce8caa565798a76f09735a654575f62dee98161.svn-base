@@ -1,0 +1,306 @@
+package com.bsi.ms.controller;
+
+import java.util.List;
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.bsi.ms.model.Dict;
+import com.bsi.ms.model.Project;
+import com.bsi.ms.model.StatusCount;
+import com.bsi.ms.model.User;
+import com.bsi.ms.model.WorkItem;
+import com.bsi.ms.service.DictService;
+import com.bsi.ms.service.LdapService;
+import com.bsi.ms.service.ProjectService;
+import com.bsi.ms.service.WorkItemService;
+import com.bsi.ms.utils.Pager;
+
+@Controller
+public class PartakeItemsController {
+
+	protected static Logger logger = LogManager.getLogger(PartakeItemsController.class);
+	
+	@Autowired
+	private ProjectService projectService;
+	@Autowired
+	private WorkItemService workItemService;
+	@Autowired
+	private LdapService ldapService;
+	@Autowired
+	private DictService dictService;
+
+	//项目管理-我参与的-初始化页面
+	@RequestMapping(value = "/partakeitems/list", method = { RequestMethod.GET,RequestMethod.POST })
+	public String list(HttpServletRequest request,HttpServletResponse response,Model model) {
+		//获取登录账户
+		User loginUser  = (User) request.getSession().getAttribute("loginUser");
+		String account = loginUser.getAccount();
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("memberAccount", account);
+		map.put("sta", 1);
+		//查询所有数据
+		List<Project> pro =projectService.queryByTerm(map);
+		// 获取待评价工作项数量
+		WorkItem wi = new WorkItem();
+		wi.setStatus(1);
+		wi.setCreatorAccount(account);
+		List<StatusCount> sta = workItemService.selectStaNum(wi);
+		logger.debug("所有我参与的项目的待评价工作项数量集合"+sta);
+		for (Project pr : pro) {
+			for (StatusCount s : sta) {
+				if (pr.getId() == s.getId()) {
+					pr.setNoEvaLuateCount(s.getNum());
+				}
+			}
+			// 获取项目进度相关数据
+			//获取所有项目的已评价工作项的有效工时总和的集合
+			List<WorkItem> eff = workItemService.getEffHList();
+			logger.debug("所有项目的已评价工作项的有效工时总和的集合"+eff);
+			//获取所有项目的计划工时总和的集合
+			List<WorkItem> hour = workItemService.getHoursList();
+			logger.debug("所有项目的计划工时总和的集合"+hour);
+			for (WorkItem w : hour) {
+				for (WorkItem i : eff) {
+					if (w.getId() == i.getProjectId()) {
+						BigDecimal st = i.getEffectiveHours();
+						BigDecimal et = w.getHours();
+						int pb = 0;
+						pb = Math.round(st.floatValue() * 100 / et.floatValue());
+						if (i.getProjectId() == pr.getId()) {
+							pr.setProgressBar(Integer.toString(pb).concat("%"));
+						}
+					}
+				}
+			}
+		}
+		model.addAttribute("list", pro);
+		logger.info("我参与的初始化查询result:{}", pro);
+		return "/PartakeItems/PartakeItemsList";
+	}
+
+	//项目管理-我参与的-根据日期查询数据
+	@RequestMapping(value = "/partakeitems/queryByDate", method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public Pager queryByDate(HttpServletRequest request,HttpServletResponse response,
+			@RequestParam MultiValueMap<String, String> parameters, ModelMap model) {
+		logger.info("根据日期条件查询数据parameter:{}", parameters);
+		Map<String, String> paramMap = parameters.toSingleValueMap();
+		Map<String, Object> map = new HashMap<String, Object>();
+		//获取登录账户
+		User loginUser  = (User) request.getSession().getAttribute("loginUser");
+		String account = loginUser.getAccount();
+		map.put("memberAccount", account);
+		map.put("sta", 1);
+		List<Project> pro = null;
+		String dateTime = paramMap.get("dateTime");
+		String opt = paramMap.get("opt");
+		//获取日历控件上的时间并截取
+		if(dateTime!=null){
+			try {
+				String startTime = dateTime.substring(0, 10);
+				String endTime = dateTime.substring(13);
+				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+				Date startDate = null;
+				Date endDate = null; 
+				startDate = dateFormat.parse(startTime);
+				endDate =dateFormat. parse(endTime);
+				//查询条件为项目开始时间
+				if(opt!=null && opt.equals("1")){
+					map.put("opt", Integer.parseInt(opt));
+					map.put("startTime", startDate);
+					map.put("endTime", endDate);
+					//查询条件为项目计划结束时间	
+				}else if(opt!=null && opt.equals("2")){
+					map.put("opt", Integer.parseInt(opt));
+					map.put("startTime", startDate);
+					map.put("endTime", endDate);
+				}
+				pro = projectService.queryByTerm(map);
+			} catch (ParseException e) {
+				logger.error("项目管理-我参与的-根据日期查询时间格式转换错误"+e);
+			}
+		}else{
+			pro = projectService.queryByTerm(map);
+		}	
+		//获取待评价工作项数量
+		WorkItem wi = new WorkItem();
+		wi.setStatus(1);
+		wi.setCreatorAccount(account);
+		List<StatusCount> sta = workItemService.selectStaNum(wi);
+		logger.debug("所有我参与的项目的待评价工作项数量集合"+sta);
+		for(Project pr : pro){
+			for(StatusCount s : sta){
+				if(pr.getId() == s.getId()){
+					pr.setNoEvaLuateCount(s.getNum());
+				}
+			}
+			//获取项目进度相关数据
+			//获取所有项目的已评价工作项的有效工时总和的集合
+			List<WorkItem> eff = workItemService.getEffHList();
+			logger.debug("所有项目的已评价工作项的有效工时总和的集合"+eff);
+			//获取所有项目的计划工时总和的集合
+			List<WorkItem> hour = workItemService.getHoursList();
+			logger.debug("所有项目的计划工时总和的集合"+hour);
+			for(WorkItem w : hour){
+				for(WorkItem i : eff){
+					if(w.getId() == i.getProjectId()){			
+						BigDecimal st = i.getEffectiveHours();
+						BigDecimal et = w.getHours();
+						int pb = 0;
+						pb = Math.round(st.floatValue()*100/et.floatValue());
+						if(i.getProjectId() == pr.getId()){
+							pr.setProgressBar(Integer.toString(pb).concat("%"));
+						}
+					}
+				}
+			}
+		}
+		model.addAttribute("list", pro);
+		int currentPage = paramMap.get("currentPage") == null ? 1 : Integer.parseInt(paramMap.get("currentPage"));
+		List<Object> sub = new ArrayList<Object>(pro);
+		Pager pager = new Pager(sub, currentPage);
+		logger.info("根据日期条件查询结果result:{}", pager);
+		return pager;
+	}
+
+	//项目管理-我参与的-根据项目经理或项目名称查询数据
+	@RequestMapping(value = "/partakeitems/queryByItem", method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public Pager queryByItem(HttpServletRequest request,HttpServletResponse response,
+			@RequestParam MultiValueMap<String, String> parameters, ModelMap model) {	
+		logger.info("根据项目经理或项目名称查询数据parameter:{}", parameters);
+		Map<String, String> paramMap = parameters.toSingleValueMap();
+		Map<String, Object> map = new HashMap<String, Object>();
+		//获取登录账户
+		User loginUser  = (User) request.getSession().getAttribute("loginUser");
+		String account = loginUser.getAccount();
+		map.put("memberAccount", account);
+		map.put("sta", 1);
+		List<Project> pro = null;	
+		String keyword = paramMap.get("keyword");
+		String opt = paramMap.get("opt");
+		//查询条件为项目名称时
+		if(opt!=null && opt.equals("1")){
+			map.put("projectName", keyword);
+			//查询条件为项目经理时	
+		}else if(opt!=null && opt.equals("2")){
+			map.put("pmName", keyword);
+		}	
+		pro = projectService.queryByTerm(map);		
+		//获取待评价工作项数量
+		WorkItem wi = new WorkItem();
+		wi.setStatus(1);
+		wi.setCreatorAccount(account);
+		List<StatusCount> sta = workItemService.selectStaNum(wi);
+		logger.debug("所有我参与的项目的待评价工作项数量集合"+sta);
+		for(Project pr : pro){
+			for(StatusCount s : sta){
+				if(pr.getId() == s.getId()){				
+					pr.setNoEvaLuateCount(s.getNum());
+				}
+			}
+			//获取项目进度相关数据
+			//获取所有项目的已评价工作项的有效工时总和的集合
+			List<WorkItem> eff = workItemService.getEffHList();
+			logger.debug("所有项目的已评价工作项的有效工时总和的集合"+eff);
+			//获取所有项目的计划工时总和的集合
+			List<WorkItem> hour = workItemService.getHoursList();
+			logger.debug("所有项目的计划工时总和的集合"+hour);
+			for(WorkItem w : hour){
+				for(WorkItem i : eff){
+					if(w.getId() == i.getProjectId()){			
+						BigDecimal st = i.getEffectiveHours();
+						BigDecimal et = w.getHours();
+						int pb = 0;
+						pb = Math.round(st.floatValue()*100/et.floatValue());
+						if(i.getProjectId() == pr.getId()){
+							pr.setProgressBar(Integer.toString(pb).concat("%"));
+						}
+					}
+				}
+			}
+		}
+		model.addAttribute("list", pro);
+		int currentPage = paramMap.get("currentPage") == null ? 1 : Integer.parseInt(paramMap.get("currentPage"));
+		List<Object> sub = new ArrayList<Object>(pro);
+		Pager pager = new Pager(sub, currentPage);
+		logger.info("根据项目经理或项目名称查询结果result:{}", pager);
+		return pager;
+	}
+
+	@RequestMapping(value = "/partakeitems/login", method = { RequestMethod.GET,RequestMethod.POST })
+	@ResponseBody
+	public boolean login(HttpServletRequest request,HttpServletResponse response) {
+		String account = request.getParameter("account");
+		String password = request.getParameter("password");
+		if(StringUtils.isBlank(account)||StringUtils.isBlank(password)){
+			return false;
+		}
+		return ldapService.authenticate(account, password);
+	}
+
+	//根据传入的项目id 查询出项目详情（我参与的）
+	@RequestMapping(value = "/partakeitems/details", method = { RequestMethod.GET,RequestMethod.POST},produces = {"application/text;charset=UTF-8"} )
+	@ResponseBody
+	public String queryItemDetails(HttpServletRequest request,
+			HttpServletResponse response,
+			@RequestParam MultiValueMap<String, String> parameters, ModelMap model) {		
+		String projectid=request.getParameter("projectId");
+		Project itemsDetails= new Project();
+		try{
+			//前台超链接传过来的字符串id 转换成数据库中Integer类型id
+			Integer id=Integer.parseInt(projectid);
+			itemsDetails =projectService.getItemDetailsById(id);
+			//status 1  为项目分类  获取到所有的项目分类进行比对
+			List<Dict> dict= dictService.getProjectType(1);
+			String projectType = itemsDetails.getProjectType().toString();
+			String  projectTypeName="";
+			for(Dict D :dict   ){
+				if(D.getDictValue().equals(projectType)){
+					projectTypeName=D.getDictName();
+					itemsDetails.setProjectTypeName(projectTypeName);
+				}
+			}
+			Integer pigeonhole=itemsDetails.getPigeonhole();
+			String pigeonholeName="";
+			if(pigeonhole==1){
+				pigeonholeName="已归档"; 
+			}
+			if(pigeonhole==0){
+				pigeonholeName="未归档";
+			}
+			String details ="<div class='row' style='margin-bottom:4%' ><div class=col-md-12><B style='line-height: 34px' >项目名称:</B><input type='text' class='form-control' value='"+itemsDetails.getProjectName()+"'></input></div></div>";
+			details+="<div class='row' style='margin-bottom:4%'  ><div class=col-md-6><B style='line-height: 34px'>项目编号:</B><input type='text'class='form-control' value='"+itemsDetails.getContractNo()+"'></input></div><div class=col-md-6><B style='line-height: 34px'>流水号:</B><input type='text' class='form-control' value='"+itemsDetails.getSeriaNo()+"'></input></div></div>";
+			details+="<div class='row' style='margin-bottom:4%'  ><div class=col-md-6><B style='line-height: 34px'>项目分类:</B><input type='text'class='form-control' value='"+itemsDetails.getProjectTypeName()+"'></input></div><div class=col-md-6><B style='line-height: 34px'>项目经理:</B><input type='text' class='form-control' value='"+itemsDetails.getPmName()+"'></input></div></div>";
+			details+="<div class='row' style='margin-bottom:4%' ><div class=col-md-6><B style='line-height: 34px'>责任部门:</B><input type='text'class='form-control' value='"+itemsDetails.getRespDeptName()+"'></input></div><div class=col-md-6><B style='line-height: 34px'>是否归档:</B><input type='text'class='form-control'  value='"+pigeonholeName+"'></input></div></div>";
+
+			return details;
+		}catch(NumberFormatException e) {
+			e.printStackTrace();
+			System.out.println("获取到的id有误,转换错误。");
+		}
+		return "项目信息获取错误";
+	}
+
+}

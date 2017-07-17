@@ -1,0 +1,301 @@
+package com.bsi.ms.controller;
+
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import com.bsi.ms.model.User;
+import com.bsi.ms.model.WorkItem;
+import com.bsi.ms.model.WorkItemWithBLOBs;
+import com.bsi.ms.service.MyItemsService;
+import com.bsi.ms.service.WorkItemService;
+import com.bsi.ms.utils.Pager;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+@Controller
+public class MyWorkItemsController {
+
+	protected static Logger logger = LogManager.getLogger(MyWorkItemsController.class);
+
+	@Autowired
+	private MyItemsService MyItemsService;
+	@Autowired
+	private WorkItemService workItemService;
+
+	// 我承担的工作项初跳转页面
+	@RequestMapping(value = "/workItem/index", method = { RequestMethod.GET, RequestMethod.POST })
+	public String index(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam MultiValueMap<String, String> parameters, ModelMap model) {
+		logger.info("从我参与的跳转到我承担的工作项携带的项目Id parameter:{}", parameters);
+		Map<String, String> paramMap = parameters.toSingleValueMap();
+		//从我参与的待评价工作项跳转页面
+		String id = paramMap.get("id");
+		if(id !=null && id != ""){
+			int projectId = Integer.parseInt(id);
+			  request.setAttribute("id", projectId);
+		}
+		return "workItem/assume";
+	}
+
+	// 通过关键字来查询出对应工作项
+	@RequestMapping(value = "/workItem/query", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public Pager query(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam MultiValueMap<String, String> parameters, ModelMap model) {
+		logger.info("关键字查询parameter:{}", parameters);
+		Map<String, String> paramMap = parameters.toSingleValueMap();
+		String id = request.getParameter("id");
+		
+		User loginUser = (User) request.getSession().getAttribute("loginUser");
+		String creatorAccount = loginUser.getAccount();
+		// 获取并设置workItem
+		WorkItem WI = new WorkItem();
+		if(id != null && id != ""){
+			WI.setProjectId(Integer.parseInt(id));
+		}
+		WI.setCreatorAccount(creatorAccount);
+		String itemTopic = paramMap.get("itemTopic");
+		String projectName = paramMap.get("projectName");
+		String sponsorName = paramMap.get("sponsorName");
+		String status = paramMap.get("status");
+		// 定义一个status初始值 避免空比较 （可更换 但不能是状态存储对应的任何一个）
+		Integer statuss = 100;
+		if ("草稿".equals(status)) {
+			statuss = 0;
+		}
+		if ("待审核".equals(status)) {
+			statuss = 1;
+		}
+		if ("已审核".equals(status)) {
+			statuss = 9;
+		}
+		if ("已删除".equals(status)) {
+			statuss = 4;
+		}
+		if ("已退回".equals(status)) {
+			statuss = 3;
+		}
+		WI.setItemTopic(itemTopic);
+		WI.setProjectName(projectName);
+		WI.setSponsorName(sponsorName);
+		WI.setStatus(statuss);
+		// 调用查询方法 任一关键字查找
+		List<WorkItem> list = MyItemsService.getMyWorkList(WI);
+		model.addAttribute("list", list);
+		int currentPage = paramMap.get("currentPage") == null ? 1 : Integer.parseInt(paramMap.get("currentPage"));
+		List<Object> sub = new ArrayList<Object>(list);
+		Pager pager = new Pager(sub, currentPage);
+		logger.info("关键字查询result:{}", list);
+		return pager;
+	}
+
+	// 通过时间来查询工作项
+	@RequestMapping(value = "/workItem/queryTime", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public Pager queryTime(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam MultiValueMap<String, String> parameters, ModelMap model) {
+		logger.info("时间段查询工作项parameter:{}", parameters);
+		Map<String, String> paramMap = parameters.toSingleValueMap();
+		User loginUser = (User) request.getSession().getAttribute("loginUser");
+		String creatorAccount = loginUser.getAccount();
+		// 四种时间查询
+		String actStartTimes = paramMap.get("actStartTime");
+		String actEndTimes = paramMap.get("actEndTime");
+		String planStartTimes = paramMap.get("planStartTime");
+		String planEndTimes = paramMap.get("planEndTime");
+
+		// 初始定义时间段查询的前后时间
+		String startTime = "";
+		String endTime = "";
+		java.util.Date startDate = null;
+		java.util.Date endDate = null;
+		List<WorkItem> list = new ArrayList<>();
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("creatorAccount", creatorAccount);
+		map.put("startDate", startDate);
+		map.put("endDate", endDate);
+		// 时间格式转换
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");// 小写的mm表示的是分钟
+		try {
+			if (!actStartTimes.isEmpty()) {
+				startTime = actStartTimes.substring(0, 11);
+				endTime = actStartTimes.substring(12);
+				startDate = sdf.parse(startTime);
+				endDate = sdf.parse(endTime);
+				map.put("startDate", startDate);
+				map.put("endDate", endDate);
+				list = MyItemsService.getMyWorkByActStart(map);
+				logger.debug("工作项实际开始时间" + actStartTimes);
+			}
+			if (!actEndTimes.isEmpty()) {
+				startTime = actEndTimes.substring(0, 11);
+				endTime = actEndTimes.substring(12);
+				startDate = sdf.parse(startTime);
+				endDate = sdf.parse(endTime);
+				map.put("startDate", startDate);
+				map.put("endDate", endDate);
+				list = MyItemsService.getMyWorkByActEnd(map);
+				logger.debug("工作项实际结束时间" + actEndTimes);
+			}
+			if (!planStartTimes.isEmpty()) {
+				startTime = planStartTimes.substring(0, 11);
+				endTime = planStartTimes.substring(12);
+				startDate = sdf.parse(startTime);
+				endDate = sdf.parse(endTime);
+				map.put("startDate", startDate);
+				map.put("endDate", endDate);
+				list = MyItemsService.getMyWorkByPlanStart(map);
+				logger.debug("工作项计划开始时间" + planStartTimes);
+			}
+			if (!planEndTimes.isEmpty()) {
+				startTime = planEndTimes.substring(0, 11);
+				endTime = planEndTimes.substring(12);
+				startDate = sdf.parse(startTime);
+				endDate = sdf.parse(endTime);
+				map.put("startDate", startDate);
+				map.put("endDate", endDate);
+				list = MyItemsService.getMyWorkByPlanEnd(map);
+				logger.debug("工作项计划结束时间" + planEndTimes);
+			}
+		} catch (ParseException e) {
+			logger.error("我承担的工作项时间段查询时间格式转换错误" + e);
+		}
+		model.addAttribute("list", list);
+		int currentPage = paramMap.get("currentPage") == null ? 1 : Integer.parseInt(paramMap.get("currentPage"));
+		List<Object> sub = new ArrayList<Object>(list);
+		Pager pager = new Pager(sub, currentPage);
+		logger.info("时间段查询工作项result:{}", list);
+		return pager;
+	}
+
+	// 工作项管理-工作项评价-初始化页面
+	@RequestMapping(value = "/workItem/list", method = { RequestMethod.GET, RequestMethod.POST })
+	public String list(HttpServletRequest request, @RequestParam MultiValueMap<String, String> parameters,
+			ModelMap model) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		// 获取登录账户
+		User loginUser = (User) request.getSession().getAttribute("loginUser");
+		String account = loginUser.getAccount();
+		map.put("auditorAccount", account);
+		List<WorkItemWithBLOBs> list = workItemService.selectByTerm(map);
+		model.addAttribute("list", list);
+		logger.info("工作项评价初始查询result:{}", list);
+		return "workItem/WorkItemAppraise";
+
+	}
+
+	// 工作项管理-工作项评价-根据查询框查询数据
+	@RequestMapping(value = "/workItem/queryByExample", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public Pager queryByExample(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam MultiValueMap<String, String> parameters, ModelMap model) {
+		logger.info("根据查询框输入条件查询工作项评价parameter:{}", parameters);
+		Map<String, String> paramMap = parameters.toSingleValueMap();
+		Map<String, Object> map = new HashMap<String, Object>();
+		// 获取登录账户
+		User loginUser = (User) request.getSession().getAttribute("loginUser");
+		String account = loginUser.getAccount();
+		map.put("auditorAccount", account);
+		// 获取查询框输入的查询条件
+		String creatorName = paramMap.get("creatorName");
+		String projectName = paramMap.get("projectName");
+		String val = paramMap.get("val");
+		// 使前台页面查询的input框里面的值回传
+		if (creatorName != null && creatorName != "") {
+			model.addAttribute("keyValue", creatorName);
+		}
+		if (projectName != null && projectName != "") {
+			model.addAttribute("keyValue", projectName);
+		}
+		if (val != null && val != "") {
+			model.addAttribute("keyValue", val);
+		}
+		map.put("creatorName", creatorName);
+		map.put("projectName", projectName);
+		// 查找并存入list
+		List<WorkItemWithBLOBs> list = workItemService.selectByTerm(map);
+		model.addAttribute("list", list);
+		int currentPage = paramMap.get("currentPage") == null ? 1 : Integer.parseInt(paramMap.get("currentPage"));
+		List<Object> sub = new ArrayList<Object>(list);
+		Pager pager = new Pager(sub, currentPage);
+		logger.info("根据查询框查询结果result:{}", pager);
+		return pager;
+	}
+
+	// 工作项管理-工作项评价-根据三个按钮(全部、已评价、未评价)的选择显示不同页面
+	@RequestMapping(value = "/workItem/queryByBtn", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public Pager queryByBtn(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam MultiValueMap<String, String> parameters, ModelMap model) {
+		logger.info("根据三个按钮(全部、已评价、未评价)的选择显示不同状态的工作项parameter:{}", parameters);
+		Map<String, String> paramMap = parameters.toSingleValueMap();
+		Map<String, Object> map = new HashMap<String, Object>();
+		// 获取登录账户
+		User loginUser = (User) request.getSession().getAttribute("loginUser");
+		String account = loginUser.getAccount();
+		map.put("auditorAccount", account);
+		// 获取点击事件携带的参数
+		String type = paramMap.get("type");
+		String status = paramMap.get("status");
+		// 获取查询框输入的查询条件
+		String creatorName = paramMap.get("creatorName");
+		String projectName = paramMap.get("projectName");
+		if (type != null && type != "") {
+			map.put("type", Integer.parseInt(type));
+			map.put("status", Integer.parseInt(status));
+		}
+		map.put("creatorName", creatorName);
+		map.put("projectName", projectName);
+		// 查找并存入list
+		List<WorkItemWithBLOBs> list = workItemService.selectByTerm(map);
+		model.addAttribute("list", list);
+		int currentPage = paramMap.get("currentPage") == null ? 1 : Integer.parseInt(paramMap.get("currentPage"));
+		List<Object> sub = new ArrayList<Object>(list);
+		Pager pager = new Pager(sub, currentPage);
+		logger.info("按钮切换显示不同状态工作项result:{}", pager);
+		return pager;
+	}
+
+	// 工作项管理-工作项评价-修改已评价工作项、评价工作项
+	@RequestMapping(value = "/workItem/edit", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public void edit(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam MultiValueMap<String, String> parameters, ModelMap model) {
+		logger.info("修改已评价工作项、评价工作项parameter:{}", parameters);
+		Map<String, String> paramMap = parameters.toSingleValueMap();
+		// 获取参数
+		int id = Integer.parseInt(paramMap.get("id"));
+		String str = paramMap.get("effectiveHours");
+		BigDecimal effectiveHours = new BigDecimal(str);
+		int point = Integer.parseInt(paramMap.get("point"));
+		String comment = paramMap.get("comment");
+		String status = paramMap.get("status");
+		WorkItemWithBLOBs wis = new WorkItemWithBLOBs();
+		wis.setId(id);
+		wis.setEffectiveHours(effectiveHours);
+		wis.setPoint(point);
+		wis.setComment(comment);
+		if (status != null && status != "") {
+			wis.setStatus(Integer.parseInt(status));
+		}
+		// 修改评价并存入list
+
+		workItemService.updateByPrimaryKeySelective(wis);
+
+	}
+
+}

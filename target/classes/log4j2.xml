@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Don't forget to set system property -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector 
+	to make all loggers asynchronous. -->
+<Configuration status="DEBUG" monitorInterval="120">
+	<properties>
+		<property name="LOG_HOME">D:/Apache/apache-tomcat-8.0.30/logs</property>
+	</properties>
+	<Appenders>
+		<Console name="Console" target="SYSTEM_OUT">
+			<PatternLayout pattern="%d %p %c{1.}:%L[%t] %m%n" />
+		</Console>
+		<RollingRandomAccessFile name="RollingRandomAccessFile" fileName="${LOG_HOME}/info.log" filePattern="${LOG_HOME}/info-%d{MM-dd-yyyy}.log.gz">
+			<PatternLayout>
+				<Pattern>%d %p %c{1.} [%t] %m%n</Pattern>
+			</PatternLayout>
+			<Policies>
+				<OnStartupTriggeringPolicy />
+				<TimeBasedTriggeringPolicy />
+				<SizeBasedTriggeringPolicy size="100 MB" />
+			</Policies>
+		</RollingRandomAccessFile>
+	</Appenders>
+	<Loggers>
+		<Logger name="org.springframework" level="INFO" />
+		<Logger name="log4j2.logger.org.apache.ibatis" level="DEBUG" />
+		<Logger name="org.springframework.jdbc.core.JdbcTemplate" level="DEBUG" />
+		<Logger name="org.springframework.jdbc.core.StatementCreatorUtils" level="DEBUG" />
+		<Logger name="org.springframework.web.filter" level="DEBUG" />
+		<Logger name="com.mchange" level="INFO" />
+		<Logger name="com.bsi.ms" level="INFO" />
+		<Root level="DEBUG" includeLocation="true">
+			<AppenderRef ref="Console" />
+			<AppenderRef ref="RollingRandomAccessFile" />
+		</Root>
+		<Logger name="com.bsi.ms.mapper" level="TRACE" additivity="false">
+			<AppenderRef ref="RollingRandomAccessFile" />
+		</Logger>
+	</Loggers>
+</Configuration>

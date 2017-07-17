@@ -1,0 +1,253 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="OVIT Project Manage System" />
+<meta name="author" content="OVIT R&D" />
+<title>光谷信息项目管理系统</title>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/fonts/arimo/css/arimo.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/fonts/linecons/css/linecons.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/fonts/fontawesome/css/font-awesome.min.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/bootstrap.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/xenon-core.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/xenon-forms.css"> 
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/xenon-components.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/xenon-skins.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/custom.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/js/select2/select2.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/js/select2/select2-bootstrap.css">
+<script src="${pageContext.request.contextPath}/assets/js/jquery-1.11.1.min.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/jquery-form.js"></script>
+<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!--[if lt IE 9]>
+	<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+	<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+<![endif]-->
+</head>
+<body class="page-body">
+	<%@ include file="../frame/setting.jsp" %>
+	<div class="page-container">
+		<%@ include file="../frame/left.jsp" %>
+		<div class="main-content">
+			<%@ include file="../frame/nav.jsp" %>
+			<script type="text/javascript">
+				jQuery(document).ready(function($)
+				{	
+					//下拉框预加载
+					$("#s2example-2").select2({
+						placeholder: '请选择项目成员',
+						allowClear: true
+					}).on('select2-open', function()
+					{
+						// Adding Custom Scrollbar
+						$(this).data('select2').results.addClass('overflow-hidden').perfectScrollbar();
+					});
+					
+					$("#sboxit-1").selectBoxIt().on('open', function()
+					{
+						// Adding Custom Scrollbar
+						$(this).data('selectBoxSelectBoxIt').list.perfectScrollbar();
+					});
+					
+					// Notifications
+					setTimeout(function()
+					{			
+						var opts = {
+							"closeButton": true,
+							"debug": false,
+							"positionClass": "toast-top-right toast-default",
+							"toastClass": "black",
+							"onclick": null,
+							"showDuration": "100",
+							"hideDuration": "1000",
+							"timeOut": "5000",
+							"extendedTimeOut": "1000",
+							"showEasing": "swing",
+							"hideEasing": "linear",
+							"showMethod": "fadeIn",
+							"hideMethod": "fadeOut"
+						};
+				
+						toastr.info("欢迎登录项目管理系统!", "Account Subcription Updated", opts);
+					}, 3000);
+					
+					// Resize charts
+					$(window).on('xenon.resize', function()
+					{
+						/* $("#pageviews-visitors-chart").data("dxChart").render();
+						$("#server-uptime-chart").data("dxChart").render();
+						$("#realtime-network-stats").data("dxChart").render();
+						
+						$('.first-month').data("dxSparkline").render();
+						$('.second-month').data("dxSparkline").render();
+						$('.third-month').data("dxSparkline").render(); */
+					});
+					
+				});
+				
+			</script>
+
+			<div class="page-title">
+				<div class="title-env">
+					<h1 class="title">项目成员管理</h1>
+					<p class="description">${projectName }</p>
+				</div>
+
+				<div class="breadcrumb-env">
+					<ol class="breadcrumb bc-1">
+						<li><a href="${pageContext.request.contextPath}/manageSystem/index"><i class="fa-home"></i>首页</a>
+						</li>
+						<li><a href="${pageContext.request.contextPath}/partakeitems/list">我参与的</a></li>
+						<li class="active"><strong>项目成员管理</strong></li>
+					</ol>
+				</div>
+			</div>
+
+			<div class="panel panel-default">
+				<input type="hidden" id="projectId" name="projectId" value="${projectId }" />
+				<table border="0">
+					<thead align="center">
+					<tr>
+						<td width="20%" valign="top">
+							<div class="form-group">
+								<select class="form-control" id="sboxit-1" style="display: none;" onchange="queryProjectMember();">
+									<option value="全部部门">全部部门</option>
+									<c:forEach items='${deptList }' var='list' varStatus='status'>
+										<option value='${list.name}'><c:out value='${list.name}'></c:out></option>
+									</c:forEach>
+								</select>
+							</div>
+						</td>
+						<td width="600px" colspan="3" style="padding-left:15px">
+							<div class="form-group" id="member">
+								<select class="form-control select2-offscreen" id="s2example-2"
+									multiple="" tabindex="-1">
+									<c:forEach items='${userList }' var='list' varStatus='status'>
+									<option value='${list.name}'><c:out value='${list.name}'></c:out></option>
+									</c:forEach>
+								</select>
+							</div>
+						</td>
+						<td width="15%"><a href="javascript:void(0)" class="btn btn-secondary btn-sm btn-icon icon-left" onclick="addProjectMember();">确认添加</a></td>
+					</tr>
+					</thead>
+				</table>
+					
+				<div class="panel-body">
+				<table id="memberTable" class="table table-bordered table-striped">
+						<thead align="center">
+							<tr>
+								<td width="20%" align="center">姓名</td>
+								<td width="20%" align="center">职务</td>
+								<td width="25%" align="center">部门</td>
+								<td width="25%" align="center">邮箱</td>
+								<td width="10%" align="center">操作</td>
+							</tr>
+						</thead>
+						<tbody class="middle-align">
+							<c:forEach items="${projectMemberList}" var="item" varStatus="status">
+								<tr>
+									<td>${item.memberName }</td>
+									<td></td>
+									<td>${item.dept }</td>
+									<td>${item.memberAccount }</td>
+									<td><a href="javascript:void(0);" id="${item.id }" onclick="deleteProjectMember(id);"
+										class="btn btn-danger btn-sm btn-icon icon-left">删除</a></td>
+								</tr>
+							</c:forEach>
+						</tbody>
+					</table>
+
+				</div>
+			</div>		
+			
+			<!-- Main Footer -->
+			<%@ include file="../frame/footer.jsp" %>
+		</div>
+	</div>
+	<%@ include file="../frame/bottomScript.jsp" %>
+
+</body>
+<script type="text/javascript">
+
+function queryProjectMember(){
+	
+	$("#s2example-2").empty();
+	var dept = $("#sboxit-1").val();
+	$.ajax({
+			type:"POST",
+			url:"${pageContext.request.contextPath}/projectMember/getProjectMemberByDept",
+			data : ({
+				dept : dept,
+			}),
+			success : function(data) {
+					$("#s2example-2").html(data);
+				},
+			error:function(){
+					
+			}
+		});
+	
+}
+
+function addProjectMember(){
+	
+	var projectMember = $(".select2-search-choice").text();
+	var projectId = $("#projectId").val();
+	$.ajax({
+		type:"POST",
+		url:"${pageContext.request.contextPath}/projectMember/addProjectMember",
+		data : ({
+			projectMember : projectMember,
+			projectId : projectId,
+		}),
+		success : function(data) {
+				if(data == "success"){
+					alert("添加成功！");
+					window.location.href="${pageContext.request.contextPath}/projectMember/checkProjectMember?id=" + projectId;
+				}else{
+					alert("添加失败！");
+					window.location.href="${pageContext.request.contextPath}/projectMember/checkProjectMember?id=" + projectId;
+				}
+			},
+		error:function(){
+			alert("添加失败！");
+			window.location.href="${pageContext.request.contextPath}/projectMember/checkProjectMember?id=" + projectId;	
+		}
+	});
+}
+
+function deleteProjectMember(id){
+	var projectId = $("#projectId").val();
+	$.ajax({
+		type:"POST",
+		url:"${pageContext.request.contextPath}/projectMember/deleteProjectMember",
+		data : ({
+			id : id,
+		}),
+		success : function(data) {
+				if(data == "success"){
+					alert("删除成功！");
+					window.location.href="${pageContext.request.contextPath}/projectMember/checkProjectMember?id=" + projectId;
+				}else{
+					alert("删除失败！");
+					window.location.href="${pageContext.request.contextPath}/projectMember/checkProjectMember?id=" + projectId;
+				}
+			},
+		error:function(){
+			alert("删除失败！");
+			window.location.href="${pageContext.request.contextPath}/projectMember/checkProjectMember?id=" + projectId;
+		}
+	});
+	
+}
+
+</script>
+</html>

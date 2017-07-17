@@ -1,0 +1,405 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="OVIT Project Manage System" />
+<meta name="author" content="OVIT R&D" />
+<title>光谷信息项目管理系统</title>
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/css/fonts/arimo/css/arimo.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/css/fonts/linecons/css/linecons.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/css/fonts/fontawesome/css/font-awesome.min.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/css/bootstrap.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/css/xenon-core.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/css/xenon-forms.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/css/xenon-components.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/css/xenon-skins.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/css/custom.css">
+<!-- Imported styles on this page -->
+ <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/jquery.treegrid.css">
+ <style type="text/css">
+ .treegrid-1  
+ {
+ font-weight:bold;
+  background-color: #666666;
+ }
+ 
+ </style>
+<script src="${pageContext.request.contextPath}/assets/js/jquery-1.11.1.min.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/jquery-form.js"></script>
+<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!--[if lt IE 9]>
+	<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+	<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+<![endif]-->
+</head>
+<body class="page-body">
+	<%@ include file="../frame/setting.jsp"%>
+	<div class="page-container">
+		<%@ include file="../frame/left.jsp"%>
+		<div class="main-content">
+			<%@ include file="../frame/nav.jsp"%>
+
+			  <div class="page-title">
+
+				<div class="title-env">
+					<h1 class="title">里程碑</h1>
+					<p class="description">项目管理里程碑管理</p>
+				</div>
+
+				<div class="breadcrumb-env">
+
+					<ol class="breadcrumb bc-1">
+						<li><a href="../"><i class="fa-home"></i>主页</a></li>
+						<li><a href="../project/list">所有项目</a></li>
+						<li class="active"><strong>里程碑</strong></li>
+					</ol>
+
+				</div>
+
+			</div>
+                
+			<!-- Basic Setup -->
+			<div class="panel panel-default">
+
+				<div class="panel-heading">
+					<div class="panel-body">
+						<div class="form-group">
+
+
+							<form class="col-md-11" id="searchForm"
+								action="${pageContext.request.contextPath}/milestone/list?pid=${pid}"
+								method="post">
+								<div class="input-group">
+									<select class="form-control" name="type" style="width: 150px;"
+										id="type">
+										<option value="1">计划开始时间</option>
+										<option value="2">计划结束时间</option>
+									</select>
+									
+									
+									 <input type="text" id="timeSelect"
+										class="form-control daterange" style="width: 250px;"
+										data-callback />
+									<button type="submit" class="btn-unstyled">
+										<i class="linecons-search"></i>
+									</button>
+								</div>
+								<input type="hidden" name="startDate" id="startDate" value="">
+								<input type="hidden" name="endDate" id="endDate" value="">
+							</form>
+
+							<div class="col-sm-1">
+								<form action="${pageContext.request.contextPath}/milestone/resolve/milestone?pid=${pid}" 
+										method="post" enctype="multipart/form-data" name = "uploadMilestoneForm" id = "uploadMilestoneForm">
+										<input name="fileType" type="hidden" value="" />
+									 	<input class="fa-cloud" type="file" style="width: 73px;font-size: 14px;" 
+									 		name = "uploadMilestone" id ="uploadMilestone" value="" onchange="uploadMilestoneSub('uploadMilestoneForm')" />
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="panel-body">
+ 
+					<table id="table" class="table tree table-bordered table-striped table-condensed"
+						cellspacing="0" width="100%">
+						 
+
+						<tbody >
+						<tr class="treegrid-1">  
+							 	<td width="5%"> </td>
+								<td>阶段</td>
+								<td width="10%">上级</td>
+								<td>计划开始时间</td>
+								<td>计划结束时间</td>
+								<td>计划工时</td>
+								<td>负责人</td>
+								<td width="27%">操作</td>
+							</tr>
+							<c:forEach items="${list}" var="item" varStatus="status">
+								<tr class="treegrid-${item.id}  <c:choose>
+											<c:when test="${not empty item.parentId}">treegrid-parent-${item.parentId}
+											</c:when>
+											<c:otherwise>treegrid-parent-1</c:otherwise>
+										</c:choose>"> 
+									<td align="center"  ></td>
+									<td align="center" title="${item.milestoneName}"><c:out
+											value='${item.milestoneName}' /></td>
+									<td align="center"> <c:out value='${item.parentMilestoneName}' /></td>
+									<td align="center"><fmt:formatDate
+											value='${item.planStartDate}' pattern='yyyy-MM-dd' /></td>
+									<td align="center"><fmt:formatDate
+											value='${item.planEndDate}' pattern='yyyy-MM-dd' /></td>
+									<td align="center""><c:out value='${item.planHours}' /></td>
+									<td align="center""><c:out value='${item.inChargeName}' /></td>
+									<td align="center"><a href="javascript:void(0)"
+										class="btn btn-secondary btn-sm btn-icon icon-left"
+										onclick="edit(${item.id})">编辑</a> <a href="javascript:void(0)"
+										class="btn btn-danger btn-sm btn-icon icon-left"
+										onclick="del(${item.id})"> 删除 </a> <a
+										href="javascript:void(0)"
+										class="btn btn-info btn-sm btn-icon icon-left"
+										onclick="addSub(${item.id})" id="addSub"> 新增子项 </a></td>
+								</tr>
+							</c:forEach>
+
+						</tbody>
+					</table>
+
+				</div>
+			</div>
+
+			<div class="modal fade" id="modal">
+				<div class="modal-dialog">
+					<div class="modal-content">
+
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal"
+								aria-hidden="true">&times;</button>
+							<h4 class="modal-title" id="modalTitle"></h4>
+						</div>
+
+						<div class="modal-body">
+							<div class="row">
+								<div class="col-md-12">
+
+									<div class="form-group">
+										<label for="milestoneName" class="control-label">里程碑</label> <input
+											type="text" class="form-control" name="milestoneName"
+											data-validate="required" data-message-required="请填写里程碑名称."
+											placeholder="Required Field" value="${model.milestoneName}" />
+									</div>
+
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-6">
+
+									<div class="form-group">
+										<label for="planStartDate" class="control-label">计划开始时间</label>
+
+										<input type="text" name="planStartDate"
+											class="form-control datepicker" data-format="yyyy-mm-dd">
+
+									</div>
+
+								</div>
+
+								<div class="col-md-6">
+
+									<div class="form-group">
+										<label for="planStartDate" class="control-label">计划结束时间</label>
+
+										<input type="text" name="planStartDate"
+											class="form-control datepicker" data-format="yyyy-mm-dd">
+
+									</div>
+
+								</div>
+							</div>
+
+
+
+							<div class="row">
+								<div class="col-md-6">
+
+									<div class="form-group">
+										<label for="planHours" class="control-label">计划工时</label> <input
+											type="text" class="form-control" name="planHours"
+											data-validate="number" placeholder="请填写计划工时" />
+									</div>
+
+								</div>
+
+								<div class="col-md-6">
+
+									<div class="form-group">
+										<label for="milestoneNo" class="control-label">里程碑编号</label> <input
+											type="text" class="form-control" name="milestoneNo"
+											placeholder="请填写里程碑编号" />
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="modal-footer">
+							<button type="button" class="btn btn-white" data-dismiss="modal">取消</button>
+							<button type="button" class="btn btn-info" id="btnSave">保存</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+
+
+			<!-- Main Footer -->
+			<%@ include file="../frame/footer.jsp"%>
+		</div>
+	</div>
+	<%@ include file="../frame/bottomScript.jsp"%>
+
+
+ 
+<script src="${pageContext.request.contextPath}/assets/js/treegrid/jquery.treegrid.js"></script>
+ <script type="text/javascript" src="${pageContext.request.contextPath}/assets/js/treegrid/jquery.treegrid.bootstrap3.js"></script>
+	<script type="text/javascript">
+	var table;
+ 
+	 $(function() {
+		   
+		 $('.tree').treegrid({
+			 expanderExpandedClass: 'glyphicon glyphicon-minus',
+             expanderCollapsedClass: 'glyphicon glyphicon-plus'
+         });
+		 /*
+		  table = $('#table2').DataTable({
+                      "bLengthChange" : false, //改变每页显示数据数量
+												"bFilter" : false, //过滤功能
+												 'ordering'  :false,
+												"oLanguage" : {
+													"sProcessing" : "<img src='/images/datatable_loading.gif'>  努力加载数据中.",
+													"sLengthMenu" : "每页显示 _MENU_ 条记录",
+													"sZeroRecords" : "抱歉， 没有找到",
+													"sInfo" : "从 _START_ 到 _END_ /共 _TOTAL_ 条数据",
+													"sInfoEmpty" : "没有数据",
+													"sInfoFiltered" : "(从 _MAX_ 条数据中检索)",
+													"sZeroRecords" : "没有检索到数据",
+													"sSearch" : "模糊查询:  ",
+													"oPaginate" : {
+														"sFirst" : "首页",
+														"sPrevious" : "前一页",
+														"sNext" : "后一页",
+														"sLast" : "尾页"
+													}
+												}, 
+		 });
+							
+							
+			*/				
+		 
+						 
+		// Show multidatetime picker
+		// more infos here: http://tamble.github.io/jquery-ui-daterangepicker/
+		$('#timeSelect').daterangepicker({
+				    locale: {
+				      format: 'yyyy-mm-dd'
+				    } 
+				}, 
+				function(start, end, label) { 
+					 $('#startDate').val(start.format('YYYY-MM-DD'));
+					 $('#endDate').val(end.format('YYYY-MM-DD'));
+					 return;//不使用异步刷新
+					 var type=$('#type').val();
+					$.ajax({
+						url : '${pageContext.request.contextPath}/milestone/getlist',
+						type:'post', 
+						  dataType:"json",
+						data: ({
+							type:type,
+							startDate:start.format('YYYY-MM-DD'),
+							endDate:end.format('YYYY-MM-DD') 
+						}),
+						success : function(data) {    
+							table.destroy();
+							$(data).each(function(i,item){
+								var trObj = $('<tr></tr>'); 
+								trObj.append($('<td>'+item.id+'</td>'));
+								trObj.append($('<td>'+item.milestoneName+'</td>'));
+								trObj.append($('<td>'+ item.parentMilestone.milestoneName+'</td>'));
+								trObj.append($('<td>'+item.planStartDate +'</td>'));
+								trObj.append($('<td>'+item.planStartDate+'</td>'));
+								trObj.append($('<td>'+item.planHours+'</td>'));
+								trObj.append($('<td>'+item.inChargeName+'</td>'));
+								trObj.append($('<td><a href="javascript:void(0)" class="btn btn-secondary btn-sm btn-icon icon-left" value="'+item.id+'" id="edit">编辑</a> <a href="javascript:void(0)" class="btn btn-danger btn-sm btn-icon icon-left" id="del">删除 </a> <a href="javascript:void(0)"class="btn btn-info btn-sm btn-icon icon-left" id="addSub">新增子项 </a></td>'));
+								 $('#tbody').append(trObj);
+							})  
+							
+						}, 
+						error:function(error){ 
+							 alert(error.responseText);
+						}
+				});
+			 });
+		
+		$("#btnAdd").click(function(){ 
+			
+			
+			window.location.href="${pageContext.request.contextPath}/milestone/addMain?pid=" + ${pid};
+			// $('#model').modal('show');
+	    });
+		
+	});
+	  
+	 
+	 function del(id){
+	      //判断是否有下级
+	       
+	      if (confirm("数据将永久删除，你确定要删除吗？")) {
+		      $.ajax({
+					url : '${pageContext.request.contextPath}/milestone/del',
+					type: "POST",
+	                data: "id="+id,
+					success : function(result) {    
+						  if(result=="Success")
+						  {
+							  window.location.reload();
+						 }
+						  else  {
+							  toastr.success(result);
+							  } 
+					}, 
+					error:function(error){ 
+					 
+						 toastr.success(error.responseText);
+			          } 
+	        })
+	      }
+	} 
+	 function addSub(id){
+		 
+		 
+		 //$('#model').modal('show');
+		 window.location.href="${pageContext.request.contextPath}/milestone/add?id=" + id;
+	 }
+	 function edit(id){
+		 window.location.href="${pageContext.request.contextPath}/milestone/edit?id=" + id;
+	 }
+	
+	 //上传里程碑
+	 function uploadMilestoneSub(formId){
+			debugger
+			var file = document.forms[1].uploadMilestone.value;
+			var pos = file.lastIndexOf(".");
+			var ext = file.substring(pos+1).toLowerCase();
+			document.forms[1].fileType.value = ext;
+			  $("#"+formId).ajaxSubmit({
+				  success : function (data){
+					  debugger
+					 if(data=="SUCCESS"){
+						 alert("上传成功!");
+					 }else{
+						 alert("上传失败!")
+					 }
+				  }
+			  });
+		}	 
+	</script>
+</body>
+</html>

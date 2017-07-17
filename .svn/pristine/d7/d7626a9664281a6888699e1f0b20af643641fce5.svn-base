@@ -1,0 +1,473 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="OVIT Project Manage System" />
+<meta name="author" content="OVIT R&D" />
+<title>光谷信息项目管理系统</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Arimo:400,700,400italic">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/fonts/linecons/css/linecons.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/fonts/fontawesome/css/font-awesome.min.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/bootstrap.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/xenon-core.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/xenon-forms.css"> 
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/xenon-components.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/xenon-skins.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/custom.css">
+
+<script src="${pageContext.request.contextPath}/assets/js/jquery-1.11.1.min.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/layer/layer.js"></script>
+<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!--[if lt IE 9]>
+	<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+	<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+<![endif]-->
+<style type="text/css">
+#table{
+   
+    table-layout:fixed;/* 只有定义了表格的布局算法为fixed，下面td的定义才能起作用。 */
+}
+#table .mtd{
+   
+    width:auto;
+    word-break:keep-all;/* 不换行 */
+    white-space:nowrap;/* 不换行 */
+    overflow:hidden;/* 内容超出宽度时隐藏超出部分的内容 */
+    text-overflow:ellipsis;/* 当对象内文本溢出时显示省略标记(...) ；需与overflow:hidden;一起使用。*/
+}	
+.wwwwww:hover{
+text-decoration: underline;
+}
+
+</style> 
+</head>
+<body class="page-body">
+	 <%@ include file="../frame/setting.jsp" %> 
+	<div class="page-container">
+		<%@ include file="../frame/left.jsp" %>
+		<div class="main-content">
+			<%@ include file="../frame/nav.jsp" %>
+			<div class="page-title">
+				<div class="title-env">
+					<h1 class="title">我参与的</h1>					
+				</div>
+
+				<div class="breadcrumb-env">
+					<ol class="breadcrumb bc-1">
+						<li><a href="${pageContext.request.contextPath}/manageSystem/index"><i class="fa-home"></i>首页</a>
+						</li>
+						<li class="active"><strong>项目管理</strong></li>
+						<li class="active"><strong>我参与的</strong></li>
+					</ol>
+				</div>
+			</div>		
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<table cellpadding="0" cellspacing="0" width="100%" border="0">
+						<tr>
+							<td width="10%"></td>
+							<td width="10%"></td>
+							<td width="10%"></td>
+							<td width="16%"></td>
+							<td width="6%"></td>
+							<td width="8%"></td>
+							<td width="10%"></td>
+							<td width="10%"></td>
+							<td width="10%"></td>
+							<td width="10%"></td>
+						</tr>
+						<tr>
+							<td colspan="2">
+				 				<select class="form-control" id="sec" name ="sele" style ="width:150px;height:40px;">
+									<option selected="selected" value="1">项目开始时间</option>
+									<option value="2">项目计划结束时间</option>				
+								</select>
+							</td>
+							<td colspan="2">
+								<div id="dat" class="daterange daterange-inline" data-format="YYYY-MM-DD" style="width:85%;height:40px;background:rgba(255, 255, 255, 0.9)">
+									<i class="fa-calendar"></i>
+									<span id="dateTime">请选择日期范围</span>
+								</div> 
+							</td>
+							<td align="left">
+								<a href="javascript:void(0)" class="btn-unstyled" onclick="btnAction();"><i style="float:center;margin-top:5px" class="linecons-search"></i></a> 
+							</td>
+							<td></td>										
+							<td colspan="2" align="center"> 
+								<select class="form-control" id="sect" name ="sel" style ="width:100px;height:40px;">
+									<option value="0">请选择</option> 
+									<option value="1">项目名称</option>
+									<option value="2">项目经理</option>
+								</select>
+							</td>
+							<td colspan="2">																	
+								<div class="form-control" style="padding-top:5px;height:40px;">
+									<input type="text" id="kw" name="keyword" maxlength="200" style="width:85%;height:30px;border-style:none;outline:medium;">				
+									<a href="javascript:void(0)" class="btn-unstyled" onclick="btnActions();"><i class="linecons-search"></i></a> 
+								</div>
+							</td>	
+						</tr>	
+					</table> 					  
+				<table id="table" class="table table-bordered table-striped" width="100%">
+					<thead align="center">
+						<tr>
+							<td align="center">项目名称</td>
+							<td width="10%" align="center">项目经理</td>
+							<td width="12%" align="center">项目开始时间</td>
+							<td width="15%" align="center" title="项目计划结束时间">项目计划结束时间</td>
+							<td width="12%" align="center" title="待评价工作项">待评价工作项</td>
+							<td width="16%" align="center">项目进度</td>
+							<td width="19%" align="center">操作</td>
+						</tr>
+					</thead>				
+					<tbody class="middle-align">			
+					<c:forEach items="${list}" var="item" varStatus="status">
+							<tr>
+					   		 	<td class="mtd" align="center" title="${item.projectName}"><a href="javascript:void(0);" onclick="showAjaxModal(${item.id});">${item.projectName}</a></td>
+					    		<td align="center" title="${item.pmName}"><c:out value='${item.pmName}'/>&nbsp;</td>
+								<td align="center"><fmt:formatDate value='${item.startTime}' pattern='yyyy-MM-dd'/>&nbsp;</td>
+								<td align="center"><fmt:formatDate value='${item.endTime}' pattern='yyyy-MM-dd'/>&nbsp;</td>
+								<c:choose>
+									<c:when test="${item.noEvaLuateCount ne 0}">
+										<td align="center" title="${item.noEvaLuateCount}">
+											<a href="javascript:void(0);" id="${item.id}" onclick="toAppraise(id);">											
+												<font class="wwwwww" style="color:red;"><c:out value='${item.noEvaLuateCount}'/></font>&nbsp;
+											</a>			
+										</td>
+									</c:when>
+									<c:otherwise>
+										<td align="center" title="0"><c:out value='0'/>&nbsp;</td>	
+									</c:otherwise>
+								</c:choose>
+								<td align="center">
+									<div class="progress" style="height:20px;">
+										<div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width:${item.progressBar gt 100 ? 100 : item.progressBar }%;padding-top:2px">
+											<span style="z-index: 100001;position: absolute;float: left;" ><font style="color:#2c2e2f;"><c:out value='${item.progressBar == 0 ? 0.00 : item.progressBar}%'/></font></span>
+										</div>
+									</div>
+								</td>
+								<td>
+									<c:if test="${item.role ne 0}">
+										<a href="${pageContext.request.contextPath}/milestone/list?pid=${item.id}" class="btn btn-info btn-sm btn-icon icon-left">里程碑</a>
+									</c:if>
+									<a href="${pageContext.request.contextPath}/projectMember/checkProjectMember?id=${item.id}&partake=partake" class="btn btn-orange btn-sm btn-icon icon-left">查看成员</a>
+							   </td>
+							</tr>
+						</c:forEach>
+				  </tbody>
+			</table>
+		</div>
+	</div>
+			<!-- Main Footer -->
+			<%@ include file="../frame/footer.jsp" %>
+		</div>
+	</div>
+	<%@ include file="../frame/bottomScript.jsp" %>
+	<div class="modal fade" id="modal-7" aria-hidden="true" style="display: none;">
+		<div class="modal-dialog detiles">
+			<div class="modal-content ">
+				
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+					<h4 class="modal-title">项目详情</h4>
+				</div>
+				
+				<div class="modal-body ">								
+				</div>
+				
+				<div class="modal-footer">
+					<button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+/* 分页 */
+jQuery(document).ready(function($){  
+	table = $('#table').DataTable({
+        "bLengthChange" : false, //改变每页显示数据数量
+		"bFilter" : false, //过滤功能
+		'ordering'  :false,
+		"oLanguage" : {
+			"sProcessing" : "<img src='/images/datatable_loading.gif'>  努力加载数据中.",
+			"sLengthMenu" : "每页显示 _MENU_ 条记录",
+			"sZeroRecords" : "抱歉， 没有找到",
+			"sInfo" : "从 _START_ 到 _END_ /共 _TOTAL_ 条数据",
+			"sInfoEmpty" : "没有数据",
+			"sInfoFiltered" : "(从 _MAX_ 条数据中检索)",
+			"sZeroRecords" : "没有检索到数据",
+			"sSearch" : "模糊查询:  ",
+			"oPaginate" : {
+				"sFirst" : "首页",
+				"sPrevious" : "上一页",
+				"sNext" : "下一页",
+				"sLast" : "尾页"
+			}
+		}, 
+    });            
+});
+ //根据项目时间查询
+ function btnAction(){
+	//debugger;
+	if($('#dateTime').text() == "请选择日期范围"){
+			layer.tips('请选择日期范围！', '#dat', {
+				  tips: [1, '#3595CC'],
+				  time: 4000
+				});
+		return;
+	}
+	var dateTime = $("#dateTime").text();
+	var opt = document.getElementById("sec").value
+	$.ajax({
+		url : '${pageContext.request.contextPath}/partakeitems/queryByDate',
+		type:'post',
+		data: ({
+			dateTime:dateTime,
+			opt:opt,
+		}),
+		success : function(result) {    
+			statement(result.data);
+			var pageCount = result.pageNum;//取到pageCount的值(把返回数据转成object类型)
+            var currentPage = result.currentPage;// //得到currentPage
+            var options = {
+                 bootstrapMajorVersion: 3, //版本
+                 currentPage: currentPage, //当前页数
+                 totalPages: pageCount, //总页数
+                 itemTexts: function (type1, page, current) {
+                     switch (type1) {
+                       case "first":
+                             return page;
+                         case "prev":
+                             return '上一页';
+                         case "next":
+                             return '下一页';
+                        case "last":
+                             return page;
+                         case "page":
+                             return page;
+                     }
+                 },
+                 pageUrl: function(type1, page, current){
+                	 if (page==current) {
+                         return "javascript:void(0)";
+                     }
+                 },
+                 onPageClicked: function (event, originalEvent, type1, page) { //异步换页
+                     $.post("${pageContext.request.contextPath}/partakeitems/queryByDate",{dateTime:dateTime,opt:opt,currentPage:page},function(d) {
+                    	 statement(d.data);
+                    	 start = d.totalCount==0?0:(d.currentPage -1 )*d.pagerSize+1;
+                         end = d.currentPage*d.pagerSize < d.totalCount ?d.currentPage*d.pagerSize:d.totalCount;
+                         $("#table_info").empty().append("从 "+start+" 到 "+end+" 共 "+d.totalCount+" 条数据");
+                     });
+                 },
+            };
+            var start = result.totalCount == 0?0:(result.currentPage -1 )*result.pagerSize+1;
+            var end = result.currentPage*result.pagerSize < result.totalCount ?result.currentPage*result.pagerSize:result.totalCount;
+            $("#table_info").empty().append("从 "+start+" 到 "+end+" 共 "+result.totalCount+" 条数据");
+            $('#table_paginate .pagination').bootstrapPaginator(options);	
+		},
+	});
+} 
+//查询框查询
+ function btnActions(){
+	//debugger;
+	var keyword = document.getElementById("kw").value;
+	var opt = document.getElementById("sect").value;
+	if(keyword !="" && opt == 0){
+		layer.tips('请选择查询条件！', '#kw', {
+			  tips: [1, '#3595CC'],
+			  time: 4000
+			});
+		return;
+	}
+	if(keyword =="" && opt == 1){
+		layer.tips('关键字不能为空！', '#kw', {
+			  tips: [1, '#3595CC'],
+			  time: 4000
+			});
+		return;
+	}
+	if(keyword =="" && opt == 2){
+		layer.tips('关键字不能为空！', '#kw', {
+			  tips: [1, '#3595CC'],
+			  time: 4000
+			});
+		return;
+	}
+	$.ajax({
+		url : '${pageContext.request.contextPath}/partakeitems/queryByItem',
+		type:'post',
+		data: ({
+			keyword:keyword,
+			opt:opt,
+		}),
+		success : function(result) {    
+			statement(result.data);
+			debugger;
+			var pageCount = result.pageNum;//取到pageCount的值(把返回数据转成object类型)
+            var currentPage = result.currentPage;// //得到currentPage
+            var options = {
+                 bootstrapMajorVersion: 3, //版本
+                 currentPage: currentPage, //当前页数
+                 totalPages: pageCount, //总页数
+                 itemTexts: function (type1, page, current) {
+                     switch (type1) {
+                       case "first":
+                             return page;
+                         case "prev":
+                             return '上一页';
+                         case "next":
+                             return '下一页';
+                        case "last":
+                             return page;
+                         case "page":
+                             return page;
+                     }
+                 },
+                 pageUrl: function(type1, page, current){
+                	 if (page==current) {
+                         return "javascript:void(0)";
+                     }
+                 },
+                 onPageClicked: function (event, originalEvent, type1, page) { //异步换页
+                     $.post("${pageContext.request.contextPath}/workItem/queryByExample",{type:type,status:status,creatorName:creatorName,projectName:projectName,val:val,currentPage:page},function(d) {
+                    	 statement(d.data);
+                    	 start = d.totalCount==0?0:(d.currentPage -1 )*d.pagerSize+1;
+                         end = d.currentPage*d.pagerSize < d.totalCount ?d.currentPage*d.pagerSize:d.totalCount;
+                         $("#table_info").empty().append("从 "+start+" 到 "+end+" 共 "+d.totalCount+" 条数据");
+                     });
+                 },
+            };
+            var start = result.totalCount == 0?0:(result.currentPage -1 )*result.pagerSize+1;
+            var end = result.currentPage*result.pagerSize < result.totalCount ?result.currentPage*result.pagerSize:result.totalCount;
+            $("#table_info").empty().append("从 "+start+" 到 "+end+" 共 "+result.totalCount+" 条数据");
+            $('#table_paginate .pagination').bootstrapPaginator(options);
+		}, 
+		failure : function(data) {
+			layer.open({
+				  title: '操作提醒'
+				  ,content: '查询失败，请重新输入正确关键字！'
+				});
+		},
+		error:function(error){ 
+			 layer.open({
+				  title: '操作提醒'
+				  ,content: '请输入正确关键字！'
+				});
+		}
+	});
+}  
+
+//点击待评价工作项跳转到工作项评价
+ function toAppraise(id){ 
+	 //debugger;
+	 //var staNum = null;
+	 //projectName = $(this).parent().find("td :eq(0)").val();
+	 //staNum = $(this).parent().find("td :eq(4)").val();
+	 //var projectName = $("#" + id).parent().parent().find("td:eq(0)").attr("title");
+	 window.location.href="${pageContext.request.contextPath}/workItem/index?id=" + id;
+ }
+ 
+ function showAjaxModal(id)
+	{	 
+		jQuery('#modal-7').modal('show', {backdrop: 'static'});
+		var projectId=id;
+		jQuery.ajax({
+			url: '${pageContext.request.contextPath}/partakeitems/details',
+			type: 'post',
+			data: ({
+				projectId:projectId
+				
+			}),
+			success: function(response)
+			{				
+				jQuery('#modal-7 .modal-body').html(response);
+			}
+		});
+	}
+ 
+//返回的毫秒数 转成统一格式
+ function getMyDate(str){  
+        var oDate = new Date(str),  
+        oYear = oDate.getFullYear(),  
+        oMonth = oDate.getMonth()+1,  
+        oDay = oDate.getDate(),  
+        oTime = oYear +'-'+ getzf(oMonth) +'-'+ getzf(oDay) ;
+        return oTime;  
+    }
+    //补0操作  
+    function getzf(num){  
+        if(parseInt(num) < 10){  
+            num = '0'+num;  
+        }  
+        return num;  
+    }  	
+ //异步请求后拼接html显示
+	function statement(data){
+			$(".middle-align").empty();
+			var datas="";
+			$(data).each(function(i,item){
+				datas+="<tr>"; 
+				if(item.projectName != null && item.projectName != undefined && item.projectName != ''){
+					datas+="<td class='mtd' align='center' title='"+item.projectName+"'><a href='javascript:void(0);' onclick='showAjaxModal('"+item.id+"');'>"+item.projectName+"</a></td>";
+				}else{datas+="<td align='center' title=''></td>";
+				}
+				if(item.pmName != null && item.pmName != undefined && item.pmName != ''){
+					datas+="<td align='center' title='"+item.pmName+"'>"+item.pmName+"</td>";
+				}else{datas+="<td align='center' title=''></td>";
+				} 
+				if(item.startTime!=null){
+					var startTime=getMyDate(item.startTime);
+					datas+="<td align='center' >"+startTime+"</td>";
+				}else{
+				datas+="<td align='center' ></td>";
+				}
+				 if(item.endTime !=null){
+					var endTime=getMyDate(item.endTime);
+					datas+="<td align='center' >"+endTime+"</td>";
+				}else{
+					datas+="<td align='center' ></td>";
+					}
+				 if(item.noEvaLuateCount != null && item.noEvaLuateCount != undefined && item.noEvaLuateCount != ''){
+					datas+="<td align='center' title='"+item.noEvaLuateCount+"'>"+
+					"<a href='javascript:void(0);' id='"+item.id+"' onclick='toAppraise(id);'>"+
+					"<font class='wwwwww' style='color:red;'>"+item.noEvaLuateCount+"</font></a></td>";
+				}else{
+					datas+="<td align='center' title='0'>"+"<c:out value='0'/></td>";
+				} 
+				 //debugger;
+				 if(item.progressBar != null && item.progressBar != undefined && item.progressBar != ''){
+						datas+="<td align='center'>";
+						datas+="<div class='progress' style='height:20px;'>";
+						datas+="<div class='progress-bar progress-bar-success' role='progressbar' aria-valuenow='20' aria-valuemin='0' aria-valuemax='100' style='width:";
+						 if(item.progressBar >= 0 && item.progressBar < 100){
+								datas += item.progressBar;
+							}else{
+								datas += "100";
+							}
+						datas += "%;padding-top:2px'>";
+						datas+="<span style='z-index: 100001;position: absolute;float: left;' ><font style='color:#2c2e2f;'>"+parseFloat(item.progressBar).toFixed(2)+"%</font></span></div></div></td>";
+					}else{
+						datas+="<td align='center'>"+
+						"<div class='progress' style='height:20px;'>"+
+						"<div class='progress-bar progress-bar-success' role='progressbar' aria-valuenow='20' aria-valuemin='0' aria-valuemax='100' style='width:0%;padding-top:2px'>"+
+						"<span class='' ><font style='color:#2c2e2f;'><c:out value='0.00%'/>"+
+						"</font></span></div></div></td>";
+					}
+				 datas+="<td>"
+				 if(item.role != 0){
+					 datas+="<a href='${pageContext.request.contextPath}/milestone/list?pid="+item.id+"' class='btn btn-info btn-sm btn-icon icon-left'>里程碑</a>"
+				 }
+				 datas+="<a href='${pageContext.request.contextPath}/projectMember/checkProjectMember?id="+item.id+"&partake=partake' class='btn btn-orange btn-sm btn-icon icon-left'>"+"查看成员"+"</a></td></tr>";
+			});	
+		$(".middle-align").html(datas);
+	} 
+</script>	
+</html>

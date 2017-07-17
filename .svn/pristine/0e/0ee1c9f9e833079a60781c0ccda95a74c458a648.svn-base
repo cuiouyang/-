@@ -1,0 +1,7 @@
+package com.bsi.ms.service;
+
+public interface CommonService {
+
+	String getSequnce();
+
+}

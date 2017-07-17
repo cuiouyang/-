@@ -1,0 +1,85 @@
+package com.bsi.ms.model;
+
+import java.util.Date;
+
+public class Attachment {
+	private Integer id;
+
+	private Integer projectId;
+
+	private String attachmentName;
+
+	private String attachmentUrl;
+
+	private String creatorAccount;
+
+	private Integer type;
+
+	private String relatedId;
+
+	private Date createTime;
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public Integer getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(Integer projectId) {
+		this.projectId = projectId;
+	}
+
+	public String getAttachmentName() {
+		return attachmentName;
+	}
+
+	public void setAttachmentName(String attachmentName) {
+		this.attachmentName = attachmentName == null ? null : attachmentName.trim();
+	}
+
+	public String getAttachmentUrl() {
+		return attachmentUrl;
+	}
+
+	public void setAttachmentUrl(String attachmentUrl) {
+		this.attachmentUrl = attachmentUrl == null ? null : attachmentUrl.trim();
+	}
+
+	public String getCreatorAccount() {
+		return creatorAccount;
+	}
+
+	public void setCreatorAccount(String creatorAccount) {
+		this.creatorAccount = creatorAccount == null ? null : creatorAccount.trim();
+	}
+
+	public Integer getType() {
+		return type;
+	}
+
+	public void setType(Integer type) {
+		this.type = type;
+	}
+
+	public String getRelatedId() {
+		return relatedId;
+	}
+
+	public void setRelatedId(String relatedId) {
+		this.relatedId = relatedId == null ? null : relatedId.trim();
+	}
+
+	public Date getCreateTime() {
+		return createTime;
+	}
+
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
+	}
+}

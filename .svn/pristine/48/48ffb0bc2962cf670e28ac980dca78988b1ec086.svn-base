@@ -1,0 +1,34 @@
+package com.bsi.ms.mapper;
+
+import java.util.Date;
+import java.util.List;
+
+import com.bsi.ms.model.ProjectMember;
+
+public interface ProjectMemberMapper {
+    int deleteByPrimaryKey(Integer id);
+
+    int insert(ProjectMember record);
+
+    int insertSelective(ProjectMember record);
+
+    ProjectMember selectByPrimaryKey(Integer id);
+
+    int updateByPrimaryKeySelective(ProjectMember record);
+
+    int updateByPrimaryKey(ProjectMember record);
+    
+    List<ProjectMember> getAllMember();
+    
+    String getMemberAccount(String id);
+    
+    String getMemberName(String id);
+
+    List<ProjectMember> getProjectMemberById(String id);
+    
+    int addProjectMember(ProjectMember projectMember);
+
+    int checkProjectMember(ProjectMember projectMember);
+
+    int deleteProjectMember(ProjectMember projectMember);
+}

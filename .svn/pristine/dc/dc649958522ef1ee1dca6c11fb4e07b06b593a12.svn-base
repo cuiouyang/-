@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="CommonMapper">
+
+	<select id="getSeq" resultType="string" parameterType="string">
+		select value from system_config where cfgKey=#{parameter}		 
+	</select>
+
+	<insert id="insert" parameterType="java.util.Map">
+	<![CDATA[
+		replace into system_config (cfgKey,value) values (#{key},#{value})
+	]]> 
+	</insert>
+
+</mapper>

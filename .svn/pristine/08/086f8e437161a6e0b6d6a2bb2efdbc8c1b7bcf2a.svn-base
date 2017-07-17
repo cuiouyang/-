@@ -1,0 +1,86 @@
+package com.bsi.ms.controller;
+
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.bsi.ms.model.User;
+import com.bsi.ms.service.CommonService;
+import com.bsi.ms.service.LdapService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+/**
+ * @ClassName: LoginController
+ * @Description: 登录验证controller文件
+ * @author chenqim
+ * @date Mar 28, 2017 10:32:42 AM
+ * 
+ */
+@Controller
+public class LoginController {
+
+	@Autowired
+	private LdapService ldapService;
+	@Autowired
+	private CommonService commonService;
+	
+	protected static Logger logger = LogManager.getLogger(LoginController.class);
+	
+	@RequestMapping(value = "/manageSystem/index", method = { RequestMethod.GET, RequestMethod.POST })
+	public String index(HttpServletRequest request, HttpServletResponse response,Model model) {
+		User loginUser  = (User) request.getSession().getAttribute("loginUser");
+			String account = loginUser.getAccount();
+			List<String> qaList = commonService.getQAMembers();
+			if(qaList.contains(account)){
+				request.getSession().setAttribute("role","QA");
+			}else{
+				request.getSession().setAttribute("role","common");
+			}
+		return "redirect:/partakeitems/list";
+	}
+	
+	@RequestMapping(value = "/manageSystem/logout", method = { RequestMethod.GET, RequestMethod.POST })
+	public String logout(HttpServletRequest request, HttpServletResponse response,Model model) {
+		HttpSession session = request.getSession();
+		session.invalidate();
+		return "login";
+	}
+
+	@RequestMapping(value = "/manageSystem/loginFilter", method = { RequestMethod.GET, RequestMethod.POST })
+	public String loginFilter(HttpServletRequest request, HttpServletResponse response) {
+		return "login";
+	}
+
+	@RequestMapping(value = "/manageSystem/login", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public String login(HttpServletRequest request, HttpServletResponse response) {
+		String account = request.getParameter("account");
+		String password = request.getParameter("password");
+		if (StringUtils.isBlank(account) || StringUtils.isBlank(password)) {
+			return "nullError";
+		} else {
+			if(!account.endsWith("@51bsi.com")){
+				account+="@51bsi.com";
+			}
+			if (ldapService.authenticate(account, password)) {
+				HttpSession session = request.getSession();
+				User loginUser = ldapService.findUserByAccount(account);
+				session.setAttribute("loginUser", loginUser);
+				return "success";
+			} else {
+				return "pwdError";
+			}
+		}
+	}
+}

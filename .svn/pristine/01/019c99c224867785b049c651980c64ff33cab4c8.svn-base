@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="
+         http://www.springframework.org/schema/beans
+	     http://www.springframework.org/schema/beans/spring-beans.xsd
+	     http://www.springframework.org/schema/context
+	     http://www.springframework.org/schema/context/spring-context-4.0.xsd
+         http://www.springframework.org/schema/mvc
+         http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+         http://www.springframework.org/schema/tx
+         http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+         http://www.springframework.org/schema/util
+         http://www.springframework.org/schema/util/spring-util-4.0.xsd
+         http://www.springframework.org/schema/aop 
+         http://www.springframework.org/schema/aop/spring-aop-4.0.xsd">
+    
+    <context:property-placeholder location="classpath:default.properties"/>
+    <util:properties id="settings" location="classpath:config.properties"/>  
+    
+    
+    <import resource="classpath:spring/servlet-context.xml" />
+    <mvc:annotation-driven />
+	<!-- 使用annotation 自动注册bean, 并保证@Required、@Autowired的属性被注入 -->
+	<context:annotation-config/> 
+	<context:component-scan base-package="com.bsi">
+		<context:exclude-filter type="regex" expression=".*Controller$"/>
+		<context:exclude-filter type="regex" expression=".*JacksonConversionServiceConfigurer$"/>
+		<context:exclude-filter type="regex" expression=".*Mapper$"/>
+		<context:exclude-filter type="regex" expression="org.springframework.web.servlet.handler.HandlerInterceptorAdapter"/>
+	</context:component-scan>
+
+    <bean id="dataSource"
+        class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="${default.driver}" />
+        <property name="jdbcUrl" value="${default.driverUrl}" />
+        <property name="user" value="${default.user}" />
+        <property name="password" value="${default.password}" />
+        <property name="minPoolSize" value="${default.minPoolSize}" />
+        <property name="maxPoolSize" value="${default.maxPoolSize}" /> 
+        <property name="maxIdleTime" value="3600" />
+        <property name="idleConnectionTestPeriod" value="30" />
+        <property name="preferredTestQuery" value="select 1" />
+        <property name="description" value="defaultDataSource" />
+    </bean>
+     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer"> 
+		<property name="basePackage" value="com.bsi.ms.mapper" />
+	</bean>
+    <bean id="jdbcTemplate"  class="org.springframework.jdbc.core.JdbcTemplate">
+        <constructor-arg ref="dataSource"></constructor-arg>
+    </bean>
+
+    <!-- 配置LDAP数据源 -->    
+   <!--  <bean id="contextSource" 
+        class="org.springframework.ldap.core.support.LdapContextSource">
+        <property name="url" value="${ldap.url}" />
+        <property name="base" value="${ldap.base}" />
+        <property name="userDn" value="${ldap.userDn}" />
+        <property name="password" value="${ldap.password}" />
+        <property name="baseEnvironmentProperties">  
+            <map>  
+                <entry key="java.naming.security.authentication" value="simple" />  
+            </map>
+        </property> 
+    </bean> -->
+
+ <bean id="contextSource" 
+        class="org.springframework.ldap.core.support.LdapContextSource">
+        <property name="url" value="ldap://192.168.100.251:389" />
+        <property name="base" value="DC=51bsi,DC=com" />
+        <property name="userDn"  
+            value="cn=ldap,cn=Users,DC=51bsi,DC=com" />  
+        <property name="password" value="liubin@51bsi.com" />
+        <property name="baseEnvironmentProperties">  
+            <map>  
+                <entry key="java.naming.security.authentication" value="simple" />  
+            </map>
+        </property> 
+    </bean>
+
+    <!-- 配置LdapTemplate -->
+    <bean id="ldapTemplate" class="org.springframework.ldap.core.LdapTemplate">
+        <constructor-arg ref="contextSource" />
+    </bean>
+
+
+	<!-- 配置mybatis -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="mapperLocations" value="classpath:mybatis/*.xml" />
+		<property name="typeAliasesPackage" value="com.bsi.**.model"/>
+		<property name="configurationProperties">
+			<props>
+				<prop key="cacheEnabled">false</prop>
+				<prop key="defaultExecutorType">REUSE</prop>			
+			</props>
+		</property>
+	    <property name="dataSource" ref="dataSource" />  
+	</bean>
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate" scope="prototype">
+		<constructor-arg index="0" ref="sqlSessionFactory" />
+	</bean>
+
+	<!-- 使用注解方式定义事务 -->
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <!-- 配置事务管理器-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <bean id="transactionInterceptor"
+        class="org.springframework.transaction.interceptor.TransactionInterceptor">
+        <property name="transactionManager" ref="transactionManager" />
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+</beans>

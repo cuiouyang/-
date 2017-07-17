@@ -1,0 +1,212 @@
+package com.bsi.ms.controller;
+ 
+  
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody; 
+import org.springframework.web.servlet.ModelAndView;
+
+import com.bsi.ms.model.ProjectMilestone; 
+import com.bsi.ms.service.MilestoneService;
+import com.bsi.ms.utils.Pager;
+ 
+
+@Controller
+@RequestMapping("/milestone") 
+public class MilestoneController  extends BaseController   {
+
+	public final static Logger logger = Logger.getLogger(MilestoneController.class);
+	@Autowired
+	private MilestoneService service;
+
+	// 里程碑-查询里程碑
+	@RequestMapping(value = "list", method = { RequestMethod.GET, RequestMethod.POST })
+	public Object list(HttpServletRequest request,
+			@RequestParam MultiValueMap<String, String> parameters, ModelMap model) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		Map<String, String> paramMap = parameters.toSingleValueMap();	
+		 String pid=paramMap.get("pid");
+		map.put("projectId", pid);
+		 String type=paramMap.get("type");
+		 if(type!=null&&type.length() > 0)
+		 {
+			 map.put("type", Integer.parseInt(type));
+			  String stime = paramMap.get("startDate");
+				String etime = paramMap.get("endDate");
+				 if(stime!=null&&stime.length() > 0&&etime!=null&&etime.length() > 0)
+				 {
+				map.put("startDate", stime);
+				map.put("endDate", etime);
+				 }
+				 else
+				 {
+					 map.put("type", 0);
+				 }
+		 }
+		 else
+		 {
+			 map.put("type", 0);
+		 } 
+			model.addAttribute("pid", pid); 
+		
+		List<ProjectMilestone> list = service.getList(map);  
+		model.addAttribute("list", list); 
+		
+		int currentPage = paramMap.get("currentPage") == null ? 1 : Integer.parseInt(paramMap.get("currentPage"));
+		List<Object> sub = new ArrayList<Object>(list);
+		Pager pager = new Pager(sub, currentPage);
+		return pager;
+		//return "milestone/list";
+	}
+
+	// 里程碑-异步查询里程碑
+	@RequestMapping(value = "/getlist", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public  List<ProjectMilestone> getlist(@RequestParam MultiValueMap<String, String> parameters, ModelMap model) {
+		Map<String, String> request = parameters.toSingleValueMap();	
+		String pid = request.get("id");
+		String type = request.get("type");
+		String stime = request.get("startDate");
+		String etime = request.get("endDate");
+		Map<String, Object> map = new HashMap<String, Object>();
+		 
+		 int id=1;
+		 if(pid!=null&&pid.length() > 0)
+		 {
+			 id=Integer.parseInt(pid);
+		 }
+		map.put("projectId", id);
+		map.put("type", Integer.parseInt(type));
+		map.put("startDate", stime);
+		map.put("endDate", etime);
+		List<ProjectMilestone> list = service.getList(map);
+		return list;
+	}
+
+	// 里程碑-新增一级里程碑
+	@RequestMapping(value = "/addMain", method = { RequestMethod.GET, RequestMethod.POST })
+	public ModelAndView addMain(HttpServletRequest request,HttpServletResponse response, ModelMap model) {
+		model.addAttribute("type", 0);  
+		model.addAttribute("title", "新增一级里程碑"); 
+		String pid=request.getParameter("pid");
+		ProjectMilestone record=new ProjectMilestone();
+		record.setProjectId(Integer.parseInt(pid));
+		model.addAttribute("record", record);
+		
+		return new ModelAndView("milestone/edit",model);
+		 
+	}
+	
+	// 里程碑-新增一级里程碑
+		@RequestMapping(value = "/del")
+		@ResponseBody
+		public  String del(@RequestParam(value = "id") Integer id) {
+			   
+			  String msg="操作错误";
+				 int count=service.hasChild(id);
+				 if(count>0)
+				 {
+					 msg="包含下级里程碑，请先删除下级里程碑";
+				 }
+				 else
+				 {
+					 count=service.delete(id);
+					 if(count>0)
+					 {
+						 msg="Success";
+					 }
+				 } 
+			return msg;
+		}
+
+	// 里程碑-新增下级里程碑
+	@RequestMapping(value = "/add", method = { RequestMethod.GET, RequestMethod.POST })
+	public ModelAndView add(HttpServletRequest request,HttpServletResponse response, Integer id, ModelMap model) {
+		model.addAttribute("type", 1); 
+		
+		ProjectMilestone record = service.selectByPrimaryKey(id);
+		if (record != null) {
+			Integer parentId=record.getId(); 
+			Integer projectId=record.getProjectId(); 
+			model.addAttribute("title", "新增【"+record.getMilestoneName()+"】下级里程碑"); 
+			record=new ProjectMilestone();
+			record.setParentId(parentId);
+			record.setProjectId(projectId);
+			model.addAttribute("record", record);
+		}
+		return new ModelAndView("milestone/edit",model);
+		 
+	}
+
+	// 里程碑-编辑下级里程碑
+	@RequestMapping(value = "/edit", method = { RequestMethod.GET, RequestMethod.POST })
+	public ModelAndView edit(HttpServletRequest request,HttpServletResponse response, Integer id, ModelMap model) {
+		model.addAttribute("type", 2); 
+		ProjectMilestone record = service.selectByPrimaryKey(id);
+		if (record != null) {
+			model.addAttribute("title", "编辑里程碑"); 
+			model.addAttribute("record", record);
+		} 
+		return new ModelAndView("milestone/edit",model);
+		//return "milestone/edit";
+	}
+
+	// 里程碑-保存里程碑
+	@RequestMapping(value = "/edit/save", method = { RequestMethod.GET, RequestMethod.POST }) 
+	public String save(HttpServletRequest request, ProjectMilestone record, Model model) throws Exception{
+		
+		 
+		// 获取表单数据
+		int type = Integer.parseInt(request.getParameter("type"));    
+		HttpSession session = request.getSession();
+		String inChargeAccount=session.getAttribute("loginUserAccount").toString();//账户
+	    String loginUserName=session.getAttribute("loginUserName").toString();//获取密码
+	    record.setInChargeAccount(inChargeAccount);
+		record.setInChargeName(loginUserName);
+	    Date curDate = new Date();
+		 int i = -1;
+		if (type == 2)// 不修改上级里程碑，只修改时间等参数信息
+		{
+			//修改时，更新修改人等信息
+			int id = Integer.parseInt(request.getParameter("id"));  
+			record.setId(id);
+			record.setUpdateTime(curDate);
+			i = service.update(record);
+		} else {
+			record.setCreateTime(curDate);
+			 String milestoneId = UUID.randomUUID().toString();//新增时，获取uiid 
+			 record.setMilestoneId(milestoneId); 
+			i = service.insert(record);
+		}
+		
+		String msg = "";
+		if(i>0)
+		{
+			return "redirect:/milestone/list?pid="+record.getProjectId();
+		}
+		else
+		{
+			return "redirect:/milestone/list?pid="+record.getProjectId();
+		} 
+
+	}
+}
+

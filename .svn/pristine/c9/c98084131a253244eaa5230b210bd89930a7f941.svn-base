@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="SampleMapper">
+
+	<select id="listInfo" resultType="map" parameterType="map">
+		select id, name, age, sex, birth, point from tbl_sample
+		 <trim prefix="WHERE" prefixOverrides="AND|OR"> 
+			<if test="name != null and name != ''">
+				AND name like  #{name}
+			</if>
+			<if test="sex != null and sex != ''">
+				AND sex = #{sex}
+			</if>
+		 </trim>		
+	</select>
+
+	<update id="update" parameterType="map">
+	<![CDATA[
+		update tbl_sample set name = #{name},age = #{age},sex = #{sex},birth = #{birth},point = #{point} where id = #{id}
+	]]> 
+	</update>
+	
+	<insert id="insert" parameterType="map">
+	<![CDATA[
+		insert into tbl_sample (name,age,sex,birth,point)
+		values (#{name},#{age},#{sex},#{birth},#{point})
+	]]> 
+	</insert>
+	
+	<delete id="delete" parameterType="String">
+	<![CDATA[
+		delete from tbl_sample where id = #{id}
+	]]> 
+	</delete>
+
+</mapper>

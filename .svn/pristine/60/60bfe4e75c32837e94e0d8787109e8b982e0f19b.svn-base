@@ -1,0 +1,42 @@
+package com.bsi.ms.mapper;
+
+import java.util.List;
+import java.util.Map;
+import com.bsi.ms.model.WorkItem;
+import com.bsi.ms.model.WorkItemWithBLOBs;
+
+public interface WorkItemMapper {
+	int deleteByPrimaryKey(Integer id);
+
+	int insert(WorkItemWithBLOBs record);
+
+	int insertSelective(WorkItemWithBLOBs record);
+
+	WorkItemWithBLOBs selectByPrimaryKey(Integer id);
+
+	int updateByPrimaryKeySelective(WorkItemWithBLOBs record);
+
+	int updateByPrimaryKeyWithBLOBs(WorkItemWithBLOBs record);
+
+	int updateByPrimaryKey(WorkItem record);
+
+	WorkItemWithBLOBs selectById(Integer id);
+
+	List<WorkItemWithBLOBs> selectByTerm(Map<String, Object> map);
+	
+	// 根据传入条件查询我的工作项
+	List<WorkItem> selectByMyWork(WorkItem parameters);
+
+	// 根据传入的工作状态查询匹配我的工作项
+	List<WorkItem> selectByMyWorkStatus(Integer status);
+
+	// 根据传入的时间区间查找对应工作项
+	List<WorkItem> selectByActStartTime(Map<String, Object> map);
+
+	List<WorkItem> selectByActEndTime(Map<String, Object> map);
+
+	List<WorkItem> selectByPlanStartTime(Map<String, Object> map);
+
+	List<WorkItem> selectByPlanEndTime(Map<String, Object> map);
+
+}

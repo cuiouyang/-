@@ -1,0 +1,42 @@
+package com.bsi.ms.service.impl;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.ibatis.session.SqlSession;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.bsi.ms.service.CommonService;
+
+@Service
+@Transactional
+public class CommonServiceImpl implements CommonService {
+	@Autowired
+	private SqlSession session;
+
+	@Override
+	public String getSequnce() {
+		String key = new SimpleDateFormat("yyyyMM").format(Calendar.getInstance().getTime());
+		int seq = 1;
+		String value = session.selectOne("CommonMapper.getSeq", key);
+		if (null != value) {
+			seq = Integer.parseInt(value);
+			seq++;
+		}
+		resetSequnce(key, seq);
+		String serialNo = key + "N" + String.format("%03d", seq);
+		return serialNo;
+	}
+
+	private void resetSequnce(String key, int value) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("key", key);
+		map.put("value", value);
+		session.insert("CommonMapper.insert", map);
+	}
+
+}

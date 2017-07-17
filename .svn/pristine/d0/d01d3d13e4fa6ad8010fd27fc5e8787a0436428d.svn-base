@@ -1,0 +1,248 @@
+package com.bsi.ms.controller;
+
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.bsi.ms.model.Project;
+import com.bsi.ms.model.ProjectMember;
+import com.bsi.ms.model.ProjectMilestone;
+import com.bsi.ms.model.User;
+import com.bsi.ms.model.WorkItemWithBLOBs;
+import com.bsi.ms.service.MilestoneService;
+import com.bsi.ms.service.ProjectMemberService;
+import com.bsi.ms.service.ProjectService;
+import com.bsi.ms.service.WorkItemService;
+
+@Controller
+public class WorkItemController {
+
+	@Autowired
+	ProjectMemberService projectMemberService;
+	@Autowired
+	ProjectService projectService;
+	@Autowired
+	MilestoneService milestoneService;
+	@Autowired
+	WorkItemService workItemService;
+	
+	protected static Logger logger = LogManager.getLogger(WorkItemController.class);
+	
+	// 工作项管理-补登已完成工作项-初始化页面
+	@RequestMapping(value = "/workItem/addWorkItem", method = { RequestMethod.GET, RequestMethod.POST })
+	public String addWorkItem(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam MultiValueMap<String, String> parameters, Model model) {
+
+		User loginUser = (User)request.getSession().getAttribute("loginUser");
+		
+		// 通过账户来获取工作项目名册数据
+		List<Project> projectList = projectService.getProjectName(loginUser.getAccount());
+
+		model.addAttribute("projectList", projectList);
+		model.addAttribute("loginUserName", loginUser.getName());
+		model.addAttribute("loginUserAccount", loginUser.getAccount());
+		return "/workItem/addWorkItem";
+	}
+
+	// 工作项管理-补登已完成工作项-获取第一级里程碑
+	@RequestMapping(value = "/workItem/milestoneOne", method = { RequestMethod.GET, RequestMethod.POST }, produces = {
+			"application/text;charset=UTF-8" })
+	@ResponseBody
+	public Object milestoneOne(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam MultiValueMap<String, String> parameters, Model model) {
+		String id = request.getParameter("id");
+		// 获取项目里程碑第一级
+		List<ProjectMilestone> milestoneList = milestoneService.getMilestoneNameOne(id);
+		String option = "<option value=''>请选择</option>";
+		for (ProjectMilestone milestone : milestoneList) {
+			option += "<option value='" + milestone.getId() + "'>" + milestone.getMilestoneName() + "</option>";
+		}
+		return option;
+	}
+
+	// 工作项管理-补登已完成工作项-异步请求第二级 第三级 第四级里程碑数据
+	@RequestMapping(value = "/workItem/milestone", method = { RequestMethod.GET, RequestMethod.POST }, produces = {
+			"application/text;charset=UTF-8" })
+	@ResponseBody
+	public Object milestone(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam MultiValueMap<String, String> parameters, Model model) {
+		response.setContentType("text/html;charset=utf-8");
+		String id = request.getParameter("id");
+		// 获取项目里程碑第二三四级
+		List<ProjectMilestone> milestoneList = milestoneService.getMilestoneName(id);
+		String option = "<option value=''>请选择</option>";
+		for (ProjectMilestone milestone : milestoneList) {
+			option += "<option value='" + milestone.getId() + "'>" + milestone.getMilestoneName() + "</option>";
+		}
+		return option;
+	}
+
+	// 异步获取项目发起人的信息
+	@RequestMapping(value = "/workItem/getSponsorName", method = { RequestMethod.GET, RequestMethod.POST }, produces = {
+			"application/text;charset=UTF-8" })
+	@ResponseBody
+	public Object getSponsorName(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam MultiValueMap<String, String> parameters, Model model) {
+
+		// 获取项目id
+		String projectId = request.getParameter("id");
+
+		// 获取工作项发起人 工作项评价人数据
+		List<ProjectMember> projectMemberList = projectMemberService.getSponsorOrAuditor(projectId);
+
+		String option = "<option value=''>请选择</option>";
+		for (ProjectMember projectMember : projectMemberList) {
+			option += "<option value='" + projectMember.getId() + "'>" + projectMember.getMemberName() + "</option>";
+		}
+		return option;
+
+	}
+
+	// 异步获取项目评价人的信息
+	@RequestMapping(value = "/workItem/getAuditorName", method = { RequestMethod.GET, RequestMethod.POST }, produces = {
+			"application/text;charset=UTF-8" })
+	@ResponseBody
+	public Object getAuditorName(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam MultiValueMap<String, String> parameters, Model model) {
+
+		// 获取项目id
+		String projectId = request.getParameter("id");
+
+		// 获取工作项发起人 工作项评价人数据
+		List<ProjectMember> projectMemberList = projectMemberService.getSponsorOrAuditor(projectId);
+
+		String option = "<option value=''>请选择</option>";
+		for (ProjectMember projectMember : projectMemberList) {
+			option += "<option value='" + projectMember.getId() + "'>" + projectMember.getMemberName() + "</option>";
+		}
+		return option;
+
+	}
+
+	// 工作项管理-补登已完成工作项-提交按钮
+	@RequestMapping(value = "/workItem/saveWorkItem", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public String saveWorkItem(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam MultiValueMap<String, String> parameters, Model model) {
+
+		// 获取表单数据
+		String itemTopic = request.getParameter("itemTopic");
+		String projectId = request.getParameter("projectId");
+		String itemType = request.getParameter("itemType");
+		String milestone1 = request.getParameter("milestone1");
+		String milestone2 = request.getParameter("milestone2");
+		String milestone3 = request.getParameter("milestone3");
+		String milestone4 = request.getParameter("milestone4");
+		String itemContent = request.getParameter("itemContent");
+		String planTime = request.getParameter("planTime");
+		String actTime = request.getParameter("actTime");
+		String planHour = request.getParameter("planHour");
+		String actHour = request.getParameter("actHour");
+		String creatorName = request.getParameter("creatorName");
+		String creatorAccount = request.getParameter("creatorId");
+		String sponsorId = request.getParameter("sponsorId");
+		String auditorId = request.getParameter("auditorId");
+
+		// 通过表单获取的数据去查询工作项需要的数据
+		String itemId = UUID.randomUUID().toString();
+		String sponsorAccount = projectMemberService.getMemberAccount(sponsorId);
+		String sponsorName = projectMemberService.getMemberName(sponsorId);
+		String auditorAccount = projectMemberService.getMemberAccount(auditorId);
+		String auditorName = projectMemberService.getMemberName(auditorId);
+
+		WorkItemWithBLOBs workItem = new WorkItemWithBLOBs();
+		workItem.setItemId(itemId);
+		workItem.setCreatorAccount(creatorAccount);
+		workItem.setCreatorName(creatorName);
+		workItem.setProjectId(Integer.parseInt(projectId));
+		workItem.setItemType(Integer.parseInt(itemType));
+		workItem.setItemTopic(itemTopic);
+		workItem.setPlanHours(new BigDecimal(planHour));
+		workItem.setActHours(new BigDecimal(actHour));
+		workItem.setItemContent(itemContent);
+		workItem.setSponsorAccount(sponsorAccount);
+		workItem.setAuditorAccount(auditorAccount);
+		workItem.setSponsorName(sponsorName);
+		workItem.setAuditorName(auditorName);
+
+		// 对获取到的时间做拆分的处理
+		String planStartTime = planTime.substring(0, 10);
+		String planEndTime = planTime.substring(13);
+		Date planStartDate = null;
+		Date planEndDate = null;
+		Long planStartDateLong = 0L;
+		Long planEndDateLong = 0L;
+		try {
+			planStartDate = new SimpleDateFormat("yyyy-MM-dd").parse(planStartTime);
+			planStartDateLong = planStartDate.getTime();
+			planEndDate = new SimpleDateFormat("yyyy-MM-dd").parse(planEndTime);
+			planEndDateLong = planEndDate.getTime();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		Date planStartDateSql = new java.sql.Date(planStartDateLong);
+		Date planEndDateSql = new java.sql.Date(planEndDateLong);
+		workItem.setPlanStartTime(planStartDateSql);
+		workItem.setPlanEndTime(planEndDateSql);
+
+		String actStartTime = actTime.substring(0, 10);
+		String actEndTime = actTime.substring(13);
+		Date actStartDate = null;
+		Date actEndDate = null;
+		Long actStartDateLong = 0L;
+		Long actEndDateLong = 0L;
+		try {
+			actStartDate = new SimpleDateFormat("yyyy-MM-dd").parse(actStartTime);
+			actStartDateLong = actStartDate.getTime();
+			actEndDate = new SimpleDateFormat("yyyy-MM-dd").parse(actEndTime);
+			actEndDateLong = actEndDate.getTime();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		Date actStartDateSql = new java.sql.Date(actStartDateLong);
+		Date actEndDateSql = new java.sql.Date(actEndDateLong);
+		workItem.setActStartTime(actStartDateSql);
+		workItem.setActEndTime(actEndDateSql);
+
+		// 存入里程碑的最后一级 4321
+		if (milestone4 != null && milestone4.trim() != "") {
+			workItem.setMilestoneId(Integer.parseInt(milestone4));
+		}
+		if ((milestone4 == null || milestone4.trim() == "") && (milestone3 != null && milestone3.trim() != "")) {
+			workItem.setMilestoneId(Integer.parseInt(milestone3));
+		}
+		if ((milestone3 == null || milestone3.trim() == "") && (milestone2 != null && milestone2.trim() != "")) {
+			workItem.setMilestoneId(Integer.parseInt(milestone2));
+		} else {
+			workItem.setMilestoneId(Integer.parseInt(milestone1));
+		}
+
+		workItem.setStatus(1);
+
+		// 将工作项存入数据库
+		int i = workItemService.saveWorkItem(workItem);
+		if (i > 0) {
+			return "true";
+		}
+
+		return "false";
+	}
+
+}

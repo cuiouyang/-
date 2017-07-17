@@ -1,0 +1,106 @@
+package com.bsi.ms.service;
+
+import java.util.List;
+
+import com.bsi.ms.model.ProjectMember;
+
+/**
+ * @ClassName: ProjectMemberService
+ * @Description: 项目成员service文件
+ * @author chenqim
+ * @date Mar 28, 2017 10:32:42 AM
+ * 
+ */
+public interface ProjectMemberService {
+	
+	/**
+	 * 获取所有项目成员的id跟name
+	 * 
+	 * @param 
+	 * 
+	 * @return List<ProjectMember>
+	 */
+	List<ProjectMember> getAllMember();
+
+	/**
+	 * 通过id获取项目成员的account
+	 * 
+	 * @param id
+	 * 
+	 * @return String
+	 */
+	String getMemberAccount(String id);
+
+	/**
+	 * 通过id获取项目成员的name
+	 * 
+	 * @param id
+	 * 
+	 * @return String
+	 */
+	String getMemberName(String id);
+
+	/**
+	 * 根据项目id获取该项目的所有成员
+	 * 
+	 * @param id
+	 * 
+	 * @return List<ProjectMember>
+	 */
+	List<ProjectMember> getProjectMemberById(String id);
+
+	/**
+	 * 新增项目成员
+	 * 
+	 * @param projectMember
+	 * 
+	 * @return int
+	 */
+	int addProjectMember(ProjectMember projectMember);
+
+	/**
+	 * 判断项目成员是否已存在 大于0为已存在
+	 * 
+	 * @param projectMember
+	 * 
+	 * @return int
+	 */
+	int checkProjectMember(ProjectMember projectMember);
+
+	/**
+	 * 删除项目成员
+	 * 
+	 * @param projectMember
+	 * 
+	 * @return int
+	 */
+	int deleteProjectMember(ProjectMember projectMember);
+
+	/**
+	 * 变更项目成员的角色
+	 * 
+	 * @param projectMember
+	 * 
+	 * @return int
+	 */
+	int editProjectMemberRole(ProjectMember projectMember);
+
+	/**
+	 * 查询项目经理是否存在 大于0则存在
+	 * 
+	 * @param projectMember
+	 * 
+	 * @return int
+	 */
+	int queryProjectManeger(ProjectMember projectMember);
+
+	/**
+	 * 通过项目id获取发起人与评价人
+	 * 
+	 * @param projectId
+	 * 
+	 * @return List<ProjectMember>
+	 */
+	List<ProjectMember> getSponsorOrAuditor(String projectId);
+
+}

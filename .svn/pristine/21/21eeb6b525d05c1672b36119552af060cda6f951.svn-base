@@ -1,0 +1,104 @@
+package com.bsi.ms.service.impl;
+
+import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.bsi.ms.mapper.ProjectMemberMapper;
+import com.bsi.ms.model.ProjectMember;
+import com.bsi.ms.service.ProjectMemberService;
+
+/*
+ * 工作项service
+*/
+@Service
+public class ProjectMemberServiceImpl implements ProjectMemberService {
+
+	@Autowired
+	ProjectMemberMapper projectMemberMapper;
+
+	protected static Logger logger = LogManager.getLogger(ProjectMemberServiceImpl.class);
+	
+	@Override
+	public List<ProjectMember> getAllMember() {
+		List<ProjectMember> list = projectMemberMapper.getAllMember();
+		logger.info("result:{}", list);
+		return list;
+	}
+
+	@Override
+	public String getMemberAccount(String id) {
+		logger.info("parameter:{}", id);
+		String name = projectMemberMapper.getMemberAccount(id);
+		logger.info("result:{}", name);
+		return name;
+	}
+
+	@Override
+	public String getMemberName(String id) {
+		logger.info("parameter:{}", id);
+		String name = projectMemberMapper.getMemberName(id);
+		logger.info("result:{}", name);
+		return name;
+	}
+
+	@Override
+	public List<ProjectMember> getProjectMemberById(String id) {
+		logger.info("parameter:{}", id);
+		List<ProjectMember> list = projectMemberMapper.getProjectMemberById(id);
+		logger.info("result:{}", list);
+		return list;
+	}
+
+	@Override
+	public int addProjectMember(ProjectMember projectMember) {
+		logger.info("parameter:{}", projectMember);
+		int i = projectMemberMapper.addProjectMember(projectMember);
+		logger.info("result:{}", i);
+		return i;
+	}
+
+	@Override
+	public int checkProjectMember(ProjectMember projectMember) {
+		logger.info("parameter:{}", projectMember);
+		int i = projectMemberMapper.checkProjectMember(projectMember);
+		logger.info("result:{}", i);
+		return i;
+	}
+
+	@Override
+	public int deleteProjectMember(ProjectMember projectMember) {
+		logger.info("parameter:{}", projectMember);
+		int i = projectMemberMapper.deleteProjectMember(projectMember);
+		logger.info("result:{}", i);
+		return i;
+	}
+
+	@Override
+	public int editProjectMemberRole(ProjectMember projectMember) {
+		logger.info("parameter:{}", projectMember);
+		int i = projectMemberMapper.editProjectMemberRole(projectMember);
+		logger.info("result:{}", i);
+		return i;
+	}
+
+	@Override
+	public int queryProjectManeger(ProjectMember projectMember) {
+		logger.info("parameter:{}", projectMember);
+		int i = projectMemberMapper.queryProjectManager(projectMember);
+		logger.info("result:{}", i);
+		return i;
+	}
+
+	@Override
+	public List<ProjectMember> getSponsorOrAuditor(String projectId) {
+		logger.info("parameter:{}", projectId);
+		List<ProjectMember> list = projectMemberMapper.getSponsorOrAuditor(projectId);
+		logger.info("result:{}", list);
+		return list;
+	}
+
+}

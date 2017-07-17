@@ -1,0 +1,514 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsi.ms.mapper.WorkItemMapper" >
+  <resultMap id="BaseResultMap" type="com.bsi.ms.model.WorkItem" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="item_id" property="itemId" jdbcType="VARCHAR" />
+    <result column="creator_account" property="creatorAccount" jdbcType="VARCHAR" />
+    <result column="creator_name" property="creatorName" jdbcType="VARCHAR" />
+    <result column="dept_id" property="deptId" jdbcType="VARCHAR" />
+    <result column="dept_name" property="deptName" jdbcType="VARCHAR" />
+    <result column="project_id" property="projectId" jdbcType="INTEGER" />
+    <result column="item_type" property="itemType" jdbcType="INTEGER" />
+    <result column="milestone_id" property="milestoneId" jdbcType="INTEGER" />
+    <result column="item_topic" property="itemTopic" jdbcType="VARCHAR" />
+    <result column="plan_start_time" property="planStartTime" jdbcType="TIMESTAMP" />
+    <result column="plan_end_time" property="planEndTime" jdbcType="TIMESTAMP" />
+    <result column="plan_hours" property="planHours" jdbcType="DECIMAL" />
+    <result column="act_start_time" property="actStartTime" jdbcType="TIMESTAMP" />
+    <result column="act_end_time" property="actEndTime" jdbcType="TIMESTAMP" />
+    <result column="act_hours" property="actHours" jdbcType="DECIMAL" />
+    <result column="sponsor_account" property="sponsorAccount" jdbcType="VARCHAR" />
+    <result column="sponsor_name" property="sponsorName" jdbcType="VARCHAR" />
+    <result column="auditor_account" property="auditorAccount" jdbcType="VARCHAR" />
+    <result column="auditor_name" property="auditorName" jdbcType="VARCHAR" />
+    <result column="effective_hours" property="effectiveHours" jdbcType="DECIMAL" />
+    <result column="point" property="point" jdbcType="INTEGER" />
+    <result column="attachment_url" property="attachmentUrl" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="last_update_time" property="lastUpdateTime" jdbcType="TIMESTAMP" />
+    <result column="hours" property="hours" jdbcType="DECIMAL" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.bsi.ms.model.WorkItemWithBLOBs" extends="BaseResultMap" >
+    <result column="milestone_json" property="milestoneJson" jdbcType="LONGVARCHAR" />
+    <result column="item_content" property="itemContent" jdbcType="LONGVARCHAR" />
+    <result column="comment" property="comment" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, item_id, creator_account, creator_name, dept_id, dept_name, project_id, item_type, 
+    milestone_id, item_topic, plan_start_time, plan_end_time, plan_hours, act_start_time, 
+    act_end_time, act_hours, sponsor_account, sponsor_name, auditor_account, auditor_name, 
+    effective_hours, point, attachment_url, status, create_time, last_update_time
+  </sql>
+  <sql id="Blob_Column_List" >
+    milestone_json, item_content, comment
+  </sql>
+  <sql id="IAssume">
+    select 
+    w.id, item_id, creator_account,w.creator_name,milestone_json, item_content, comment, dept_id, dept_name, project_id, item_type, 
+    milestone_id, item_topic, plan_start_time, plan_end_time, plan_hours, act_start_time, 
+    act_end_time, act_hours, sponsor_account, sponsor_name, auditor_account, auditor_name, 
+    effective_hours, point, attachment_url, w.status, w.create_time, last_update_time,
+    p.project_name projectName
+    from work_item w,project p 
+    where  w.project_id=p.id and
+    w.creator_account=#{creatorAccount,jdbcType=VARCHAR}
+  </sql>
+  <sql id="work_item_appraise" >
+    w.id, w.item_id, w.creator_account, w.creator_name, w.dept_id, w.dept_name, w.project_id, w.item_type, 
+    w.milestone_id, w.item_topic,w.item_content, w.plan_start_time, w.plan_end_time, w.plan_hours, w.act_start_time, 
+    w.act_end_time, w.act_hours, w.sponsor_account, w.sponsor_name, w.auditor_account, w.auditor_name, 
+    w.effective_hours, w.point,w.comment, w.attachment_url, w.status, w.create_time, w.last_update_time,
+    p.project_name projectName
+  </sql>
+ 
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from work_item
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  
+  <select id="selectById" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+    select 
+    <include refid="work_item_appraise" />
+    from work_item w,project p
+    where w.id = #{id,jdbcType=INTEGER}
+  </select>
+ 
+  <select id="selectByMyWork" resultMap="ResultMapWithBLOBs" parameterType="com.bsi.ms.model.WorkItem" >
+     <include refid="IAssume"/>
+     <if test="itemTopic != '' and itemTopic != null" >
+      and  w.item_topic like '%${itemTopic}%' 
+      </if> 
+      <if test="projectName != '' and projectName != null" >
+       and p.project_name like '%${projectName}%'
+      </if> 
+      <if test="sponsorName != '' and sponsorName != null" >
+       and w.sponsor_name = like '%${sponsorName}%'
+      </if> 
+       <if test="status!=100 and status!='' and status!=null" >
+       and w.status = #{status,jdbcType=INTEGER}
+      </if>
+       <if test="projectId != '' and projectId != null" >
+       and w.project_id =#{projectId,jdbcType=INTEGER}
+      </if>  
+  </select>
+  
+  <select id="selectByMyWorkStatus" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    p.project_name projectName
+    from work_item w,project p
+    where
+     w.status = #{conditions,jdbcType=INTEGER}
+  </select>
+  
+  <select id="selectByTerm" resultMap="ResultMapWithBLOBs" parameterType="java.util.Map" >
+    select 
+    <include refid="work_item_appraise" />
+    from work_item w,project p
+    where w.project_id=p.id 
+    <if test="projectId != null and projectId != ''">
+		and w.project_id =#{projectId,jdbcType=INTEGER}
+	</if> 
+     <if test="projectName != null and projectName != ''">
+		and p.project_name like '%${projectName}%'
+	</if> 
+	<if test="creatorName != null and creatorName != ''">
+		and w.creator_name like '%${creatorName}%'
+	</if>
+	<if test="auditorAccount != null and auditorAccount != ''">
+		and w.auditor_account = #{auditorAccount}
+	</if>
+	<if test="type == 1">  
+     	and  w.status = #{status}   
+    </if>   
+    	order by w.id
+  </select>
+  
+  <select id="selectByActStartTime" resultMap="BaseResultMap" parameterType="java.util.Map">
+  <include refid="IAssume"/>
+  and w.act_start_time between #{startDate} and  #{endDate}
+  </select>
+ 
+  <select id="selectByActEndTime" resultMap="BaseResultMap" parameterType="java.util.Map">
+  <include refid="IAssume"/>
+  and w.act_end_time between #{startDate} and #{endDate}
+  </select>
+ 
+  <select id="selectByPlanStartTime" resultMap="BaseResultMap" parameterType="java.util.Map">
+  <include refid="IAssume"/>
+  and w.plan_start_time between #{startDate} and #{endDate}
+  </select>
+ 
+  <select id="selectByPlanEndTime" resultMap="BaseResultMap" parameterType="java.util.Map">
+  <include refid="IAssume"/>
+  and w.plan_end_time between #{startDate} and #{endDate}
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from work_item
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  
+  <insert id="insert" parameterType="com.bsi.ms.model.WorkItemWithBLOBs" >
+    insert into work_item (id, item_id, creator_account, 
+      creator_name, dept_id, dept_name, 
+      project_id, item_type, milestone_id, 
+      item_topic, plan_start_time, plan_end_time, 
+      plan_hours, act_start_time, act_end_time, 
+      act_hours, sponsor_account, sponsor_name, 
+      auditor_account, auditor_name, effective_hours, 
+      point, attachment_url, status, 
+      create_time, last_update_time, milestone_json, 
+      item_content, comment)
+    values (#{id,jdbcType=INTEGER}, #{itemId,jdbcType=VARCHAR}, #{creatorAccount,jdbcType=VARCHAR}, 
+      #{creatorName,jdbcType=VARCHAR}, #{deptId,jdbcType=VARCHAR}, #{deptName,jdbcType=VARCHAR}, 
+      #{projectId,jdbcType=INTEGER}, #{itemType,jdbcType=INTEGER}, #{milestoneId,jdbcType=INTEGER}, 
+      #{itemTopic,jdbcType=VARCHAR}, #{planStartTime,jdbcType=TIMESTAMP}, #{planEndTime,jdbcType=TIMESTAMP}, 
+      #{planHours,jdbcType=DECIMAL}, #{actStartTime,jdbcType=TIMESTAMP}, #{actEndTime,jdbcType=TIMESTAMP}, 
+      #{actHours,jdbcType=DECIMAL}, #{sponsorAccount,jdbcType=VARCHAR}, #{sponsorName,jdbcType=VARCHAR}, 
+      #{auditorAccount,jdbcType=VARCHAR}, #{auditorName,jdbcType=VARCHAR}, #{effectiveHours,jdbcType=DECIMAL}, 
+      #{point,jdbcType=INTEGER}, #{attachmentUrl,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{lastUpdateTime,jdbcType=TIMESTAMP}, #{milestoneJson,jdbcType=LONGVARCHAR}, 
+      #{itemContent,jdbcType=LONGVARCHAR}, #{comment,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.bsi.ms.model.WorkItemWithBLOBs" >
+    insert into work_item
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="itemId != null" >
+        item_id,
+      </if>
+      <if test="creatorAccount != null" >
+        creator_account,
+      </if>
+      <if test="creatorName != null" >
+        creator_name,
+      </if>
+      <if test="deptId != null" >
+        dept_id,
+      </if>
+      <if test="deptName != null" >
+        dept_name,
+      </if>
+      <if test="projectId != null" >
+        project_id,
+      </if>
+      <if test="itemType != null" >
+        item_type,
+      </if>
+      <if test="milestoneId != null" >
+        milestone_id,
+      </if>
+      <if test="itemTopic != null" >
+        item_topic,
+      </if>
+      <if test="planStartTime != null" >
+        plan_start_time,
+      </if>
+      <if test="planEndTime != null" >
+        plan_end_time,
+      </if>
+      <if test="planHours != null" >
+        plan_hours,
+      </if>
+      <if test="actStartTime != null" >
+        act_start_time,
+      </if>
+      <if test="actEndTime != null" >
+        act_end_time,
+      </if>
+      <if test="actHours != null" >
+        act_hours,
+      </if>
+      <if test="sponsorAccount != null" >
+        sponsor_account,
+      </if>
+      <if test="sponsorName != null" >
+        sponsor_name,
+      </if>
+      <if test="auditorAccount != null" >
+        auditor_account,
+      </if>
+      <if test="auditorName != null" >
+        auditor_name,
+      </if>
+      <if test="effectiveHours != null" >
+        effective_hours,
+      </if>
+      <if test="point != null" >
+        point,
+      </if>
+      <if test="attachmentUrl != null" >
+        attachment_url,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="lastUpdateTime != null" >
+        last_update_time,
+      </if>
+      <if test="milestoneJson != null" >
+        milestone_json,
+      </if>
+      <if test="itemContent != null" >
+        item_content,
+      </if>
+      <if test="comment != null" >
+        comment,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="itemId != null" >
+        #{itemId,jdbcType=VARCHAR},
+      </if>
+      <if test="creatorAccount != null" >
+        #{creatorAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="creatorName != null" >
+        #{creatorName,jdbcType=VARCHAR},
+      </if>
+      <if test="deptId != null" >
+        #{deptId,jdbcType=VARCHAR},
+      </if>
+      <if test="deptName != null" >
+        #{deptName,jdbcType=VARCHAR},
+      </if>
+      <if test="projectId != null" >
+        #{projectId,jdbcType=INTEGER},
+      </if>
+      <if test="itemType != null" >
+        #{itemType,jdbcType=INTEGER},
+      </if>
+      <if test="milestoneId != null" >
+        #{milestoneId,jdbcType=INTEGER},
+      </if>
+      <if test="itemTopic != null" >
+        #{itemTopic,jdbcType=VARCHAR},
+      </if>
+      <if test="planStartTime != null" >
+        #{planStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="planEndTime != null" >
+        #{planEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="planHours != null" >
+        #{planHours,jdbcType=DECIMAL},
+      </if>
+      <if test="actStartTime != null" >
+        #{actStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="actEndTime != null" >
+        #{actEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="actHours != null" >
+        #{actHours,jdbcType=DECIMAL},
+      </if>
+      <if test="sponsorAccount != null" >
+        #{sponsorAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="sponsorName != null" >
+        #{sponsorName,jdbcType=VARCHAR},
+      </if>
+      <if test="auditorAccount != null" >
+        #{auditorAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="auditorName != null" >
+        #{auditorName,jdbcType=VARCHAR},
+      </if>
+      <if test="effectiveHours != null" >
+        #{effectiveHours,jdbcType=DECIMAL},
+      </if>
+      <if test="point != null" >
+        #{point,jdbcType=INTEGER},
+      </if>
+      <if test="attachmentUrl != null" >
+        #{attachmentUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastUpdateTime != null" >
+        #{lastUpdateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="milestoneJson != null" >
+        #{milestoneJson,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="itemContent != null" >
+        #{itemContent,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="comment != null" >
+        #{comment,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.bsi.ms.model.WorkItemWithBLOBs" >
+    update work_item
+    <set >
+      <if test="itemId != null" >
+        item_id = #{itemId,jdbcType=VARCHAR},
+      </if>
+      <if test="creatorAccount != null" >
+        creator_account = #{creatorAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="creatorName != null" >
+        creator_name = #{creatorName,jdbcType=VARCHAR},
+      </if>
+      <if test="deptId != null" >
+        dept_id = #{deptId,jdbcType=VARCHAR},
+      </if>
+      <if test="deptName != null" >
+        dept_name = #{deptName,jdbcType=VARCHAR},
+      </if>
+      <if test="projectId != null" >
+        project_id = #{projectId,jdbcType=INTEGER},
+      </if>
+      <if test="itemType != null" >
+        item_type = #{itemType,jdbcType=INTEGER},
+      </if>
+      <if test="milestoneId != null" >
+        milestone_id = #{milestoneId,jdbcType=INTEGER},
+      </if>
+      <if test="itemTopic != null" >
+        item_topic = #{itemTopic,jdbcType=VARCHAR},
+      </if>
+      <if test="planStartTime != null" >
+        plan_start_time = #{planStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="planEndTime != null" >
+        plan_end_time = #{planEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="planHours != null" >
+        plan_hours = #{planHours,jdbcType=DECIMAL},
+      </if>
+      <if test="actStartTime != null" >
+        act_start_time = #{actStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="actEndTime != null" >
+        act_end_time = #{actEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="actHours != null" >
+        act_hours = #{actHours,jdbcType=DECIMAL},
+      </if>
+      <if test="sponsorAccount != null" >
+        sponsor_account = #{sponsorAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="sponsorName != null" >
+        sponsor_name = #{sponsorName,jdbcType=VARCHAR},
+      </if>
+      <if test="auditorAccount != null" >
+        auditor_account = #{auditorAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="auditorName != null" >
+        auditor_name = #{auditorName,jdbcType=VARCHAR},
+      </if>
+      <if test="effectiveHours != null" >
+        effective_hours = #{effectiveHours,jdbcType=DECIMAL},
+      </if>
+      <if test="point != null" >
+        point = #{point,jdbcType=INTEGER},
+      </if>
+      <if test="attachmentUrl != null" >
+        attachment_url = #{attachmentUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastUpdateTime != null" >
+        last_update_time = #{lastUpdateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="milestoneJson != null" >
+        milestone_json = #{milestoneJson,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="itemContent != null" >
+        item_content = #{itemContent,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="comment != null" >
+        comment = #{comment,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.bsi.ms.model.WorkItemWithBLOBs" >
+    update work_item
+    set item_id = #{itemId,jdbcType=VARCHAR},
+      creator_account = #{creatorAccount,jdbcType=VARCHAR},
+      creator_name = #{creatorName,jdbcType=VARCHAR},
+      dept_id = #{deptId,jdbcType=VARCHAR},
+      dept_name = #{deptName,jdbcType=VARCHAR},
+      project_id = #{projectId,jdbcType=INTEGER},
+      item_type = #{itemType,jdbcType=INTEGER},
+      milestone_id = #{milestoneId,jdbcType=INTEGER},
+      item_topic = #{itemTopic,jdbcType=VARCHAR},
+      plan_start_time = #{planStartTime,jdbcType=TIMESTAMP},
+      plan_end_time = #{planEndTime,jdbcType=TIMESTAMP},
+      plan_hours = #{planHours,jdbcType=DECIMAL},
+      act_start_time = #{actStartTime,jdbcType=TIMESTAMP},
+      act_end_time = #{actEndTime,jdbcType=TIMESTAMP},
+      act_hours = #{actHours,jdbcType=DECIMAL},
+      sponsor_account = #{sponsorAccount,jdbcType=VARCHAR},
+      sponsor_name = #{sponsorName,jdbcType=VARCHAR},
+      auditor_account = #{auditorAccount,jdbcType=VARCHAR},
+      auditor_name = #{auditorName,jdbcType=VARCHAR},
+      effective_hours = #{effectiveHours,jdbcType=DECIMAL},
+      point = #{point,jdbcType=INTEGER},
+      attachment_url = #{attachmentUrl,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      last_update_time = #{lastUpdateTime,jdbcType=TIMESTAMP},
+      milestone_json = #{milestoneJson,jdbcType=LONGVARCHAR},
+      item_content = #{itemContent,jdbcType=LONGVARCHAR},
+      comment = #{comment,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.bsi.ms.model.WorkItem" >
+    update work_item
+    set item_id = #{itemId,jdbcType=VARCHAR},
+      creator_account = #{creatorAccount,jdbcType=VARCHAR},
+      creator_name = #{creatorName,jdbcType=VARCHAR},
+      dept_id = #{deptId,jdbcType=VARCHAR},
+      dept_name = #{deptName,jdbcType=VARCHAR},
+      project_id = #{projectId,jdbcType=INTEGER},
+      item_type = #{itemType,jdbcType=INTEGER},
+      milestone_id = #{milestoneId,jdbcType=INTEGER},
+      item_topic = #{itemTopic,jdbcType=VARCHAR},
+      plan_start_time = #{planStartTime,jdbcType=TIMESTAMP},
+      plan_end_time = #{planEndTime,jdbcType=TIMESTAMP},
+      plan_hours = #{planHours,jdbcType=DECIMAL},
+      act_start_time = #{actStartTime,jdbcType=TIMESTAMP},
+      act_end_time = #{actEndTime,jdbcType=TIMESTAMP},
+      act_hours = #{actHours,jdbcType=DECIMAL},
+      sponsor_account = #{sponsorAccount,jdbcType=VARCHAR},
+      sponsor_name = #{sponsorName,jdbcType=VARCHAR},
+      auditor_account = #{auditorAccount,jdbcType=VARCHAR},
+      auditor_name = #{auditorName,jdbcType=VARCHAR},
+      effective_hours = #{effectiveHours,jdbcType=DECIMAL},
+      point = #{point,jdbcType=INTEGER},
+      attachment_url = #{attachmentUrl,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      last_update_time = #{lastUpdateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

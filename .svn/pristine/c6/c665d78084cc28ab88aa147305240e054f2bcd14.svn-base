@@ -1,0 +1,59 @@
+package com.bsi.ms.service.impl;
+
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.util.MultiValueMap;
+
+import com.bsi.ms.mapper.WorkItemMapper;
+import com.bsi.ms.model.WorkItem;
+import com.bsi.ms.service.MyItemsService;
+
+@Component("MyItemsService")
+public class MyItemsServiceImpl implements MyItemsService {
+	
+	@Autowired
+	public WorkItemMapper mapper;
+
+	@Override
+	public List<WorkItem> getMyWorkList(WorkItem parameters) {
+		return mapper.selectByMyWork(parameters);
+	}
+
+	@Override
+	public List<WorkItem> getMyWorkByStatus(Integer status) {
+		
+		return mapper.selectByMyWorkStatus(status);
+	}
+
+	
+	@Override
+	public List<WorkItem> getMyWorkByActStart(Map<String,Object> map) {
+		// TODO Auto-generated method stub
+		return mapper.selectByActStartTime(map);
+	}
+
+	@Override
+	public List<WorkItem> getMyWorkByActEnd(Map<String,Object> map) {
+		// TODO Auto-generated method stub
+		return mapper.selectByActEndTime(map);
+	}
+
+	@Override
+	public List<WorkItem> getMyWorkByPlanStart(Map<String,Object> map) {
+		// TODO Auto-generated method stub
+		return mapper.selectByPlanStartTime(map);
+	}
+
+	@Override
+	public List<WorkItem> getMyWorkByPlanEnd(Map<String,Object> map) {
+		// TODO Auto-generated method stub
+		return mapper.selectByPlanEndTime(map);
+	}
+
+
+}

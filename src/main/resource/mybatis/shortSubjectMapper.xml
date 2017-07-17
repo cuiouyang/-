@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsi.ms.mapper.shortSubjectMapper" >
+  <resultMap id="BaseResultMap" type="com.bsi.ms.model.shortSubject" >
+    <id column="problem_id" property="problemId" jdbcType="INTEGER" />
+    <result column="course_name" property="courseName" jdbcType="VARCHAR" />
+    <result column="difficulty" property="difficulty" jdbcType="INTEGER" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.bsi.ms.model.shortSubjectWithBLOBs" extends="BaseResultMap" >
+    <result column="problem_title" property="problemTitle" jdbcType="LONGVARCHAR" />
+    <result column="solution" property="solution" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    problem_id, course_name, difficulty
+  </sql>
+  <sql id="Blob_Column_List" >
+    problem_title, solution
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from shortsubject
+    where problem_id = #{problemId,jdbcType=INTEGER}
+  </select>
+   <select id="selectByCourseName" resultMap="ResultMapWithBLOBs" parameterType="java.lang.String">
+   select
+   <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+   from shortsubject
+    where course_name = #{courseName,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from shortsubject
+    where problem_id = #{problemId,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByCourseName" parameterType="java.lang.String" >
+   delete from shortsubject
+    where course_name = #{courseName,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.bsi.ms.model.shortSubjectWithBLOBs" >
+    insert into shortsubject (problem_id, course_name, difficulty, 
+      problem_title, solution)
+    values (#{problemId,jdbcType=INTEGER}, #{courseName,jdbcType=VARCHAR}, #{difficulty,jdbcType=INTEGER}, 
+      #{problemTitle,jdbcType=LONGVARCHAR}, #{solution,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.bsi.ms.model.shortSubjectWithBLOBs" >
+    insert into shortsubject
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="problemId != null" >
+        problem_id,
+      </if>
+      <if test="courseName != null" >
+        course_name,
+      </if>
+      <if test="difficulty != null" >
+        difficulty,
+      </if>
+      <if test="problemTitle != null" >
+        problem_title,
+      </if>
+      <if test="solution != null" >
+        solution,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="problemId != null" >
+        #{problemId,jdbcType=INTEGER},
+      </if>
+      <if test="courseName != null" >
+        #{courseName,jdbcType=VARCHAR},
+      </if>
+      <if test="difficulty != null" >
+        #{difficulty,jdbcType=INTEGER},
+      </if>
+      <if test="problemTitle != null" >
+        #{problemTitle,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="solution != null" >
+        #{solution,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.bsi.ms.model.shortSubjectWithBLOBs" >
+    update shortsubject
+    <set >
+      <if test="courseName != null" >
+        course_name = #{courseName,jdbcType=VARCHAR},
+      </if>
+      <if test="difficulty != null" >
+        difficulty = #{difficulty,jdbcType=INTEGER},
+      </if>
+      <if test="problemTitle != null" >
+        problem_title = #{problemTitle,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="solution != null" >
+        solution = #{solution,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where problem_id = #{problemId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.bsi.ms.model.shortSubjectWithBLOBs" >
+    update shortsubject
+    set course_name = #{courseName,jdbcType=VARCHAR},
+      difficulty = #{difficulty,jdbcType=INTEGER},
+      problem_title = #{problemTitle,jdbcType=LONGVARCHAR},
+      solution = #{solution,jdbcType=LONGVARCHAR}
+    where problem_id = #{problemId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.bsi.ms.model.shortSubject" >
+    update shortsubject
+    set course_name = #{courseName,jdbcType=VARCHAR},
+      difficulty = #{difficulty,jdbcType=INTEGER}
+    where problem_id = #{problemId,jdbcType=INTEGER}
+  </update>
+</mapper>

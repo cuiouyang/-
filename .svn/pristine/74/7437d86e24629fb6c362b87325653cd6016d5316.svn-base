@@ -1,0 +1,7 @@
+default.driver=com.mysql.jdbc.Driver
+
+default.driverUrl=jdbc:mysql://192.168.7.225:3306/projectms?characterEncoding=utf8&useConfigs=maxPerformance&rewriteBatchedStatements=true
+default.user = projectms
+default.password = projectms
+default.minPoolSize = 1
+default.maxPoolSize = 6

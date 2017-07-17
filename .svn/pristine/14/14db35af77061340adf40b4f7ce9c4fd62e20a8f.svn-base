@@ -1,0 +1,40 @@
+package com.bsi.ms.mapper;
+
+import java.util.List;
+import java.util.Map;
+
+import com.bsi.ms.model.Project;
+import com.bsi.ms.model.ProjectMilestone;
+import com.bsi.ms.model.User;
+
+public interface ProjectMapper {
+    int deleteByPrimaryKey(Integer id);
+
+    int insert(Project record);
+
+    int insertSelective(Project record);
+
+    Project selectByPrimaryKey(Integer id);
+    
+    List<Project> selectTime();
+    
+    List<Project> queryByTerm(Project record);
+    //根据项目开始时间查询数据
+    List<Project> queryByStTime(Map<String,Object> map);
+    //根据项目计划结束时间查询数据
+    List<Project> queryByEndTime(Map<String,Object> map);
+    
+    int updateByPrimaryKeySelective(Project record);
+
+    int updateByPrimaryKey(Project record);
+    
+    List<Project> getProjectName();
+    
+    List<Project> selectByProject(Map<String,Object> map);
+    //校验项目名和和合同编号
+    int newItemsValidateName(String projectName);
+    int newItemsValidateContractNo(String contractNo);
+    //根据project的id来查询项目的详细信息
+   //Map<String ,Object> getItemDetails(int id);
+    
+}

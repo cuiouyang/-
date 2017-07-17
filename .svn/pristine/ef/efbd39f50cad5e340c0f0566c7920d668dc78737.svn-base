@@ -1,0 +1,22 @@
+package com.bsi.ms.service;
+
+import java.util.List;
+import java.util.Map;
+
+import com.bsi.ms.model.WorkItem;
+
+public interface MyItemsService {
+	//查询与我相关的工作项
+	public abstract List<WorkItem> getMyWorkList(WorkItem parameters);
+    //根据工作项的状态查询工作项
+	public abstract List<WorkItem> getMyWorkByStatus(Integer status);
+    //根据实际开始时间查询工作项
+	public abstract List<WorkItem> getMyWorkByActStart(Map<String, Object> map);
+	//根据实际结束时间查询工作项
+	public abstract List<WorkItem> getMyWorkByActEnd(Map<String, Object> map);
+	//根据计划开始时间查询工作项
+	public abstract List<WorkItem> getMyWorkByPlanStart(Map<String, Object> map);
+	//根据计划结束时间查询工作项
+	public abstract List<WorkItem> getMyWorkByPlanEnd(Map<String, Object> map);
+
+}

@@ -1,0 +1,11 @@
+package com.bsi.ms.service;
+
+import java.util.List;
+
+public interface CommonService {
+
+	String getSequnce();
+
+	List<String> getQAMembers();
+
+}

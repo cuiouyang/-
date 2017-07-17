@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsi.ms.mapper.TestMapper" >
+  <resultMap id="BaseResultMap" type="com.bsi.ms.model.Test" >
+    <id column="problem_id" property="problemId" jdbcType="INTEGER" />
+    <id column="user_id" property="userId" jdbcType="VARCHAR" />
+    <result column="course_name" property="courseName" jdbcType="VARCHAR" />
+    <result column="problem_type" property="problemType" jdbcType="INTEGER" />
+    <result column="score" property="score" jdbcType="REAL" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.bsi.ms.model.Test" extends="BaseResultMap" >
+    <result column="user_solution" property="userSolution" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    problem_id, user_id, course_name, problem_type, score
+  </sql>
+  <sql id="Blob_Column_List" >
+    user_solution
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="com.bsi.ms.model.TestKey" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from test
+    where problem_id = #{problemId,jdbcType=INTEGER}
+      and user_id = #{userId,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="selectByMap" resultMap="ResultMapWithBLOBs" parameterType="java.util.Map" >
+  select
+  <include refid="Base_Column_List" />
+    ,
+  <include refid="Blob_Column_List" />
+  from test
+   where true 
+   <if test="problemType != null and problemType !=''" >
+      and  problem_type = #{problemType,jdbcType=INTEGER } 
+   </if>
+   <if test="userId != null and userId !=''" >
+      and  user_id = #{userId,jdbcType=VARCHAR}
+   </if>
+   <if test="courseName != null and courseName != ''" >
+      and  course_name = #{courseName,jdbcType=VARCHAR}
+      </if>
+    
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="com.bsi.ms.model.TestKey" >
+    delete from test
+    where problem_id = #{problemId,jdbcType=INTEGER}
+      and user_id = #{userId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.bsi.ms.model.Test" >
+    insert into test (problem_id, user_id, course_name, 
+      problem_type, score, user_solution
+      )
+    values (#{problemId,jdbcType=INTEGER}, #{userId,jdbcType=VARCHAR}, #{courseName,jdbcType=VARCHAR}, 
+      #{problemType,jdbcType=INTEGER}, #{score,jdbcType=REAL}, #{userSolution,jdbcType=LONGVARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.bsi.ms.model.Test" >
+    insert into test
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="problemId != null" >
+        problem_id,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="courseName != null" >
+        course_name,
+      </if>
+      <if test="problemType != null" >
+        problem_type,
+      </if>
+      <if test="score != null" >
+        score,
+      </if>
+      <if test="userSolution != null" >
+        user_solution,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="problemId != null" >
+        #{problemId,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="courseName != null" >
+        #{courseName,jdbcType=VARCHAR},
+      </if>
+      <if test="problemType != null" >
+        #{problemType,jdbcType=INTEGER},
+      </if>
+      <if test="score != null" >
+        #{score,jdbcType=REAL},
+      </if>
+      <if test="userSolution != null" >
+        #{userSolution,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.bsi.ms.model.Test" >
+    update test
+    <set >
+      <if test="courseName != null" >
+        course_name = #{courseName,jdbcType=VARCHAR},
+      </if>
+      <if test="problemType != null" >
+        problem_type = #{problemType,jdbcType=INTEGER},
+      </if>
+      <if test="score != null" >
+        score = #{score,jdbcType=REAL},
+      </if>
+      <if test="userSolution != null" >
+        user_solution = #{userSolution,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where problem_id = #{problemId,jdbcType=INTEGER}
+      and user_id = #{userId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.bsi.ms.model.Test" >
+    update test
+    set course_name = #{courseName,jdbcType=VARCHAR},
+      problem_type = #{problemType,jdbcType=INTEGER},
+      score = #{score,jdbcType=REAL},
+      user_solution = #{userSolution,jdbcType=LONGVARCHAR}
+    where problem_id = #{problemId,jdbcType=INTEGER}
+      and user_id = #{userId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.bsi.ms.model.Test" >
+    update test
+    set course_name = #{courseName,jdbcType=VARCHAR},
+      problem_type = #{problemType,jdbcType=INTEGER},
+      score = #{score,jdbcType=REAL}
+    where problem_id = #{problemId,jdbcType=INTEGER}
+      and user_id = #{userId,jdbcType=VARCHAR}
+  </update>
+</mapper>

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsi.ms.mapper.ResultsMapper" >
+  <resultMap id="BaseResultMap" type="com.bsi.ms.model.Results" >
+    <id column="course_name" property="courseName" jdbcType="VARCHAR" />
+    <id column="user_id" property="userId" jdbcType="VARCHAR" />
+    <result column="score" property="score" jdbcType="REAL" />
+    <result column="radio_grade" property="radioGrade" jdbcType="REAL" />
+    <result column="select_grade" property="selectGrade" jdbcType="REAL" />
+    <result column="judge_grade" property="judgeGrade" jdbcType="REAL" />
+    <result column="short_answer_grade" property="shortAnswerGrade" jdbcType="REAL" />
+    <result column="whether_grade" property="whetherGrade" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    course_name, user_id, score, radio_grade, select_grade, judge_grade, short_answer_grade, 
+    whether_grade
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="com.bsi.ms.model.ResultsKey" >
+    select 
+    <include refid="Base_Column_List" />
+    from results
+    where course_name = #{courseName,jdbcType=VARCHAR}
+      and user_id = #{userId,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="selectByMap" resultMap="BaseResultMap" parameterType="java.util.Map" >
+  select
+  <include refid="Base_Column_List" />
+  from results
+   where true 
+   <if test="whetherGrade != null and whetherGrade !=''" >
+      and  whether_grade = #{whetherGrade,jdbcType=INTEGER } 
+   </if>
+   <if test="userId != null and userId !=''" >
+      and  user_id = #{userId,jdbcType=VARCHAR}
+   </if>
+   <if test="courseName != null and courseName != ''" >
+      and  course_name = #{courseName,jdbcType=VARCHAR}
+      </if>
+  order by score Desc
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="com.bsi.ms.model.ResultsKey" >
+    delete from results
+    where course_name = #{courseName,jdbcType=VARCHAR}
+      and user_id = #{userId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.bsi.ms.model.Results" >
+    insert into results (course_name, user_id, score, 
+      radio_grade, select_grade, judge_grade, 
+      short_answer_grade, whether_grade)
+    values (#{courseName,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR}, #{score,jdbcType=REAL}, 
+      #{radioGrade,jdbcType=REAL}, #{selectGrade,jdbcType=REAL}, #{judgeGrade,jdbcType=REAL}, 
+      #{shortAnswerGrade,jdbcType=REAL}, #{whetherGrade,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.bsi.ms.model.Results" >
+    insert into results
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="courseName != null" >
+        course_name,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="score != null" >
+        score,
+      </if>
+      <if test="radioGrade != null" >
+        radio_grade,
+      </if>
+      <if test="selectGrade != null" >
+        select_grade,
+      </if>
+      <if test="judgeGrade != null" >
+        judge_grade,
+      </if>
+      <if test="shortAnswerGrade != null" >
+        short_answer_grade,
+      </if>
+      <if test="whetherGrade != null" >
+        whether_grade,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="courseName != null" >
+        #{courseName,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="score != null" >
+        #{score,jdbcType=REAL},
+      </if>
+      <if test="radioGrade != null" >
+        #{radioGrade,jdbcType=REAL},
+      </if>
+      <if test="selectGrade != null" >
+        #{selectGrade,jdbcType=REAL},
+      </if>
+      <if test="judgeGrade != null" >
+        #{judgeGrade,jdbcType=REAL},
+      </if>
+      <if test="shortAnswerGrade != null" >
+        #{shortAnswerGrade,jdbcType=REAL},
+      </if>
+      <if test="whetherGrade != null" >
+        #{whetherGrade,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.bsi.ms.model.Results" >
+    update results
+    <set >
+      <if test="score != null" >
+        score = #{score,jdbcType=REAL},
+      </if>
+      <if test="radioGrade != null" >
+        radio_grade = #{radioGrade,jdbcType=REAL},
+      </if>
+      <if test="selectGrade != null" >
+        select_grade = #{selectGrade,jdbcType=REAL},
+      </if>
+      <if test="judgeGrade != null" >
+        judge_grade = #{judgeGrade,jdbcType=REAL},
+      </if>
+      <if test="shortAnswerGrade != null" >
+        short_answer_grade = #{shortAnswerGrade,jdbcType=REAL},
+      </if>
+      <if test="whetherGrade != null" >
+        whether_grade = #{whetherGrade,jdbcType=INTEGER},
+      </if>
+    </set>
+    where course_name = #{courseName,jdbcType=VARCHAR}
+      and user_id = #{userId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.bsi.ms.model.Results" >
+    update results
+    set score = #{score,jdbcType=REAL},
+      radio_grade = #{radioGrade,jdbcType=REAL},
+      select_grade = #{selectGrade,jdbcType=REAL},
+      judge_grade = #{judgeGrade,jdbcType=REAL},
+      short_answer_grade = #{shortAnswerGrade,jdbcType=REAL},
+      whether_grade = #{whetherGrade,jdbcType=INTEGER}
+    where course_name = #{courseName,jdbcType=VARCHAR}
+      and user_id = #{userId,jdbcType=VARCHAR}
+  </update>
+</mapper>

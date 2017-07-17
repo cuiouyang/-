@@ -1,0 +1,183 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="OVIT Project Manage System" />
+<meta name="author" content="OVIT R&D" />
+<title>光谷信息项目管理系统</title>
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/css/fonts/arimo/css/arimo.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/css/fonts/linecons/css/linecons.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/css/fonts/fontawesome/css/font-awesome.min.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/css/bootstrap.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/css/xenon-core.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/css/xenon-forms.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/css/xenon-components.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/css/xenon-skins.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/css/custom.css">
+
+
+<script
+	src="${pageContext.request.contextPath}/assets/js/jquery-1.11.1.min.js"></script>
+<script
+	src="${pageContext.request.contextPath}/assets/js/jquery-form.js"></script>
+<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!--[if lt IE 9]>
+	<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+	<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+<![endif]-->
+</head>
+<body class="page-body">
+	<%@ include file="../frame/setting.jsp"%>
+	<div class="page-container">
+		<%@ include file="../frame/left.jsp"%>
+		<div class="main-content">
+			<%@ include file="../frame/nav.jsp"%>
+			 <div class="page-title">
+
+				<div class="title-env">
+					<h1 class="title">编辑里程碑</h1>
+					<p class="description">里程碑编辑修改页面</p>
+				</div>
+
+				<div class="breadcrumb-env">
+
+					<ol class="breadcrumb bc-1">
+						<li><a href="/"><i class="fa-home"></i>主页</a></li>
+						<li><a href="../project/list">所有项目</a></li>
+					   <li><a href="../milestone/list?pid=${record.projectId}">里程碑</a></li>
+						<li class="active"><strong>编辑</strong></li>
+					</ol>
+
+				</div>
+
+			</div>
+			<div class="panel panel-default">
+
+				<div class="panel-heading">
+					<div class="panel-title">${title}</div>
+
+					<small class="text-small pull-right" style="padding-top: 5px;">
+						<code></code>
+					</small>
+				</div>
+
+				<div class="panel-body">
+					<form role="form" id="saveMilestone"
+						action="${pageContext.request.contextPath}/milestone/edit/save"
+						method="post" class="form-horizontal validate">
+
+						<div class=" form-group">
+							<label class="col-sm-2  control-label">里程碑名称</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" name="milestoneName"
+									value="${record.milestoneName}" data-validate="required"
+									data-message-required="里程碑名称不能为空!" placeholder="请填写里程碑名称！"
+									maxlength="32" />
+
+							</div>
+						</div>
+						<div class="form-group">
+
+							<label class="col-sm-2  control-label">计划开始时间</label>
+							<div class="col-sm-10">
+								<input type="text" value="${record.planStartDate}"
+									name="planStartDate" class="form-control datepicker"
+									data-format="yyyy-mm-dd" data-validate="required"
+									data-message-required="计划开始时间不能为空!">
+
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="col-sm-2  control-label">计划结束时间</label>
+							<div class="col-sm-10">
+								<input type="text" name="planEndDate"
+									value="${record.planEndDate}" class="form-control datepicker"
+									data-format="yyyy-mm-dd" data-validate="required"
+									data-message-required="计划结束时间不能为空!">
+
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-2 control-label">计划工时</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" name="planHours"
+									data-validate="required number" placeholder="请输入计划工时"
+									maxlength="8" value="${record.planHours}"
+									data-message-required="计划工时不能为空!" />
+							</div>
+						</div>
+						<div class="form-group-separator"></div>
+						<div class="form-group">
+							<input type="hidden" name="projectId" value="${record.projectId}">
+							<input type="hidden" name="parentId" value="${record.parentId}">
+							<input type="hidden" name="id" value="${record.id}"> <input
+								type="hidden" name="type" value="${type}">
+							<button type="submit" onclick="validate()"
+								class="btn btn-success">保存</button>
+							<button type="reset" id="btnCancel" class="btn btn-white">取消</button>
+
+						</div>
+
+					</form>
+
+				</div>
+
+			</div>
+			<!-- Main Footer -->
+			<%@ include file="../frame/footer.jsp"%>
+		</div>
+	</div>
+	<%@ include file="../frame/bottomScript.jsp"%>
+	<script
+		src="${pageContext.request.contextPath}/assets/js/jquery-validate/jquery.validate.min.js"></script>
+</body>
+<script type="text/javascript">
+       function validate(){
+		          //验证时间
+		           $('#saveMilestone').submit();
+		          //验证
+		   
+				//判断里程碑名称是否重复
+				$.ajax({
+							url: '${pageContext.request.contextPath}/milestone/validate',
+							type:'post',
+							data: ({
+								projectName:$('#milestoneName').val(),
+								type:$('#type').val() 
+							}),
+							success:function(data){
+			                    if(data=='Success'){
+									
+			                    	 $('#saveMilestone').submit();
+								}else  
+									
+									alert(data);
+								} 
+							},
+							error:function(error){  
+							}
+				});
+				
+ }
+	 
+ 
+</script>
+</html>

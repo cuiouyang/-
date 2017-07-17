@@ -1,0 +1,69 @@
+package com.bsi.ms.service.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.bsi.ms.mapper.AttachmentMapper;
+import com.bsi.ms.model.Attachment;
+import com.bsi.ms.service.AttachmentService; 
+
+/** 
+* @ClassName: AttachmentServiceImpl 
+* @Description: TODO(交付物实现service业务) 
+* @author wangxy
+* @date Mar 28, 2017 10:34:43 AM 
+*  
+*/
+@Service
+@Transactional
+public class AttachmentServiceImpl implements AttachmentService {
+	
+	@Autowired
+	private AttachmentMapper attachmentMapper;
+
+	@Override
+	public int deleteByPrimaryKey(Integer id) {
+		return attachmentMapper.deleteByPrimaryKey(id);
+	}
+    
+	@Override
+	public int insert(Attachment record) {
+		return attachmentMapper.insert(record);
+	}
+
+	@Override
+	public int insertSelective(Attachment record) {
+		return attachmentMapper.insertSelective(record);
+	}
+
+	@Override
+	public Attachment selectByPrimaryKey(Integer id) {
+		return attachmentMapper.selectByPrimaryKey(id);
+	}
+
+	@Override
+	public int updateByPrimaryKeySelective(Attachment record) {
+		return attachmentMapper.updateByPrimaryKeySelective(record);
+	}
+
+	@Override
+	public int updateByPrimaryKey(Attachment record) {
+		return attachmentMapper.updateByPrimaryKey(record);
+	}
+
+	@Override
+	public List<Attachment> selectByMilestone(String relatedId) {
+		return attachmentMapper.selectByMilestone(relatedId);
+	}
+
+	@Override
+	public int insertAttachment(Map<String, Object> attMap) {
+		return attachmentMapper.insertAttachment(attMap);
+	}
+	
+	 
+}

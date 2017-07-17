@@ -1,0 +1,91 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <link rel="stylesheet" href="css/bootstrap.css"/>
+</head>
+<body>
+<button type="button" class="btn btn-primary" id="btn-modal">测试Modal</button>
+<script type="text/html" id="modal-tpl">
+    <form>
+        <div class="form-group">
+            <label>Email address</label>
+            <input type="email" class="form-control" name="email" placeholder="Email">
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" class="form-control" name="password" placeholder="Password">
+        </div>
+    </form>
+</script>
+<script src="js/jquery.js"></script>
+<script src="js/bootstrap.js"></script>
+<script src="js/dialog.js"></script>
+<script>
+var modal = new Modal({
+    title: '测试modal',
+    content: $('#modal-tpl').html(),
+    width: 500,
+    onOk: function(){
+        var $form = this.$modal.find('form');
+        var data = $form.serializeArray();
+        var postData = {};
+        data.forEach(function(obj){
+           postData[obj.name] = obj.value;
+        });
+
+        if(!postData.email) {
+            Alert('请输入EMAIL!');
+            return false;
+        }
+
+        var deferred = $.Deferred();
+        if(!postData.password) {
+            Confirm({
+                msg: 'Password为空，是否要继续？',
+                onOk: function(){
+                    _post();
+                },
+                onCancel: function(){
+                    deferred.reject();
+                }
+            })
+        } else {
+            _post();
+        }
+
+        return $.when(deferred);
+
+        function _post(){
+            //模拟异步任务
+            setTimeout(function(){
+                if(postData.email === 'admin@admin') {
+                    Alert({
+                        msg: '提交成功！',
+                        onOk: function(){
+                            deferred.resolve();
+                        }
+                    });
+                } else {
+                    Alert({
+                        msg: '提交失败！',
+                        onOk: function(){
+                            deferred.reject();
+                        }
+                    });
+                }
+            },3000);
+        }
+    },
+    onModalShow: function () {
+        var $form = this.$modal.find('form');
+        $form[0].reset();
+    }
+});
+$('#btn-modal').click(function () {
+    modal.open();
+});
+</script>
+</body>
+</html>

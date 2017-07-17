@@ -1,0 +1,109 @@
+package com.bsi.ms.service.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import com.bsi.ms.mapper.WorkItemMapper;
+import com.bsi.ms.model.WorkItem;
+import com.bsi.ms.model.WorkItemWithBLOBs;
+import com.bsi.ms.service.WorkItemService;
+
+/**
+ * @ClassName: WorkItemService
+ * @Description: 补登工作项service文件
+ * @author chenqim
+ * @date Mar 28, 2017 10:32:42 AM
+ * 
+ */
+@Service
+@Transactional
+public class WorkItemServiceImpl implements WorkItemService{
+
+	@Autowired
+	private WorkItemMapper workItemMapper;
+	
+	protected static Logger logger = LogManager.getLogger(WorkItemServiceImpl.class);
+	
+	/**
+	 * 保存补登的工作项
+	 * 
+	 * @param workItem 
+	 * 
+	 * @return int
+	 */
+    @Override
+    public int saveWorkItem(WorkItemWithBLOBs workItem) {
+    	logger.info("parameter:{}", workItem);
+		int i = workItemMapper.insertSelective(workItem);
+		logger.info("result:{}", i);
+		return i;
+    }
+
+    /**
+	 * 点击项目标题进入项目详情
+	 * 
+	 * @param id 
+	 * 
+	 * @return
+	 */
+    @Override
+	public WorkItemWithBLOBs selectById(Integer id) {
+		return workItemMapper.selectById(id);
+	}
+    
+    /**
+	 * 根据id修改已评价的工作项
+	 * 
+	 * @param id 
+	 * 
+	 * @return int
+	 */
+	@Override
+	public int updateByPrimaryKeySelective(WorkItemWithBLOBs record) {
+		return workItemMapper.updateByPrimaryKeySelective(record);
+	}
+
+	/**
+	 * 根据条件查询工作项评价数据
+	 * 
+	 * @param record 
+	 * 
+	 * @return List<WorkItemWithBLOBs>
+	 */
+	@Override
+	public List<WorkItemWithBLOBs> selectByTerm(Map<String, Object> map) {
+		return workItemMapper.selectByTerm(map);
+	}
+
+	/**
+	 * 获取对应项目已评价工作项的有效工时
+	 * 
+	 * @param status 
+	 * @param projectId 
+	 * 
+	 * @return List<WorkItem>
+	 */
+	@Override
+	public List<WorkItem> getEffHList() {
+		return workItemMapper.getEffHList();
+	}
+
+	/**
+	 * 获取对应项目的计划工时
+	 * 
+	 *
+	 * @return List<WorkItem>
+	 */
+	@Override
+	public List<WorkItem> getHoursList() {
+		return workItemMapper.getHoursList();
+	}
+	
+	
+}
+

@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xmlns="http://java.sun.com/xml/ns/javaee" xmlns:jsp="http://java.sun.com/xml/ns/javaee/jsp" 
+xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" 
+version="3.0" >
+    <display-name>Project Manage System</display-name>
+    <context-param>
+        <param-name>webAppRootKey</param-name>
+        <param-value>ProjectMS</param-value>
+    </context-param>
+    <welcome-file-list>
+        <welcome-file></welcome-file>
+    </welcome-file-list>
+    
+    <!-- spring的主配置文件路径  -->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath:spring/application-context.xml</param-value>
+    </context-param>
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    
+    <!-- 字符过滤，统一使用utf-8 -->
+    <filter>
+        <filter-name>encodingFilter</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>forceEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>encodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+    </filter-mapping>
+        
+    <filter>
+    	<filter-name>loginFilter</filter-name>
+    	<filter-class>com.bsi.ms.filter.LoginFilter</filter-class>
+    	<init-param>
+            <param-name>exclude</param-name>
+            <param-value>
+                 /manageSystem/login;
+                 ^(/images)(.+)$;^(/assets)(.+)$;^(/css)(.+)$;
+            </param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+    	<filter-name>loginFilter</filter-name>
+    	<url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+<filter>
+		<filter-name>routerFilter</filter-name>
+		<filter-class>com.bsi.ms.filter.RouterFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>routerFilter</filter-name>
+		<url-pattern> /*</url-pattern>
+	</filter-mapping>
+
+	<filter>
+		<filter-name>characterFilter</filter-name>
+		<filter-class>com.bsi.ms.filter.CharacterFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>characterFilter</filter-name>
+		<url-pattern> /*</url-pattern>
+	</filter-mapping>
+
+    <servlet>
+        <servlet-name>appServlet</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>classpath:spring/servlet-context.xml</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+        <async-supported>true</async-supported>
+    </servlet>
+		
+	<servlet-mapping>
+		<servlet-name>appServlet</servlet-name>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+    <!-- 	<servlet-mapping>
+          <servlet-name>default</servlet-name>
+          <url-pattern>*.css</url-pattern>
+          <url-pattern>*.js</url-pattern>
+          <url-pattern>*.ico</url-pattern>
+          <url-pattern>*.swf</url-pattern>
+          <url-pattern>*.gif</url-pattern>
+          <url-pattern>*.jpeg</url-pattern>
+          <url-pattern>*.bmp</url-pattern>
+          <url-pattern>*.psd</url-pattern>
+          <url-pattern>*.jpg</url-pattern>
+          <url-pattern>*.png</url-pattern>
+          <url-pattern>*.htm</url-pattern>
+          <url-pattern>*.html</url-pattern>
+          <url-pattern>*.crx</url-pattern>
+          <url-pattern>*.xpi</url-pattern>
+          <url-pattern>*.exe</url-pattern>
+          <url-pattern>*.ipa</url-pattern>
+          <url-pattern>*.apk</url-pattern>
+          <url-pattern>*.htc</url-pattern>
+      </servlet-mapping>-->
+    <!-- 验证码 -->
+    <servlet>
+        <servlet-name>kaptcha</servlet-name>
+        <servlet-class>com.google.code.kaptcha.servlet.KaptchaServlet</servlet-class>
+        <init-param>
+            <param-name>kaptcha.border</param-name>
+            <param-value>no</param-value>
+        </init-param>
+        <init-param>
+            <param-name>kaptcha.textproducer.char.string</param-name>
+            <param-value>abcde2345678gfynmnpwx</param-value>
+        </init-param>
+        <init-param>
+            <param-name>kaptcha.textproducer.char.length</param-name>
+            <param-value>4</param-value>
+        </init-param>
+        <init-param>
+            <param-name>kaptcha.textproducer.font.color</param-name>
+            <param-value>black</param-value>
+        </init-param>
+        <init-param>
+            <param-name>kaptcha.textproducer.char.space</param-name>
+            <param-value>4</param-value>
+        </init-param>
+        <init-param>
+            <param-name>kaptcha.textproducer.font.size</param-name>
+            <param-value>30</param-value>
+        </init-param>
+        <init-param>
+            <param-name>kaptcha.noise.color</param-name>
+            <param-value>0,134,211</param-value>
+        </init-param>
+        <init-param>
+            <param-name>kaptcha.image.width</param-name>
+            <param-value>130</param-value>
+        </init-param>
+        <init-param>
+            <param-name>kaptcha.image.height</param-name>
+            <param-value>34</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>kaptcha</servlet-name>
+        <url-pattern>/images/kaptcha.jpg</url-pattern>
+    </servlet-mapping>
+    
+    <session-config>
+        <session-timeout>30</session-timeout>
+        <cookie-config>
+			<path>/</path>
+		</cookie-config>
+    </session-config>
+</web-app>

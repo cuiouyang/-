@@ -1,0 +1,31 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<!-- User Info, Notifications and Menu Bar -->
+<nav class="navbar user-info-navbar" role="navigation">
+	<!-- Left links for user info navbar -->
+	<ul class="user-info-menu left-links list-inline list-unstyled">
+		<li class="hidden-sm hidden-xs">
+			<a href="#" data-toggle="sidebar">
+				<i class="fa-bars"></i>
+			</a>
+		</li>
+	</ul>
+	<ul class="user-info-menu right-links list-inline list-unstyled" style="width:auto;">
+		<li class="dropdown user-profile">
+			<a href="${pageContext.request.contextPath}/manageSystem/logout" data-toggle="">
+			<span>安全退出<i class=""></i></span>
+			</a>
+		</li>
+	</ul>
+	<!-- Right links for user info navbar -->
+	<ul class="user-info-menu right-links list-inline list-unstyled" style="width:auto;">
+		<li class="dropdown user-profile">
+			<a href="#" data-toggle="dropdown">
+				<%-- <img src="${pageContext.request.contextPath}/assets/images/user-4.png" alt="user-image" class="img-circle img-inline userpic-32" width="28" /> --%>
+				<span>当前登录人：${loginUser.name }<i class=""></i></span>
+			</a>
+		</li>
+	</ul>	
+</nav>

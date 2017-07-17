@@ -1,0 +1,638 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="OVIT Project Manage System" />
+<meta name="author" content="OVIT R&D" />
+<title>光谷信息项目管理系统</title>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/fonts/arimo/css/arimo.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/fonts/linecons/css/linecons.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/fonts/fontawesome/css/font-awesome.min.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/bootstrap.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/xenon-core.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/xenon-forms.css"> 
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/xenon-components.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/xenon-skins.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/custom.css">
+	
+<script src="${pageContext.request.contextPath}/assets/js/jquery-1.11.1.min.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/layer/layer.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/dropzone/dropzone.min.js"></script>
+<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!--[if lt IE 9]>
+	<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+	<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+<![endif]-->
+</head>
+<body class="page-body">
+	<%@ include file="../frame/setting.jsp" %>
+	<div class="page-container">
+		<%@ include file="../frame/left.jsp" %>
+		<div class="main-content">
+			<%@ include file="../frame/nav.jsp" %>
+			<script type="text/javascript">
+					// Resize charts
+					$(window).on('xenon.resize', function()
+					{
+						/* $("#pageviews-visitors-chart").data("dxChart").render();
+						$("#server-uptime-chart").data("dxChart").render();
+						$("#realtime-network-stats").data("dxChart").render();
+						
+						$('.first-month').data("dxSparkline").render();
+						$('.second-month').data("dxSparkline").render();
+						$('.third-month').data("dxSparkline").render(); */
+					});
+					
+					
+			</script>
+			
+			<div class="page-title">
+				<div class="title-env">
+					<h1 class="title">补登完成工作项</h1>
+					<p class="description">请将已完成的工作项填报上交</p>
+				</div>
+
+				<div class="breadcrumb-env">
+					<ol class="breadcrumb bc-1">
+						<li>
+							<a href="${pageContext.request.contextPath}/manageSystem/index"><i class="fa-home"></i>首页</a>
+						</li>
+						<li>
+							<a href="#">工作项管理</a>
+						</li>
+						<li class="active"><strong>补登完成工作项</strong></li>
+					</ol>
+				</div>
+			</div>
+			
+			<div>
+				<div>
+					<span style="color:#FF9900;">带</span><span style="color:#FF0000;">*</span><span style="color:#FF9900;">标注的字段不能为空</span>
+				</div>
+				<form id="workItemForm" action="${pageContext.request.contextPath}/workItem/saveWorkItem" method="GET">
+					<table width="100%" border="0">
+						<tr>
+							<td width="10%"></td>
+							<td width="10%"></td>
+							<td width="10%"></td>
+							<td width="10%"></td>
+							<td width="10%"></td>
+							<td width="50%"></td>
+						</tr>
+						<tr height="40px">
+							<td><span style="color:#FF0000;">*</span>工作项的标题</td>
+							<td colspan="5" height="35px"><input type="text" id="itemTopic" name="itemTopic" class="form-control input-sm" value="" /></td>
+						</tr>
+						<tr height="40px">
+							<td><span style="color:#FF0000;">*</span>参与项目名称</td>
+							<td colspan="5">
+								<select class="form-control" id="projectId" name="projectId" onchange="getMilestone1();getSponsorName();getAuditorName();">
+									<option value="">请选择</option>
+									<c:forEach items='${projectList }' var='list' varStatus='status'>
+										<option value='${list.id}'><c:out value='${list.projectName}'></c:out></option>
+									</c:forEach>
+								</select>
+							</td>
+						</tr>
+						<tr height="40px">
+							<td><span style="color:#FF0000;">*</span>参与工作类型</td>
+							<td colspan="4">
+								<label class="radio-inline">
+									<input type="radio" name="itemType" value="1">会议
+								</label>
+								<label class="radio-inline">
+									<input type="radio" name="itemType" value="2">代码
+								</label>
+								<label class="radio-inline">
+									<input type="radio" name="itemType" value="3">测试
+								</label>
+								<label class="radio-inline">
+									<input type="radio" name="itemType" value="4">文档
+								</label>
+								<label class="radio-inline">
+									<input type="radio" name="itemType" checked="checked" value="5">其它
+								</label>
+							</td>
+							<td style="padding-left:10px"><span style="color:#FF0000;">*</span>工作内容描述</td>
+						</tr>
+						<tr height="40px">
+							<td><span style="color:#FF0000;">*</span>项目的里程碑</td>
+							<td>
+								<select class="form-control" id="milestone1" name="milestone1" onchange="getMilestone2();">
+									<option value="" selected="selected">请选择</option>
+									<c:forEach items='${milestoneList }' var='list' varStatus='status'>
+										<option value='${list.id}'><c:out value='${list.milestoneName}'></c:out></option>
+									</c:forEach>
+								</select>
+							</td>
+							<td>
+								<select class="form-control" id="milestone2" name="milestone2" onchange="getMilestone3();">
+									<option value="" selected="selected">请选择</option>
+								</select>
+							</td>
+							<td>
+								<select class="form-control" id="milestone3" name="milestone3" onchange="getMilestone4();">
+									<option value="" selected="selected">请选择</option>
+								</select>
+							</td>
+							<td>
+								<select class="form-control" name="milestone4" id="milestone4">
+									<option value="" selected="selected">请选择</option>
+								</select>
+							</td>
+							<td rowspan="4" align="left" valign="top" style="padding-left:10px">
+								<textarea class="form-control" style="width:500px;height:170px;resize:none;" id="itemContent" name="itemContent"></textarea>
+							</td>
+						</tr>
+						<tr height="42px">
+							<td><span style="color:#FF0000;">*</span>计划工作日期</td>
+							<td colspan="4">
+								<div class="daterange daterange-inline" data-format="YYYY-MM-DD" style="background-color:white">
+									<i class="fa-calendar"></i>
+									<span id="planTime"></span>
+								</div>
+							</td>
+						</tr>
+						<tr height="42px">
+							<td><span style="color:#FF0000;">*</span>实际工作日期</td>
+							<td colspan="4">
+								<div class="daterange daterange-inline" data-format="YYYY-MM-DD" style="background-color:white">
+									<i class="fa-calendar"></i>
+									<span id="actTime"></span>
+								</div>
+							</td>
+						</tr>
+						<tr height="40px">
+							<td><span style="color:#FF0000;">*</span>计划工作时长</td>
+							<td colspan="2"><input type="text" id="planHour" name="planHour" class="form-control input-sm" value="" maxlength="4"/></td>
+							<td colspan="2">&nbsp;&nbsp;小时</td>
+						</tr>
+						<tr height="40px">
+							<td><span style="color:#FF0000;">*</span>实际工作时长</td>
+							<td colspan="2"><input type="text" id="actHour" name="actHour" class="form-control input-sm" value="" maxlength="4"/></td>
+							<td colspan="2">&nbsp;&nbsp;小时</td>
+							<td style="padding-left:10px">工作交付物</td>
+						</tr>
+						<tr height="40px">
+							<td><span style="color:#FF0000;">*</span>工作项承担人</td>
+							<td colspan="4">
+								<input type="text" id="creatorName" name="creatorName" value="${loginUser.name }" class="form-control input-sm" style="background-color:white" readonly="readonly"/>
+								<input type="hidden" id="creatorId" name="creatorId" value="${loginUser.account }" />
+							</td>
+							<td rowspan="3" valign="top" style="padding-left:10px">
+								<div class="row">
+									<div class="col-sm-3 text-center">
+										<div id="advancedDropzone" class="droppable-area">上传交付物</div>
+									</div>
+								<div class="col-sm-9">
+							
+									<table class="table table-bordered table-striped" id="example-dropzone-filetable">
+										<thead>
+											<tr>
+												<th width="1%" class="text-center">#</th>
+												<th width="20%">文件名</th>
+												<th width="33%">上传进度</th>
+												<th>大小</th>
+												<th>状态</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td colspan="5">文件列表将出现在这里</td>
+											</tr>
+										</tbody>
+									</table>
+							
+								</div>
+								</div>
+							</td>
+						</tr>
+						<tr height="40px">
+							<td><span style="color:#FF0000;">*</span>工作项发起人</td>
+							<td colspan="4">
+								<select class="form-control" name="sponsorId" id="sponsorId">
+									<option value="">请选择</option>
+								</select>
+							</td>
+							
+						</tr>
+						<tr height="40px">
+							<td><span style="color:#FF0000;">*</span>工作项评价人</td>
+							<td colspan="4">
+								<select class="form-control" name="auditorId" id="auditorId">
+									<option value="">请选择</option>
+								</select>
+							</td>
+						</tr>
+						<tr height="40px">
+							<td colspan="8" align="center" style="padding-top:10px">
+								<a href="javascript:void(0)" class="btn btn-secondary btn-sm btn-icon icon-left" onclick="save();">提交</a>&nbsp;&nbsp;&nbsp;&nbsp;
+								<a href="${pageContext.request.contextPath}/manageSystem/index" class="btn btn-turquoise btn-sm btn-icon icon-left">取消</a>
+							</td>
+						</tr>
+					</table>
+				</form>
+			</div>
+			<!-- Main Footer -->
+			<%@ include file="../frame/footer.jsp" %>
+		</div>
+	</div>
+	<%@ include file="../frame/bottomScript.jsp" %>
+<script src="${pageContext.request.contextPath}/assets/js/dialog/js/jquery.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/dialog/js/bootstrap.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/dialog/js/dialog.js"></script>
+
+<script src="${pageContext.request.contextPath}/assets/js/jquery-form.js"></script>
+</body>
+<script type="text/javascript">
+
+function getMilestone1(){
+	
+	$("#milestone1").empty();
+	$("#milestone1").append("<option value=''>请选择</option>");
+	$("#milestone2").empty();
+	$("#milestone2").append("<option value=''>请选择</option>");
+	$("#milestone3").empty();
+	$("#milestone3").append("<option value=''>请选择</option>");
+	$("#milestone4").empty();
+	$("#milestone4").append("<option value=''>请选择</option>");
+	var id = $("#projectId").val();
+	$.ajax({
+ 			type:"POST",
+ 			url:"${pageContext.request.contextPath}/workItem/milestoneOne",
+ 			data : ({
+ 					id : id,
+ 			}),
+ 			success : function(data) {
+ 					$("#milestone1").html(data);
+ 				},
+ 			error:function(){
+ 					
+ 			}
+ 		});
+}
+
+function getMilestone2(){
+	
+	$("#milestone2").empty();
+	$("#milestone2").append("<option value=''>请选择</option>");
+	$("#milestone3").empty();
+	$("#milestone3").append("<option value=''>请选择</option>");
+	$("#milestone4").empty();
+	$("#milestone4").append("<option value=''>请选择</option>");
+	var id = $("#milestone1").val();
+	$.ajax({
+ 			type:"POST",
+ 			url:"${pageContext.request.contextPath}/workItem/milestone",
+ 			data : ({
+ 					id : id,
+ 			}),
+ 			success : function(data) {
+ 					$("#milestone2").html(data);
+ 				},
+ 			error:function(){
+ 					
+ 			}
+ 		});
+}
+	
+function getMilestone3(){
+	
+		$("#milestone3").empty();
+		$("#milestone3").append("<option value=''>请选择</option>");
+		$("#milestone4").empty();
+		$("#milestone4").append("<option value=''>请选择</option>");
+		var id = $("#milestone2").val();
+		$.ajax({
+  			type:"POST",
+  			url:"${pageContext.request.contextPath}/workItem/milestone",
+  			data : ({
+  					id : id,
+  			}),
+  			success : function(data) {
+  					$("#milestone3").html(data);
+  					//如果第三级里程碑的下拉选项只有一个 直接加载第四级的下拉框
+  					/* if($("#milestone3").length == 1){
+  						getMilestone3();
+  					} */
+  				},
+  			error:function(){
+  					
+  			}
+  		});
+	}
+
+function getMilestone4(){
+	
+	$("#milestone4").empty();
+	$("#milestone4").append("<option value=''>请选择</option>");
+	var id = $("#milestone3").val();
+	$.ajax({
+			type:"POST",
+			url:"${pageContext.request.contextPath}/workItem/milestone",
+			data : ({
+					id : id,
+			}),
+			success : function(data) {
+					$("#milestone4").html(data);
+				},
+			error:function(){
+					
+			}
+	});
+}
+
+function getSponsorName(){
+	
+	$("#sponsorId").empty();
+	$("#sponsorId").append("<option value=''>请选择</option>");
+	var id = $("#projectId").val();
+	$.ajax({
+ 			type:"POST",
+ 			url:"${pageContext.request.contextPath}/workItem/getSponsorName",
+ 			data : ({
+ 					id : id,
+ 			}),
+ 			success : function(data) {
+ 					$("#sponsorId").html(data);
+ 				},
+ 			error:function(){
+ 					
+ 			}
+ 		});
+}
+
+function getAuditorName(){
+	
+	$("#auditorId").empty();
+	$("#auditorId").append("<option value=''>请选择</option>");
+	var id = $("#projectId").val();
+	$.ajax({
+ 			type:"POST",
+ 			url:"${pageContext.request.contextPath}/workItem/getAuditorName",
+ 			data : ({
+ 					id : id,
+ 			}),
+ 			success : function(data) {
+ 					$("#auditorId").html(data);
+ 				},
+ 			error:function(){
+ 					
+ 			}
+ 		});
+}
+
+function save(){
+	
+	if($("#itemTopic").val() == ""){
+		layer.tips('工作项的标题不能为空！', '#itemTopic', {
+			  tips: [1, '#3595CC'],
+			  time: 4000
+		});
+		return;
+	}
+	if($("#projectId").val() == "" || $("#projectId").val() == "请选择"){
+		layer.tips('参与项目名称不能为空！', '#projectId', {
+			  tips: [1, '#3595CC'],
+			  time: 4000
+		});
+		return;
+	}
+	
+	if($("#planTime").text() == ""){
+		layer.tips('计划工作日期不能为空！', '#planTime', {
+			  tips: [1, '#3595CC'],
+			  time: 4000
+		});
+		return;
+	}
+	
+	if($("#actTime").text() == ""){
+		layer.tips('实际工作日期不能为空！', '#actTime', {
+			  tips: [1, '#3595CC'],
+			  time: 4000
+		});
+		return;
+	}
+	
+	//var reg = /^[0-3][0-9]|40$/;
+	//var reg = /^([0-3]?)([0-9]{1})((.[0-9]){1})|40|40.0$/;
+	var planHour = $("#planHour").val();
+	if(planHour == ""){
+		layer.tips('计划工作时长不能为空！', '#planHour', {
+			  tips: [1, '#3595CC'],
+			  time: 4000
+		});
+		return;
+	}
+	if(!isNaN(planHour)){
+		 if(parseFloat(planHour)<=0 || parseFloat(planHour)>40.0){
+			layer.tips('请输入合法计划工作时长！', '#planHour', {
+				  tips: [1, '#3595CC'],
+				  time: 4000
+			});
+			return;
+		 }
+	}else{
+		layer.tips('请输入合法计划工作时长！', '#planHour', {
+			  tips: [1, '#3595CC'],
+			  time: 4000
+		});
+		return;
+	}
+
+	var actHour = $("#actHour").val();
+	if(actHour == ""){
+		layer.tips('实际工作时长不能为空！', '#actHour', {
+			  tips: [1, '#3595CC'],
+			  time: 4000
+		});
+		return;
+	}
+	if(!isNaN(actHour)){
+		 if(parseFloat(actHour)<=0 || parseFloat(actHour)>40.0){
+			layer.tips('请输入合法实际工作时长！', '#actHour', {
+				  tips: [1, '#3595CC'],
+				  time: 4000
+			});
+			return;
+		 }
+	}else{
+		layer.tips('请输入合法实际工作时长！', '#actHour', {
+			  tips: [1, '#3595CC'],
+			  time: 4000
+		});
+		return;
+	}
+	
+	if($("#itemContent").val() == ""){
+		layer.tips('工作内容描述不能为空！', '#itemContent', {
+			  tips: [1, '#3595CC'],
+			  time: 4000
+		});
+		return;
+	}
+	
+	if($("#sponsorId").val() == "" || $("#sponsorId").val() == "请选择"){
+		layer.tips('工作项发起人不能为空！', '#sponsorId', {
+			  tips: [1, '#3595CC'],
+			  time: 4000
+		});
+		return;
+	}
+	
+	if($("#auditorId").val() == "" || $("#auditorId").val() == "请选择"){
+		layer.tips('工作项评价人不能为空！', '#auditorId', {
+			  tips: [1, '#3595CC'],
+			  time: 4000
+		});
+		return;
+	}
+	
+	var milestone1 = $("#milestone1").val();
+	var milestone2 = $("#milestone2").val();
+	var milestone3 = $("#milestone3").val();
+	var milestone4 = $("#milestone4").val();
+	if(milestone1 == "" || milestone1 == "请选择"){
+		layer.tips('项目里程碑第一级不能为空！', '#milestone1', {
+			  tips: [1, '#3595CC'],
+			  time: 4000
+		});
+		return;
+	}
+	
+	//判断里程碑二三四级是否存在 若存在则判断是否已选择
+	if(document.getElementById("milestone2").options.length > 1){
+		if(milestone2 == "" || milestone2 == "请选择"){
+			layer.tips('项目里程碑第二级不能为空！', '#milestone2', {
+				  tips: [1, '#3595CC'],
+				  time: 4000
+			});
+			return;
+		}else{
+			if(document.getElementById("milestone3").options.length > 1){
+				if(milestone3 == "" || milestone3 == "请选择"){
+					layer.tips('项目里程碑第三级不能为空！', '#milestone3', {
+						  tips: [1, '#3595CC'],
+						  time: 4000
+					});
+					return;
+				}else{
+					if(document.getElementById("milestone4").options.length > 1){
+						if(milestone4 == "" || milestone4 == "请选择"){
+							layer.tips('项目里程碑第四级不能为空！', '#milestone4', {
+								  tips: [1, '#3595CC'],
+								  time: 4000
+							});
+							return;
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	submitWorkItem();
+	
+}
+
+var arr = new Array();
+var param = new Array();
+var  flag=true;
+function submitWorkItem(){
+	if(flag ==true){
+		flag=false;
+	    var planTime = $("#planTime").text();
+		var actTime = $("#actTime").text();
+		$('#workItemForm').ajaxSubmit({
+			data:{'param':param},
+			type:"POST",
+			url:"${pageContext.request.contextPath}/workItem/saveWorkItem?planTime=" + planTime + "&actTime=" + actTime,
+	 		success:function(data){
+				flag=true;
+			 	if(data){
+			 		layer.msg('保存成功！', {icon: 1});
+			 		window.location.href="${pageContext.request.contextPath}/workItem/index";
+			    }else{
+			    	layer.confirm('保存失败！', {
+						  btn: ['确定'] //按钮
+						}, function(){
+							window.location.href="${pageContext.request.contextPath}/workItem/index";
+						}); 
+			 	}
+	 		},
+			error:function(){
+				flag=true;
+				layer.confirm('登录超时，请刷新并重新登录后进行此操作！', {
+					  btn: ['去登录'] //按钮
+					}, function(){
+						window.location.href="${pageContext.request.contextPath}";
+					}); 
+			}
+		});
+	}
+}
+
+</script>
+<script type="text/javascript">
+		jQuery(document).ready(function($){
+			debugger
+			var i = 1,
+				$example_dropzone_filetable = $("#example-dropzone-filetable"),
+				example_dropzone = $("#advancedDropzone").dropzone({
+				url: '${pageContext.request.contextPath}/workItem/uploadDeliverable',
+			    paramName: "file",
+			    method: 'post',
+				// Events
+				addedfile: function(file){
+					debugger
+					if(i == 1)
+					{
+						$example_dropzone_filetable.find('tbody').html('');
+					}
+					
+					var size = parseInt(file.size/1024, 10);
+					size = size < 1024 ? (size + " KB") : (parseInt(size/1024, 10) + " MB");
+					
+					var	$el = $('<tr>\
+									<td class="text-center">'+(i++)+'</td>\
+									<td>'+file.name+'</td>\
+									<td><div class="progress progress-striped"><div class="progress-bar progress-bar-warning"></div></div></td>\
+									<td>'+size+'</td>\
+									<td>Uploading...</td>\
+								</tr>');
+					
+					$example_dropzone_filetable.find('tbody').append($el);
+					file.fileEntryTd = $el;
+					file.progressBar = $el.find('.progress-bar');
+				},
+				
+				uploadprogress: function(file, progress, bytesSent){
+					file.progressBar.width(progress + '%');
+				},
+				
+				success: function(file){
+					file.fileEntryTd.find('td:last').html('<span class="text-success">Uploaded</span>');
+					file.progressBar.removeClass('progress-bar-warning').addClass('progress-bar-success');
+				},
+				
+				error: function(file){
+					file.fileEntryTd.find('td:last').html('<span class="text-danger">Failed</span>');
+					file.progressBar.removeClass('progress-bar-warning').addClass('progress-bar-red');
+				}
+			});
+			
+			$("#advancedDropzone").css({
+				minHeight: 200
+			});
+
+		});
+	</script>
+</html>

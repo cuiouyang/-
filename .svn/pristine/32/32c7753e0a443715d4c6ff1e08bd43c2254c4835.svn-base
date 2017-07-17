@@ -1,0 +1,80 @@
+package com.bsi.ms.service.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import com.bsi.ms.mapper.WorkItemMapper;
+import com.bsi.ms.model.StatusCount;
+import com.bsi.ms.model.WorkItem;
+import com.bsi.ms.model.WorkItemWithBLOBs;
+import com.bsi.ms.service.WorkItemService;
+
+
+@Service
+@Transactional
+public class WorkItemServiceImpl implements WorkItemService{
+
+	@Autowired
+	private WorkItemMapper workItemMapper;
+	
+	/**
+	 * 查询各种状态下工作项的数量
+	 * 
+	 * @param status 
+	 * @param id
+	 * 
+	 * @return
+	 */
+	@Override
+	public List<StatusCount> selectStaNum(WorkItem record) {
+		List<StatusCount> num = workItemMapper.selectStaNum(record);
+		return num;
+	}
+
+    @Override
+    public int saveWorkItem(WorkItemWithBLOBs workItem) {
+        return workItemMapper.insertSelective(workItem);
+    }
+
+    /**
+	 * 点击项目标题进入项目详情
+	 * 
+	 * @param id 
+	 * 
+	 * @return
+	 */
+    @Override
+	public WorkItemWithBLOBs selectById(Integer id) {
+		return workItemMapper.selectById(id);
+	}
+    
+    /**
+	 * 根据id修改已评价的工作项
+	 * 
+	 * @param id 
+	 * 
+	 * @return
+	 */
+	@Override
+	public int updateByPrimaryKeySelective(WorkItemWithBLOBs record) {
+		return workItemMapper.updateByPrimaryKeySelective(record);
+	}
+
+	/**
+	 * 根据条件查询工作项评价数据
+	 * 
+	 * @param record 
+	 * 
+	 * @return
+	 */
+	@Override
+	public List<WorkItemWithBLOBs> selectByTerm(Map<String, Object> map) {
+		return workItemMapper.selectByTerm(map);
+	}
+	
+	
+}
+

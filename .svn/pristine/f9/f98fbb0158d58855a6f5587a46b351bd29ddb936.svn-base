@@ -1,0 +1,164 @@
+package com.bsi.ms.controller;
+
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.bsi.ms.model.Dept;
+import com.bsi.ms.model.Project;
+import com.bsi.ms.model.ProjectMember;
+import com.bsi.ms.model.User;
+import com.bsi.ms.service.LdapService;
+import com.bsi.ms.service.ProjectMemberService;
+import com.bsi.ms.service.ProjectService;
+
+@Controller
+public class ProjectMemberController {
+
+	@Autowired
+	private ProjectMemberService projectMemberService;
+	@Autowired
+	private LdapService ldapService;
+	@Autowired
+	private ProjectService projectService;
+
+	// 项目管理-我参与的-查看项目成员按钮
+	@RequestMapping(value = "/projectMember/checkProjectMember", method = { RequestMethod.GET, RequestMethod.POST })
+	public String checkProjectMember(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam MultiValueMap<String, String> parameters, Model model) {
+		// 获取点击的项目id
+		String id = request.getParameter("id");
+		// 查询该项目的所有成员
+		List<ProjectMember> projectMemberList = projectMemberService.getProjectMemberById(id);
+		Project project = projectService.getItemDetailsById(Integer.parseInt(id));
+		for (ProjectMember pm : projectMemberList) {
+			// 通过名字查询相应用户
+			User user = ldapService.findUserByName(pm.getMemberName());
+			// 获取部门信息 并对部门信息做处理
+			String deptStr = user.getDistinguishedName();
+			String[] deptArr = deptStr.split(",");
+			String dept = deptArr[2].substring(3) + deptArr[1].substring(3);
+			pm.setDept(dept);
+		}
+		// 查询所有的部门
+		List<Dept> deptList = ldapService.findDept(null);
+		// 查询所有的成员
+		List<User> userList = ldapService.searchUsersByDept("");
+		// 传到前台
+		model.addAttribute("projectMemberList", projectMemberList);
+		model.addAttribute("deptList", deptList);
+		model.addAttribute("userList", userList);
+		model.addAttribute("projectId", id);
+		model.addAttribute("projectName", project.getProjectName());
+		return "/projectMember/checkProjectMember";
+	}
+
+	// 项目管理-我参与的-查看项目成员按钮-动态加载部门成员
+	@RequestMapping(value = "/projectMember/getProjectMemberByDept", method = { RequestMethod.GET,
+			RequestMethod.POST }, produces = { "application/text;charset=UTF-8" })
+	@ResponseBody
+	public String getProjectMemberByDept(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam MultiValueMap<String, String> parameters, Model model) {
+		String dept = request.getParameter("dept");
+		List<User> userList = null;
+		if ("全部部门".equals(dept)) {
+			userList = ldapService.searchUsersByDept("root");
+		} else {
+			userList = ldapService.searchUsersByDept(dept);
+		}
+		String option = "";
+		for (User user : userList) {
+			option += "<option value='" + user.getName() + "'>" + user.getName() + "</option>";
+		}
+		return option;
+	}
+
+	// 项目管理-我参与的-查看项目成员按钮-增加项目成员
+	@RequestMapping(value = "/projectMember/addProjectMember", method = { RequestMethod.GET,
+			RequestMethod.POST }, produces = { "application/text;charset=UTF-8" })
+	@ResponseBody
+	public String addProjectMember(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam MultiValueMap<String, String> parameters) {
+		String projectId = request.getParameter("projectId");
+		String projectMemberName = request.getParameter("projectMember").trim().replace(" ", ",");
+		String[] arr = projectMemberName.split(",,,,,,,,");
+		for (int j = 0; j < arr.length; j++) {
+			User user = ldapService.findUserByName(arr[j]);
+			ProjectMember projectMember = new ProjectMember();
+			projectMember.setProjectId(Integer.parseInt(projectId));
+			projectMember.setMemberAccount(user.getAccount());
+			projectMember.setMemberName(user.getName());
+			// 判断项目成员是否已经存在
+			int count = projectMemberService.checkProjectMember(projectMember);
+			if (count == 0) {
+				projectMemberService.addProjectMember(projectMember);
+			}
+		}
+		return "success";
+	}
+
+	// 项目管理-我参与的-查看项目成员按钮-删除项目成员
+	@RequestMapping(value = "/projectMember/deleteProjectMember", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public String deleteProjectMember(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam MultiValueMap<String, String> parameters) {
+		// 获取项目成员的id
+		String id = request.getParameter("id");
+		// 获取删除的时间
+		Date deleteDate = new Date();
+		ProjectMember projectMember = new ProjectMember();
+		projectMember.setId(Integer.valueOf(id));
+		projectMember.setReleseTime(deleteDate);
+		int i = projectMemberService.deleteProjectMember(projectMember);
+		if (i > 0) {
+			return "success";
+		}
+		return "fail";
+	}
+
+	// 项目管理-我参与的-查看项目成员按钮-修改成员角色
+	@RequestMapping(value = "/projectMember/editProjectMemberRole", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public String editProjectMemberRole(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam MultiValueMap<String, String> parameters) {
+		// 获取项目成员的id
+		String id = request.getParameter("id");
+		// 获取成员角色
+		String role = request.getParameter("role");
+		// 获取项目id
+		String projectId = request.getParameter("projectId");
+		ProjectMember projectMember = new ProjectMember();
+		projectMember.setId(Integer.valueOf(id));
+		projectMember.setProjectId(Integer.valueOf(projectId));
+		projectMember.setRole(role);
+		// 判断是否修改为项目经理 若是则要判断项目经理是否已经存在
+		if ("1".equals(role)) {
+			int j = projectMemberService.queryProjectManeger(projectMember);
+			if (j > 0) {
+				return "managerError";
+			} else {
+				int k = projectMemberService.editProjectMemberRole(projectMember);
+				if (k > 0) {
+					return "success";
+				}
+			}
+		} else {
+			int i = projectMemberService.editProjectMemberRole(projectMember);
+			if (i > 0) {
+				return "success";
+			}
+		}
+		return "fail";
+	}
+}

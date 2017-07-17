@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsi.ms.mapper.ProjectMilestoneMapper" >
+  <resultMap id="BaseResultMap" type="com.bsi.ms.model.ProjectMilestone" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="milestone_id" property="milestoneId" jdbcType="VARCHAR" />
+    <result column="project_id" property="projectId" jdbcType="INTEGER" />
+    <result column="milestone_no" property="milestoneNo" jdbcType="VARCHAR" />
+    <result column="milestone_name" property="milestoneName" jdbcType="VARCHAR" />
+    <result column="parent_id" property="parentId" jdbcType="INTEGER" />
+    <result column="plan_start_date" property="planStartDate" jdbcType="DATE" />
+    <result column="plan_end_date" property="planEndDate" jdbcType="DATE" />
+    <result column="plan_hours" property="planHours" jdbcType="INTEGER" />
+    <result column="in_charge_account" property="inChargeAccount" jdbcType="VARCHAR" />
+    <result column="in_charge_name" property="inChargeName" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" /> 
+    <result column="attachmentCount" property="attachmentCount" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, milestone_id, project_id, milestone_no, milestone_name, parent_id, plan_start_date, 
+    plan_end_date, plan_hours, in_charge_account, in_charge_name, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from project_milestone
+    where id = #{id,jdbcType=INTEGER}
+  </select> 
+  <select id="selectByProject" resultMap="BaseResultMap" parameterType="map" >
+    select 
+    a.*, b.milestone_name parentMilestoneName,(select count(*) from attachment t where t.related_id=a.milestone_id) as attachmentCount
+    ,(select count(*) from attachment t where t.related_id=a.milestone_id and LENGTH(t.attachment_url)>0) as noUploadCount from project_milestone a left join project_milestone b on a.parent_id=b.id  
+    where a.project_id = #{projectId}
+    <if test="type == 1">  
+     <![CDATA[ and  a.plan_start_date between #{startDate} and #{endDate}   ]]> 
+  </if>  
+  <if test="type == 2">  
+   <![CDATA[ and  a.plan_end_date between #{startDate} and #{endDate}   ]]> 
+  </if>  
+  </select>
+   
+   
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from project_milestone
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.bsi.ms.model.ProjectMilestone" >
+    insert into project_milestone (id, milestone_id, project_id, 
+      milestone_no, milestone_name, parent_id, 
+      plan_start_date, plan_end_date, plan_hours, 
+      in_charge_account, in_charge_name, create_time, 
+      update_time)
+    values (#{id,jdbcType=INTEGER}, #{milestoneId,jdbcType=VARCHAR}, #{projectId,jdbcType=INTEGER}, 
+      #{milestoneNo,jdbcType=VARCHAR}, #{milestoneName,jdbcType=VARCHAR}, #{parentId,jdbcType=VARCHAR}, 
+      #{planStartDate,jdbcType=DATE}, #{planEndDate,jdbcType=DATE}, #{planHours,jdbcType=INTEGER}, 
+      #{inChargeAccount,jdbcType=VARCHAR}, #{inChargeName,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.bsi.ms.model.ProjectMilestone" >
+    insert into project_milestone
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="milestoneId != null" >
+        milestone_id,
+      </if>
+      <if test="projectId != null" >
+        project_id,
+      </if>
+      <if test="milestoneNo != null" >
+        milestone_no,
+      </if>
+      <if test="milestoneName != null" >
+        milestone_name,
+      </if>
+      <if test="parentId != null" >
+        parent_id,
+      </if>
+      <if test="planStartDate != null" >
+        plan_start_date,
+      </if>
+      <if test="planEndDate != null" >
+        plan_end_date,
+      </if>
+      <if test="planHours != null" >
+        plan_hours,
+      </if>
+      <if test="inChargeAccount != null" >
+        in_charge_account,
+      </if>
+      <if test="inChargeName != null" >
+        in_charge_name,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="milestoneId != null" >
+        #{milestoneId,jdbcType=VARCHAR},
+      </if>
+      <if test="projectId != null" >
+        #{projectId,jdbcType=INTEGER},
+      </if>
+      <if test="milestoneNo != null" >
+        #{milestoneNo,jdbcType=VARCHAR},
+      </if>
+      <if test="milestoneName != null" >
+        #{milestoneName,jdbcType=VARCHAR},
+      </if>
+      <if test="parentId != null" >
+        #{parentId,jdbcType=VARCHAR},
+      </if>
+      <if test="planStartDate != null" >
+        #{planStartDate,jdbcType=DATE},
+      </if>
+      <if test="planEndDate != null" >
+        #{planEndDate,jdbcType=DATE},
+      </if>
+      <if test="planHours != null" >
+        #{planHours,jdbcType=INTEGER},
+      </if>
+      <if test="inChargeAccount != null" >
+        #{inChargeAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="inChargeName != null" >
+        #{inChargeName,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.bsi.ms.model.ProjectMilestone" >
+    update project_milestone
+    <set >
+      <if test="milestoneId != null" >
+        milestone_id = #{milestoneId,jdbcType=VARCHAR},
+      </if>
+      <if test="projectId != null" >
+        project_id = #{projectId,jdbcType=INTEGER},
+      </if>
+      <if test="milestoneNo != null" >
+        milestone_no = #{milestoneNo,jdbcType=VARCHAR},
+      </if>
+      <if test="milestoneName != null" >
+        milestone_name = #{milestoneName,jdbcType=VARCHAR},
+      </if>
+      <if test="parentId != null" >
+        parent_id = #{parentId,jdbcType=VARCHAR},
+      </if>
+      <if test="planStartDate != null" >
+        plan_start_date = #{planStartDate,jdbcType=DATE},
+      </if>
+      <if test="planEndDate != null" >
+        plan_end_date = #{planEndDate,jdbcType=DATE},
+      </if>
+      <if test="planHours != null" >
+        plan_hours = #{planHours,jdbcType=INTEGER},
+      </if>
+      <if test="inChargeAccount != null" >
+        in_charge_account = #{inChargeAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="inChargeName != null" >
+        in_charge_name = #{inChargeName,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.bsi.ms.model.ProjectMilestone" >
+    update project_milestone
+    set milestone_id = #{milestoneId,jdbcType=VARCHAR},
+      project_id = #{projectId,jdbcType=INTEGER},
+      milestone_no = #{milestoneNo,jdbcType=VARCHAR},
+      milestone_name = #{milestoneName,jdbcType=VARCHAR},
+      parent_id = #{parentId,jdbcType=VARCHAR},
+      plan_start_date = #{planStartDate,jdbcType=DATE},
+      plan_end_date = #{planEndDate,jdbcType=DATE},
+      plan_hours = #{planHours,jdbcType=INTEGER},
+      in_charge_account = #{inChargeAccount,jdbcType=VARCHAR},
+      in_charge_name = #{inChargeName,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <select id="getMilestoneNameOne" resultMap="BaseResultMap">
+  	  select id, milestone_name from project_milestone 
+  	  where project_id = #{id} and parent_id is null
+  </select>
+  <select id="getMilestoneName" parameterType="String" resultMap="BaseResultMap">
+  	  select id, milestone_name from project_milestone 
+  	  where parent_id = #{id}
+  </select>
+  
+   <select id="getChildCount" parameterType="java.lang.Integer"  resultType="java.lang.Integer">
+  	  select count(id) from project_milestone 
+  	  where parent_id = #{id}
+  </select>
+  <insert id ="insertMilestone" parameterType = "Map">
+  		INSERT INTO project_milestone (
+			milestone_name,
+			plan_start_date,
+			plan_end_date,
+			plan_hours,
+			in_charge_name,
+			milestone_id,
+			parent_id,
+			project_id
+		)
+		VALUES(
+			#{milestone_name},
+			#{plan_start_date},
+			#{plan_end_date},
+			#{plan_hours},
+			#{in_charge_name},
+			#{milestone_id},
+			#{parent_id},
+			#{project_id}
+		);
+  
+  </insert>
+   <select id ="getParentId" resultType = "java.lang.Integer" parameterType = "java.lang.String">
+  		SELECT
+			id
+		FROM
+			project_milestone
+		WHERE
+			milestone_id = #{uuid};
+  </select>
+   <select id="Validate" resultType ="java.lang.Integer" parameterType="map" >
+    select count(*) from project_milestone
+    where  project_id = #{projectId}
+     <if test="type == 0">  
+     <![CDATA[ and   milestone_name = #{name} and  ISNULL(parent_id)=1 ]]> 
+    </if> 
+    <if test="type == 1">  
+     <![CDATA[ and  milestone_name = #{name} and parent_id=#{parentId} ]]> 
+    </if>  
+	  <if test="type==2">  
+     <![CDATA[ and  milestone_name = #{name} and id!=#{id}  and parent_id=#{parentId} ]]> 
+    </if>  
+  </select>
+</mapper>

@@ -1,0 +1,20 @@
+package com.bsi.ms.service;
+
+import java.util.List;
+
+import com.bsi.ms.model.Dept;
+import com.bsi.ms.model.User;
+
+public interface LdapService {
+
+	List<Dept> findDept(String dept);
+
+	boolean authenticate(String account, String password);
+
+	List<User> searchUsersByDept(String dept);
+
+	User findUserByName(String name);
+
+	User findUserByAccount(String account);
+
+}

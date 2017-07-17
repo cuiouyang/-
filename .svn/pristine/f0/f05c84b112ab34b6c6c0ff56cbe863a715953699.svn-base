@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsi.ms.mapper.ProjectMapper" >
+  <resultMap id="BaseResultMap" type="com.bsi.ms.model.Project" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="project_name" property="projectName" jdbcType="VARCHAR" />
+    <result column="contract_no" property="contractNo" jdbcType="VARCHAR" />
+    <result column="seria_no" property="seriaNo" jdbcType="VARCHAR" />
+    <result column="project_full_name" property="projectFullName" jdbcType="VARCHAR" />
+    <result column="project_type" property="projectType" jdbcType="INTEGER" />
+    <result column="resp_dept_id" property="respDeptId" jdbcType="INTEGER" />
+    <result column="resp_dept_name" property="respDeptName" jdbcType="VARCHAR" />
+    <result column="pigeonhole" property="pigeonhole" jdbcType="INTEGER" />
+    <result column="pm_account" property="pmAccount" jdbcType="VARCHAR" />
+    <result column="pm_name" property="pmName" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="creator" property="creator" jdbcType="VARCHAR" />
+     <result column="creator_name" property="creatorName" jdbcType="VARCHAR" />
+    <result column="start_time" property="startTime" jdbcType="DATE" />
+    <result column="end_time" property="endTime" jdbcType="DATE" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="lastupdate_time" property="lastupdateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, project_name, contract_no, seria_no, project_full_name, project_type, resp_dept_id, 
+    resp_dept_name, pigeonhole, pm_account, pm_name, status, creator,creator_name,start_time,end_time, create_time, lastupdate_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from project
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectByProject" resultMap="BaseResultMap" parameterType="map" >
+    select  p.*,d.dict_name projectTypeName
+    from project p join dict d 
+    where p.project_type=d.dict_value and d.status=1
+    <if test="type == 1">  
+     <![CDATA[ and  p.project_name like CONCAT('%',#{value},'%')    ]]> 
+     </if>  
+     <if test="type == 2">  
+     <![CDATA[ and  p.pm_name like CONCAT('%',#{value},'%')    ]]> 
+      </if>  
+      <if test="type == 3">  
+     <![CDATA[ and  p.resp_dept_name like CONCAT('%',#{value},'%')    ]]> 
+      </if>
+      <if test="type == 4">  
+     <![CDATA[ and  p.creator_name like CONCAT('%',#{value},'%')    ]]> 
+      </if>
+      <if test="type == 5">  
+     <![CDATA[ and  d.dict_name like CONCAT('%',#{value},'%')     ]]> 
+      </if>
+       <if test="type == 6">  
+     <![CDATA[ and  p.seria_no like CONCAT('%',#{value},'%')     ]]> 
+      </if>
+      <if test="createDate!=null and createDate!=''">  
+     <![CDATA[ and  p.create_time = #{createDate}  ]]> 
+     </if>  
+  </select>
+  <select id="getItemDetails" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+  select
+  <include refid="Base_Column_List" />
+    from project 
+    where  id = #{id,jdbcType=INTEGER} 
+  
+  </select>
+  <select id="queryByTerm" resultMap="BaseResultMap" parameterType="com.bsi.ms.model.Project" >
+    select 
+    <include refid="Base_Column_List" />
+    from project
+    <if test="projectName != null and projectName != ''">
+		where project_name like '%${projectName}%'
+	</if> 
+	<if test="pmName != null and pmName != ''">
+		where pm_name like '%${pmName}%'
+	</if>
+  </select>
+  
+  <select id="queryByStTime" resultMap="BaseResultMap" parameterType="java.util.Map" >
+    select 
+    <include refid="Base_Column_List" />
+    from project
+	where start_time between #{startTime} and  #{endTime}
+  </select>
+  
+  <select id="queryByEndTime" resultMap="BaseResultMap" parameterType="java.util.Map" >
+    select 
+    <include refid="Base_Column_List" />
+    from project
+	where end_time between #{startTime} and  #{endTime}
+  </select>
+  
+  <select id="newItemsValidateName" parameterType="java.lang.String" resultType ="java.lang.Integer">
+   select count(project_name) from project where project_name=#{projectName} 
+   </select>
+
+ <select id="newItemsValidateContractNo" parameterType="java.lang.String" resultType="java.lang.Integer"> 
+ select count(contract_No) from project where contract_No=#{contractNo} 
+ </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from project
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.bsi.ms.model.Project" >
+    insert into project (id, project_name, contract_no, 
+      seria_no, project_full_name, project_type, 
+      resp_dept_id, resp_dept_name, pigeonhole, 
+      pm_account, pm_name, status, 
+      creator,creator_name, start_time,end_time,
+      create_time, lastupdate_time
+      )
+    values (#{id,jdbcType=INTEGER}, #{projectName,jdbcType=VARCHAR}, #{contractNo,jdbcType=VARCHAR}, 
+      #{seriaNo,jdbcType=VARCHAR}, #{projectFullName,jdbcType=VARCHAR}, #{projectType,jdbcType=INTEGER}, 
+      #{respDeptId,jdbcType=INTEGER}, #{respDeptName,jdbcType=VARCHAR}, #{pigeonhole,jdbcType=INTEGER}, 
+      #{pmAccount,jdbcType=VARCHAR}, #{pmName,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, 
+      #{creator,jdbcType=VARCHAR},#{creatorName,jdbcType=VARCHAR},#{startTime,jdbcType=DATE}, #{endTime,jdbcType=DATE},
+      #{createTime,jdbcType=TIMESTAMP}, #{lastupdateTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.bsi.ms.model.Project" >
+    insert into project
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="projectName != null" >
+        project_name,
+      </if>
+      <if test="contractNo != null" >
+        contract_no,
+      </if>
+      <if test="seriaNo != null" >
+        seria_no,
+      </if>
+      <if test="projectFullName != null" >
+        project_full_name,
+      </if>
+      <if test="projectType != null" >
+        project_type,
+      </if>
+      <if test="respDeptId != null" >
+        resp_dept_id,
+      </if>
+      <if test="respDeptName != null" >
+        resp_dept_name,
+      </if>
+      <if test="pigeonhole != null" >
+        pigeonhole,
+      </if>
+      <if test="pmAccount != null" >
+        pm_account,
+      </if>
+      <if test="pmName != null" >
+        pm_name,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="creatorName != null" >
+        creator_name,
+      </if>
+       <if test="creator != null" >
+        creator,
+      </if>
+       <if test="startTime != null" >
+        start_time,
+      </if>
+       <if test="endTime != null" >
+        end_time,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="lastupdateTime != null" >
+        lastupdate_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="projectName != null" >
+        #{projectName,jdbcType=VARCHAR},
+      </if>
+      <if test="contractNo != null" >
+        #{contractNo,jdbcType=VARCHAR},
+      </if>
+      <if test="seriaNo != null" >
+        #{seriaNo,jdbcType=VARCHAR},
+      </if>
+      <if test="projectFullName != null" >
+        #{projectFullName,jdbcType=VARCHAR},
+      </if>
+      <if test="projectType != null" >
+        #{projectType,jdbcType=INTEGER},
+      </if>
+      <if test="respDeptId != null" >
+        #{respDeptId,jdbcType=INTEGER},
+      </if>
+      <if test="respDeptName != null" >
+        #{respDeptName,jdbcType=VARCHAR},
+      </if>
+      <if test="pigeonhole != null" >
+        #{pigeonhole,jdbcType=INTEGER},
+      </if>
+      <if test="pmAccount != null" >
+        #{pmAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="pmName != null" >
+        #{pmName,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="creatorName != null" >
+        #{creatorName,jdbcType=VARCHAR},
+      </if>
+      <if test="creator != null" >
+        #{creator,jdbcType=VARCHAR},
+      </if> 
+      <if test="startTime != null" >
+        #{startTime,jdbcType=DATE},
+      </if>
+      <if test="endTime != null" >
+        #{endTime,jdbcType=DATE},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastupdateTime != null" >
+        #{lastupdateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.bsi.ms.model.Project" >
+    update project
+    <set >
+      <if test="projectName != null" >
+        project_name = #{projectName,jdbcType=VARCHAR},
+      </if>
+      <if test="contractNo != null" >
+        contract_no = #{contractNo,jdbcType=VARCHAR},
+      </if>
+      <if test="seriaNo != null" >
+        seria_no = #{seriaNo,jdbcType=VARCHAR},
+      </if>
+      <if test="projectFullName != null" >
+        project_name = #{projectName,jdbcType=VARCHAR},
+      </if>
+      <if test="projectType != null" >
+        project_type = #{projectType,jdbcType=INTEGER},
+      </if>
+      <if test="respDeptId != null" >
+        resp_dept_id = #{respDeptId,jdbcType=INTEGER},
+      </if>
+      <if test="respDeptName != null" >
+        resp_dept_name = #{respDeptName,jdbcType=VARCHAR},
+      </if>
+      <if test="pigeonhole != null" >
+        pigeonhole = #{pigeonhole,jdbcType=INTEGER},
+      </if>
+      <if test="pmAccount != null" >
+        pm_account = #{pmAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="pmName != null" >
+        pm_name = #{pmName,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="creator != null" >
+        creator = #{creator,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null" >
+        start_time = #{startTime,jdbcType=DATE},
+      </if>
+      <if test="endTime != null" >
+        end_time = #{endTime,jdbcType=DATE},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastupdateTime != null" >
+        lastupdate_time = #{lastupdateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.bsi.ms.model.Project" >
+    update project
+    set project_name = #{projectName,jdbcType=VARCHAR},
+      contract_no = #{contractNo,jdbcType=VARCHAR},
+      seria_no = #{seriaNo,jdbcType=VARCHAR},
+      project_full_name = #{projectFullName,jdbcType=VARCHAR},
+      project_type = #{projectType,jdbcType=INTEGER},
+      resp_dept_id = #{respDeptId,jdbcType=INTEGER},
+      resp_dept_name = #{respDeptName,jdbcType=VARCHAR},
+      pigeonhole = #{pigeonhole,jdbcType=INTEGER},
+      pm_account = #{pmAccount,jdbcType=VARCHAR},
+      pm_name = #{pmName,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      creator = #{creator,jdbcType=VARCHAR},
+      start_time = #{startTime,jdbcType=DATE},
+      end_time = #{endTime,jdbcType=DATE},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      lastupdate_time = #{lastupdateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <select id="getProjectName" resultMap="BaseResultMap">
+      select id,project_name from project
+  </select>
+  
+</mapper>

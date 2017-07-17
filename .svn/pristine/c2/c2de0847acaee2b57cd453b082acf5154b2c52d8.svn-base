@@ -1,0 +1,49 @@
+package com.bsi.ms.service;
+
+import java.util.List;
+import java.util.Map;
+
+import com.bsi.ms.model.ProjectMilestone;
+
+/*
+ 里程碑service
+*/
+public interface MilestoneService {
+	public List<ProjectMilestone> getList(Map<String, Object> map);
+
+	// 获取里程碑第一级的名字
+	public List<ProjectMilestone> getMilestoneNameOne(String id);
+
+	// 获取里程碑二三四级的名字
+	public List<ProjectMilestone> getMilestoneName(String id);
+
+	public ProjectMilestone selectByPrimaryKey(Integer id);
+
+	public int update(ProjectMilestone record);
+
+	public int insert(ProjectMilestone record);
+
+	public int delete(Integer id);
+
+	public int hasChild(Integer id);
+	/**
+	 * 导入Excel插入里程碑
+	 * @param prMap
+	 */
+	public void insertMilestone(Map<String, Object> prMap);
+	/**
+	 * 查询里程碑父级ID
+	 * @param milestoneId
+	 * @return
+	 */
+	public int getParentId(String milestoneId);
+	
+	/** 
+	* @Title: 验证里程碑名称 
+	* @author wangxy 
+	* @param @param attMap
+	* @param @return      
+	* @return int    返回类型  
+	*/
+	public int Validate(Map<String, Object> attMap);
+}

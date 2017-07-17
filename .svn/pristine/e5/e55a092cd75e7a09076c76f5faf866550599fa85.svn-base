@@ -1,0 +1,249 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="OVIT Project Manage System" />
+<meta name="author" content="OVIT R&D" />
+<title>光谷信息项目管理系统</title>
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/css/fonts/arimo/css/arimo.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/css/fonts/linecons/css/linecons.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/css/fonts/fontawesome/css/font-awesome.min.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/css/bootstrap.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/css/xenon-core.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/css/xenon-forms.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/css/xenon-components.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/css/xenon-skins.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/css/custom.css">
+<!-- Imported styles on this page -->
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/js/datatables/dataTables.bootstrap.css">
+
+<script
+	src="${pageContext.request.contextPath}/assets/js/jquery-1.11.1.min.js"></script>
+<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!--[if lt IE 9]>
+	<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+	<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+<![endif]-->
+</head>
+<body class="page-body">
+	<%@ include file="../frame/setting.jsp"%>
+	<div class="page-container">
+		<%@ include file="../frame/left.jsp"%>
+		<div class="main-content">
+			<%@ include file="../frame/nav.jsp"%>
+
+			<!-- <div class="page-title">
+
+				<div class="title-env">
+					<h1 class="title">所有项目</h1>
+					<p class="description">项目管理列表</p>
+				</div>
+
+				<div class="breadcrumb-env">
+
+					<ol class="breadcrumb bc-1">
+						<li><a href="/"><i class="fa-home"></i>主页</a></li>
+						<li><a href="/project">项目管理</a></li>
+						<li class="active"><strong>所有项目</strong></li>
+					</ol>
+
+				</div>
+
+			</div>
+                -->
+			<!-- Basic Setup -->
+			<div class="panel panel-default">
+
+				<div class="panel-heading">
+					<div class="panel-body">
+						<div class="form-group">
+
+
+							<form class="col-md-10" id="searchForm"
+								action="${pageContext.request.contextPath}/project/list"
+								method="post">
+								<div class="input-group">
+
+									<input type="text" id="createDate"
+										class="form-control daterange" style="width: 30%;" />
+									<select class="form-control" name="selectType"
+										style="width: 20%;"  >
+										<option value="1">项目名称</option>
+										<option value="2">项目经理</option>
+										<option value="3">责任部门</option>
+										<option value="4">创建者</option>
+										<option value="5">项目分类</option>
+									</select> <input type="text" class="form-control " style="width: 30%;"
+										placeholder="" name="txtValue" />
+									<button type="submit" class="btn-unstyled">
+										<i class="linecons-search"></i>
+									</button>
+								</div>
+							</form>
+
+							<div class="col-sm-2">
+
+								<button class="btn btn-info btn-sm " id="btnAdd">
+									<i class="fa-cloud"></i> <span>新增项目</span>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="panel-body">
+
+					<table id="table" class="table table-bordered table-striped"
+						cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th width="10%">流水号</th>
+								<th>项目名称</th>
+								<th width="8%">项目经理</th>
+								<th width="8%">责任部门</th>
+								<th width="8%">创建者</th>
+								<th width="8%">项目分类</th>
+								<th width="8%">创建时间</th>
+								<th width="25%">操作</th>
+							</tr>
+						</thead>
+
+						<tbody id="tbody">
+							<c:forEach items="${list}" var="item" varStatus="status">
+								<tr>
+									<td align="center" title="${item.seriaNo}"><c:out
+											value='${item.seriaNo}' /></td>
+									<td align="center" title="${item.projectName}"><c:out
+											value='${item.projectName}' /></td>
+
+									<td align="center"><c:out value='${item.pmName}' /></td>
+									<td align="center"><c:out value='${item.respDeptName}' /></td>
+									<td align="center"><c:out value='${item.creatorName}' /></td>
+									<td align="center"><c:out value='${item.projectType}' /></td>
+									<td align="center"><c:out value='${item.createTime}' /></td>
+									<td align="center"><a href="javascript:void(0)"
+										class="btn btn-secondary btn-sm btn-icon icon-left"
+										onclick="edit(${item.id})">编辑</a> <a href="javascript:void(0)"
+										class="btn btn-danger btn-sm btn-icon icon-left"
+										onclick="del(${item.id})"> 删除 </a> <a
+										href="${pageContext.request.contextPath}/milestone/list?pid=${item.id}"
+										class="btn btn-info btn-sm btn-icon icon-left">
+											里程碑</a></td>
+								</tr>
+							</c:forEach>
+
+						</tbody>
+					</table>
+
+				</div>
+			</div>
+
+
+			<!-- Main Footer -->
+			<%@ include file="../frame/footer.jsp"%>
+		</div>
+	</div>
+	<%@ include file="../frame/bottomScript.jsp"%>
+
+
+
+	<script
+		src="${pageContext.request.contextPath}/assets/js/datatables/js/jquery.dataTables.min.js"></script>
+	<script
+		src="${pageContext.request.contextPath}/assets/js/datatables/js/fnReloadAjax.js"></script>
+	<!-- Imported scripts on this page -->
+	<script
+		src="${pageContext.request.contextPath}/assets/js/datatables/dataTables.bootstrap.js"></script>
+	<script
+		src="${pageContext.request.contextPath}/assets/js/datatables/yadcf/jquery.dataTables.yadcf.js"></script>
+	<script
+		src="${pageContext.request.contextPath}/assets/js/datatables/tabletools/dataTables.tableTools.min.js"></script>
+
+
+	<script type="text/javascript">
+	var table;
+ 
+	 $(function() {
+		   
+		  table = $('#table').DataTable({
+                      "bLengthChange" : false, //改变每页显示数据数量
+												"bFilter" : false, //过滤功能
+												 'ordering'  :false,
+												"oLanguage" : {
+													"sProcessing" : "<img src='/images/datatable_loading.gif'>  努力加载数据中.",
+													"sLengthMenu" : "每页显示 _MENU_ 条记录",
+													"sZeroRecords" : "抱歉， 没有找到",
+													"sInfo" : "从 _START_ 到 _END_ /共 _TOTAL_ 条数据",
+													"sInfoEmpty" : "没有数据",
+													"sInfoFiltered" : "(从 _MAX_ 条数据中检索)",
+													"sZeroRecords" : "没有检索到数据",
+													"sSearch" : "模糊查询:  ",
+													"oPaginate" : {
+														"sFirst" : "首页",
+														"sPrevious" : "前一页",
+														"sNext" : "后一页",
+														"sLast" : "尾页"
+													}
+												}, 
+		 });
+							
+				 
+		$("#btnAdd").click(function(){ 
+			
+			
+			window.location.href="${pageContext.request.contextPath}/project/edit?id=0";
+			// $('#model').modal('show');
+	    });
+		
+	});
+	  
+	 
+	 function del(id){
+	      //判断是否有下级
+	       
+	      if (confirm("数据将永久删除，你确定要删除吗？")) {
+		      $.ajax({
+					url : '${pageContext.request.contextPath}/project/del',
+					type: "POST",
+	                data: "id="+id,
+					success : function(result) {    
+						  if(result=="Success")
+						  {
+							  window.location.reload();
+						 }
+						  else  {
+							   toastr.success(result);
+							  } 
+					}, 
+					error:function(error){ 
+					 
+						 toastr.success(error.responseText);
+			          } 
+	        })
+	      }
+	} 
+	 
+	 function edit(id){
+		 window.location.href="${pageContext.request.contextPath}/project/edit?id=" + id;
+	 }
+	
+	</script>
+</body>
+</html>

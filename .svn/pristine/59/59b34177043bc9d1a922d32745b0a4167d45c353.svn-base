@@ -1,0 +1,138 @@
+package com.bsi.ms.service.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.bsi.ms.controller.MilestoneController;
+import com.bsi.ms.mapper.ProjectMilestoneMapper;
+import com.bsi.ms.model.ProjectMilestone;
+import com.bsi.ms.service.MilestoneService;
+
+/** 
+* @ClassName: MilestoneServiceImpl 
+* @Description: 里程碑service层 
+* @author wangxy
+* @date Mar 28, 2017 5:15:58 PM 
+*  
+*/
+@Service
+@Transactional
+public class MilestoneServiceImpl implements MilestoneService {
+
+	public final static Logger logger = LogManager.getLogger(MilestoneServiceImpl.class);
+	
+	@Autowired
+	ProjectMilestoneMapper mapper;
+
+	/** 
+	* <p>Title: getMilestoneNameOne</p>  
+	* @param id
+	* @return 
+	* @see com.bsi.ms.service.MilestoneService#getMilestoneNameOne(java.lang.String) 
+	*/
+	@Override
+	public List<ProjectMilestone> getMilestoneNameOne(String id) {
+		return mapper.getMilestoneNameOne(id);
+	}
+
+	/** 
+	* <p>Title: getMilestoneName</p>  
+	* @param id
+	* @return 
+	* @see com.bsi.ms.service.MilestoneService#getMilestoneName(java.lang.String) 
+	*/
+	@Override
+	public List<ProjectMilestone> getMilestoneName(String id) {
+		return mapper.getMilestoneName(id);
+	}
+
+	/** 
+	* <p>Title: 条件查询里程碑</p>  
+	* @param map
+	* @return 
+	* @see com.bsi.ms.service.MilestoneService#getList(java.util.Map) 
+	*/
+	@Override
+	public List<ProjectMilestone> getList(Map<String, Object> map) {
+		// TODO 自动生成的方法存根
+		return mapper.selectByProject(map);
+	}
+
+	/** 
+	* <p>Title: 根据ID获取里程碑</p>  
+	* @param id
+	* @return 
+	* @see com.bsi.ms.service.MilestoneService#selectByPrimaryKey(java.lang.Integer) 
+	*/
+	@Override
+	public ProjectMilestone selectByPrimaryKey(Integer id) {
+		// TODO 自动生成的方法存根
+		return mapper.selectByPrimaryKey(id);
+	}
+
+	/** 
+	* <p>Title: 修改里程碑字段，只修改非空字段</p>  
+	* @param record
+	* @return 
+	* @see com.bsi.ms.service.MilestoneService#update(com.bsi.ms.model.ProjectMilestone) 
+	*/
+	@Override
+	public int update(ProjectMilestone record) {
+		// TODO 自动生成的方法存根
+		return mapper.updateByPrimaryKeySelective(record);
+	}
+
+	/** 
+	* <p>Title: 插入里程碑，只插入非空字段</p>  
+	* @param record
+	* @return 
+	* @see com.bsi.ms.service.MilestoneService#insert(com.bsi.ms.model.ProjectMilestone) 
+	*/
+	@Override
+	public int insert(ProjectMilestone record) {
+		logger.info("",record.toString());
+		return mapper.insertSelective(record);
+		
+	}
+
+	/** 
+	* <p>Title: 根据ID删除里程碑</p>  
+	* @param id
+	* @return 
+	* @see com.bsi.ms.service.MilestoneService#delete(java.lang.Integer) 
+	*/
+	@Override
+	public int delete(Integer id) {
+		// TODO 自动生成的方法存根
+		return mapper.deleteByPrimaryKey(id);
+	}
+
+	/** 
+	* <p>Title: 判断是否有下级里程碑</p>  
+	* @param id
+	* @return 
+	* @see com.bsi.ms.service.MilestoneService#hasChild(java.lang.Integer) 
+	*/
+	@Override
+	public int hasChild(Integer id) {
+		// TODO 自动生成的方法存根
+		return mapper.getChildCount(id);
+	}
+	
+	@Override
+	public void insertMilestone(Map<String, Object> prMap) {
+		mapper.insertMilestone(prMap);
+	}
+
+	@Override
+	public int getParentId(String milestoneId) {
+		return mapper.getParentId(milestoneId);
+	}
+
+}

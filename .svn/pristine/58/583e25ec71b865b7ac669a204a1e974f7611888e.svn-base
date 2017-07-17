@@ -1,0 +1,53 @@
+package com.bsi.ms.model;
+
+import java.io.Serializable;
+import java.util.List;
+
+public class Dept implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private String name;
+	private String distinguishedName;
+	private List<Dept> subDepts;
+	private List<User> members;
+
+	public List<Dept> getSubDepts() {
+		return subDepts;
+	}
+
+	public void setSubDepts(List<Dept> subDepts) {
+		this.subDepts = subDepts;
+	}
+
+	public List<User> getMembers() {
+		return members;
+	}
+
+	public void setMembers(List<User> members) {
+		this.members = members;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getDistinguishedName() {
+		return distinguishedName;
+	}
+
+	public void setDistinguishedName(String distinguishedName) {
+		this.distinguishedName = distinguishedName;
+	}
+
+	@Override
+	public String toString() {
+		return "Dept [name=" + name + ", distinguishedName=" + distinguishedName + ", subDepts=" + subDepts
+				+ ", members=" + members + "]";
+	}
+}

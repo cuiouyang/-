@@ -1,0 +1,51 @@
+package com.bsi.ms.service;
+
+import java.util.List;
+import java.util.Map;
+import com.bsi.ms.model.WorkItemWithBLOBs;
+
+/**
+ * @ClassName: WorkItemService
+ * @Description: 补登工作项service文件
+ * @author chenqim
+ * @date Mar 28, 2017 10:32:42 AM
+ * 
+ */
+public interface WorkItemService {
+
+	/**
+	 * 根据条件查询工作项评价数据
+	 * 
+	 * @param record
+	 * 
+	 * @return List<WorkItemWithBLOBs>
+	 */
+	List<WorkItemWithBLOBs> selectByTerm(Map<String, Object> map);
+
+	/**
+	 * 点击项目标题进入项目详情
+	 * 
+	 * @param id
+	 * 
+	 * @return WorkItemWithBLOBs
+	 */
+	WorkItemWithBLOBs selectById(Integer id);
+
+	/**
+	 * 根据id修改已评价的工作项
+	 * 
+	 * @param id
+	 * 
+	 * @return int
+	 */
+	int updateByPrimaryKeySelective(WorkItemWithBLOBs record);
+
+	/**
+	 * 保存工作项
+	 * 
+	 * @param workItem
+	 * 
+	 * @return int
+	 */
+	int saveWorkItem(WorkItemWithBLOBs workItem);
+}

@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bsi.ms.mapper.TestSetMapper" >
+  <resultMap id="BaseResultMap" type="com.bsi.ms.model.TestSet" >
+    <id column="course_name" property="courseName" jdbcType="VARCHAR" />
+    <result column="radio" property="radio" jdbcType="INTEGER" />
+    <result column="choice" property="choice" jdbcType="INTEGER" />
+    <result column="judge" property="judge" jdbcType="INTEGER" />
+    <result column="short_answer" property="shortAnswer" jdbcType="INTEGER" />
+    <result column="radio_score" property="radioScore" jdbcType="INTEGER" />
+    <result column="choice_score" property="choiceScore" jdbcType="INTEGER" />
+    <result column="judge_score" property="judgeScore" jdbcType="INTEGER" />
+    <result column="short_answer_score" property="shortAnswerScore" jdbcType="INTEGER" />
+    <result column="radio_difficulty_score" property="radioDifficultyScore" jdbcType="INTEGER" />
+    <result column="choice_difficulty_score" property="choiceDifficultyScore" jdbcType="INTEGER" />
+    <result column="judge_difficulty_score" property="judgeDifficultyScore" jdbcType="INTEGER" />
+    <result column="answer_difficulty_score" property="answerDifficultyScore" jdbcType="INTEGER" />
+    <result column="total_time" property="totalTime" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    course_name, radio, choice, judge, short_answer, radio_score, choice_score, judge_score, 
+    short_answer_score, radio_difficulty_score, choice_difficulty_score, judge_difficulty_score, 
+    answer_difficulty_score, total_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from testset
+    where course_name = #{courseName,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from testset
+    where course_name = #{courseName,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.bsi.ms.model.TestSet" >
+    insert into testset (course_name, radio, choice, 
+      judge, short_answer, radio_score, 
+      choice_score, judge_score, short_answer_score, 
+      radio_difficulty_score, choice_difficulty_score, 
+      judge_difficulty_score, answer_difficulty_score, 
+      total_time)
+    values (#{courseName,jdbcType=VARCHAR}, #{radio,jdbcType=INTEGER}, #{choice,jdbcType=INTEGER}, 
+      #{judge,jdbcType=INTEGER}, #{shortAnswer,jdbcType=INTEGER}, #{radioScore,jdbcType=INTEGER}, 
+      #{choiceScore,jdbcType=INTEGER}, #{judgeScore,jdbcType=INTEGER}, #{shortAnswerScore,jdbcType=INTEGER}, 
+      #{radioDifficultyScore,jdbcType=INTEGER}, #{choiceDifficultyScore,jdbcType=INTEGER}, 
+      #{judgeDifficultyScore,jdbcType=INTEGER}, #{answerDifficultyScore,jdbcType=INTEGER}, 
+      #{totalTime,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.bsi.ms.model.TestSet" >
+    insert into testset
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="courseName != null" >
+        course_name,
+      </if>
+      <if test="radio != null" >
+        radio,
+      </if>
+      <if test="choice != null" >
+        choice,
+      </if>
+      <if test="judge != null" >
+        judge,
+      </if>
+      <if test="shortAnswer != null" >
+        short_answer,
+      </if>
+      <if test="radioScore != null" >
+        radio_score,
+      </if>
+      <if test="choiceScore != null" >
+        choice_score,
+      </if>
+      <if test="judgeScore != null" >
+        judge_score,
+      </if>
+      <if test="shortAnswerScore != null" >
+        short_answer_score,
+      </if>
+      <if test="radioDifficultyScore != null" >
+        radio_difficulty_score,
+      </if>
+      <if test="choiceDifficultyScore != null" >
+        choice_difficulty_score,
+      </if>
+      <if test="judgeDifficultyScore != null" >
+        judge_difficulty_score,
+      </if>
+      <if test="answerDifficultyScore != null" >
+        answer_difficulty_score,
+      </if>
+      <if test="totalTime != null" >
+        total_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="courseName != null" >
+        #{courseName,jdbcType=VARCHAR},
+      </if>
+      <if test="radio != null" >
+        #{radio,jdbcType=INTEGER},
+      </if>
+      <if test="choice != null" >
+        #{choice,jdbcType=INTEGER},
+      </if>
+      <if test="judge != null" >
+        #{judge,jdbcType=INTEGER},
+      </if>
+      <if test="shortAnswer != null" >
+        #{shortAnswer,jdbcType=INTEGER},
+      </if>
+      <if test="radioScore != null" >
+        #{radioScore,jdbcType=INTEGER},
+      </if>
+      <if test="choiceScore != null" >
+        #{choiceScore,jdbcType=INTEGER},
+      </if>
+      <if test="judgeScore != null" >
+        #{judgeScore,jdbcType=INTEGER},
+      </if>
+      <if test="shortAnswerScore != null" >
+        #{shortAnswerScore,jdbcType=INTEGER},
+      </if>
+      <if test="radioDifficultyScore != null" >
+        #{radioDifficultyScore,jdbcType=INTEGER},
+      </if>
+      <if test="choiceDifficultyScore != null" >
+        #{choiceDifficultyScore,jdbcType=INTEGER},
+      </if>
+      <if test="judgeDifficultyScore != null" >
+        #{judgeDifficultyScore,jdbcType=INTEGER},
+      </if>
+      <if test="answerDifficultyScore != null" >
+        #{answerDifficultyScore,jdbcType=INTEGER},
+      </if>
+      <if test="totalTime != null" >
+        #{totalTime,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.bsi.ms.model.TestSet" >
+    update testset
+    <set >
+      <if test="radio != null" >
+        radio = #{radio,jdbcType=INTEGER},
+      </if>
+      <if test="choice != null" >
+        choice = #{choice,jdbcType=INTEGER},
+      </if>
+      <if test="judge != null" >
+        judge = #{judge,jdbcType=INTEGER},
+      </if>
+      <if test="shortAnswer != null" >
+        short_answer = #{shortAnswer,jdbcType=INTEGER},
+      </if>
+      <if test="radioScore != null" >
+        radio_score = #{radioScore,jdbcType=INTEGER},
+      </if>
+      <if test="choiceScore != null" >
+        choice_score = #{choiceScore,jdbcType=INTEGER},
+      </if>
+      <if test="judgeScore != null" >
+        judge_score = #{judgeScore,jdbcType=INTEGER},
+      </if>
+      <if test="shortAnswerScore != null" >
+        short_answer_score = #{shortAnswerScore,jdbcType=INTEGER},
+      </if>
+      <if test="radioDifficultyScore != null" >
+        radio_difficulty_score = #{radioDifficultyScore,jdbcType=INTEGER},
+      </if>
+      <if test="choiceDifficultyScore != null" >
+        choice_difficulty_score = #{choiceDifficultyScore,jdbcType=INTEGER},
+      </if>
+      <if test="judgeDifficultyScore != null" >
+        judge_difficulty_score = #{judgeDifficultyScore,jdbcType=INTEGER},
+      </if>
+      <if test="answerDifficultyScore != null" >
+        answer_difficulty_score = #{answerDifficultyScore,jdbcType=INTEGER},
+      </if>
+      <if test="totalTime != null" >
+        total_time = #{totalTime,jdbcType=INTEGER},
+      </if>
+    </set>
+    where course_name = #{courseName,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.bsi.ms.model.TestSet" >
+    update testset
+    set radio = #{radio,jdbcType=INTEGER},
+      choice = #{choice,jdbcType=INTEGER},
+      judge = #{judge,jdbcType=INTEGER},
+      short_answer = #{shortAnswer,jdbcType=INTEGER},
+      radio_score = #{radioScore,jdbcType=INTEGER},
+      choice_score = #{choiceScore,jdbcType=INTEGER},
+      judge_score = #{judgeScore,jdbcType=INTEGER},
+      short_answer_score = #{shortAnswerScore,jdbcType=INTEGER},
+      radio_difficulty_score = #{radioDifficultyScore,jdbcType=INTEGER},
+      choice_difficulty_score = #{choiceDifficultyScore,jdbcType=INTEGER},
+      judge_difficulty_score = #{judgeDifficultyScore,jdbcType=INTEGER},
+      answer_difficulty_score = #{answerDifficultyScore,jdbcType=INTEGER},
+      total_time = #{totalTime,jdbcType=INTEGER}
+    where course_name = #{courseName,jdbcType=VARCHAR}
+  </update>
+</mapper>

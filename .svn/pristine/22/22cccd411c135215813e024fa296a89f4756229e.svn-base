@@ -1,0 +1,72 @@
+package com.bsi.ms.service.impl;
+
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.bsi.ms.mapper.ProjectMemberMapper;
+import com.bsi.ms.model.ProjectMember;
+import com.bsi.ms.service.ProjectMemberService;
+
+/*
+ * 工作项service
+*/
+@Service
+public class ProjectMemberServiceImpl implements ProjectMemberService{
+    
+    @Autowired
+    ProjectMemberMapper projectMemberMapper;
+    
+    @Override
+    public List<ProjectMember> getAllMember() {
+        return projectMemberMapper.getAllMember();
+    }
+
+    @Override
+    public String getMemberAccount(String id) {
+        return projectMemberMapper.getMemberAccount(id);
+    }
+
+    @Override
+    public String getMemberName(String id) {
+        return projectMemberMapper.getMemberName(id);
+    }
+
+    @Override
+    public List<ProjectMember> getProjectMemberById(String id) {
+        return projectMemberMapper.getProjectMemberById(id);
+    }
+    
+    @Override
+    public int addProjectMember(ProjectMember projectMember) {
+        return projectMemberMapper.addProjectMember(projectMember);
+    }
+
+    @Override
+    public int checkProjectMember(ProjectMember projectMember) {
+        return projectMemberMapper.checkProjectMember(projectMember);
+    }
+
+    @Override
+    public int deleteProjectMember(ProjectMember projectMember) {
+        return projectMemberMapper.deleteProjectMember(projectMember);
+    }
+
+	@Override
+	public int editProjectMemberRole(ProjectMember projectMember) {
+		return projectMemberMapper.editProjectMemberRole(projectMember);
+	}
+
+	@Override
+	public int queryProjectManeger(ProjectMember projectMember) {
+		return projectMemberMapper.queryProjectManager(projectMember);
+	}
+
+	@Override
+	public List<ProjectMember> getSponsorOrAuditor(String projectId) {
+		return projectMemberMapper.getSponsorOrAuditor(projectId);
+	}
+    
+}

@@ -1,0 +1,75 @@
+package com.bsi.ms.mapper;
+
+import java.util.List;
+import java.util.Map;
+
+import com.bsi.ms.model.Project;
+
+/** 
+* @ClassName: ProjectMapper 
+* @Description: TODO(这里用一句话描述这个类的作用) 
+* @author wangxy
+* @date Mar 28, 2017 11:22:04 AM 
+*  
+*/
+/** 
+* @ClassName: ProjectMapper 
+* @Description: TODO(这里用一句话描述这个类的作用) 
+* @author wangxy
+* @date Mar 28, 2017 11:22:07 AM 
+*  
+*/
+/** 
+* @ClassName: ProjectMapper 
+* @Description: TODO(这里用一句话描述这个类的作用) 
+* @author wangxy
+* @date Mar 28, 2017 11:22:11 AM 
+*  
+*/
+public interface ProjectMapper {
+    int deleteByPrimaryKey(Integer id);
+
+    int insert(Project record);
+
+    int insertSelective(Project record);
+
+    Project selectByPrimaryKey(Integer id);
+    
+    List<Project> queryByTerm(Project record);
+    //根据项目开始时间查询数据
+    List<Project> queryByStTime(Map<String,Object> map);
+    //根据项目计划结束时间查询数据
+    List<Project> queryByEndTime(Map<String,Object> map);
+    
+    int updateByPrimaryKeySelective(Project record);
+
+    int updateByPrimaryKey(Project record);
+    
+    List<Project> getProjectName();
+    
+    List<Project> selectByProject(Map<String,Object> map);
+    //校验项目名和和合同编号
+    int newItemsValidateName(String projectName);
+    int newItemsValidateContractNo(String contractNo);
+    //根据project的id来查询项目的详细信息
+   //Map<String ,Object> getItemDetails(int id);
+    
+    /** 
+    * @Title: 判断是否包含里程碑 
+    * @author wangxy 
+    * @param @param id
+    * @param @return    设定文件 
+    * @return int    返回类型 
+    * @throws 
+    */
+    int HasMiletone(Integer id);
+    
+    /** 
+    * @Title: 判断是否包含人员信息 
+    * @author wangxy 
+    * @param @param id
+    * @param @return    设定文件 
+    * @return int    返回类型  
+    */
+    int HasMember(Integer id);
+}

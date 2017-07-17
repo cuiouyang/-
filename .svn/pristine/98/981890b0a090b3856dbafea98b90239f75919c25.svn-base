@@ -1,0 +1,40 @@
+package com.bsi.ms.utils;
+
+import java.io.IOException;
+import java.util.Enumeration;
+
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+
+/**
+ * 该过滤器只对通过request取值有效，若通过@RequestParam取值请修改toSingleObjectMap方法
+ * 即若要新增过滤规则需同时修改此处与toSingleObjectMap方法
+ */
+public class CharacterFilter implements Filter {
+
+	@Override
+	public void destroy() {
+	}
+
+	@Override
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+			throws IOException, ServletException {
+		Enumeration<String> params = request.getParameterNames();
+		String param = "";
+		while (params.hasMoreElements()) {
+			param = (String) params.nextElement();
+			String[] values = request.getParameterValues(param);
+			for (String value : values) {
+				request.setAttribute(param.toString(), value.replaceAll("'", "''"));
+			}
+		}
+		chain.doFilter(request, response);
+	}
+
+	public void init(FilterConfig config) throws ServletException {
+	}
+}

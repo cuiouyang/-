@@ -1,0 +1,95 @@
+package com.bsi.ms.model;
+
+import java.util.Date;
+
+public class ProjectMember {
+    private Integer id;
+
+    private Integer projectId;
+
+    private String memberAccount;
+
+    private String memberName;
+
+    private String role;
+
+    private Date createTime;
+
+    private Integer status;
+
+    private Date releseTime;
+    
+    private String dept;
+    
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Integer getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(Integer projectId) {
+        this.projectId = projectId;
+    }
+
+    public String getMemberAccount() {
+        return memberAccount;
+    }
+
+    public void setMemberAccount(String memberAccount) {
+        this.memberAccount = memberAccount == null ? null : memberAccount.trim();
+    }
+
+    public String getMemberName() {
+        return memberName;
+    }
+
+    public void setMemberName(String memberName) {
+        this.memberName = memberName == null ? null : memberName.trim();
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role == null ? null : role.trim();
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public Date getReleseTime() {
+        return releseTime;
+    }
+
+    public void setReleseTime(Date releseTime) {
+        this.releseTime = releseTime;
+    }
+    
+    public String getDept() {
+        return dept;
+    }
+
+    public void setDept(String dept) {
+        this.dept = dept;
+    }
+}

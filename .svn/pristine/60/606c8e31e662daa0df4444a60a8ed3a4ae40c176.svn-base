@@ -1,0 +1,206 @@
+package com.bsi.ms.controller;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+ 
+ 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.bsi.ms.model.Dept;
+import com.bsi.ms.model.Project;
+import com.bsi.ms.service.CommonService;
+import com.bsi.ms.service.LdapService;
+import com.bsi.ms.service.ProjectService;
+import com.bsi.ms.utils.Pager;
+import com.bsi.ms.model.User;
+
+/**
+ * @ClassName: ProjectController
+ * @Description:项目controller文件
+ * @author wangxy
+ * @date Mar 28, 2017 11:32:42 AM
+ * 
+ */ 
+@Controller
+@RequestMapping("/project")
+public class ProjectController extends BaseController {
+
+	public final static Logger logger = LogManager.getLogger(MilestoneController.class);
+	@Autowired
+	private ProjectService service;
+	@Autowired
+	private CommonService commonService;
+	@Autowired
+	private LdapService ldapService;
+
+	 
+	/** 
+	* @Title: 里程碑-查询所有项目
+	* @author wangxy 
+	* @param @param request
+	* @param @param parameters
+	* @param @param model
+	* @param @return      
+	* @return Object    返回类型  
+	*/
+	@RequestMapping(value = "list", method = { RequestMethod.GET, RequestMethod.POST })
+	public Object list(HttpServletRequest request, @RequestParam MultiValueMap<String, String> parameters,
+			ModelMap model) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		Map<String, String> paramMap = parameters.toSingleValueMap();
+		String type = paramMap.get("selectType");//查询参数
+		if (type != null && type.length() > 0) {
+			map.put("type", Integer.parseInt(type));
+			map.put("value", paramMap.get("txtValue"));//查询数据
+		} else {
+			map.put("type", 0);
+		}
+		type = paramMap.get("createDate");//时间
+		if (type != null && type.length() > 0) {
+			map.put("createDate", type);
+		} else {
+			map.put("createDate", "");
+		}
+		List<Project> list = service.selectByProject(map);
+		model.addAttribute("list", list);
+		int currentPage = paramMap.get("currentPage") == null ? 1 : Integer.parseInt(paramMap.get("currentPage"));
+		List<Object> sub = new ArrayList<Object>(list);
+		Pager pager = new Pager(sub, currentPage);
+		return pager;
+		// return "milestone/list";
+	}
+
+	/**
+	 * @Title: 里程碑-删除里程碑
+	 * @author wangxy
+	 * @param @param
+	 *            id
+	 * @param @return
+	 * @return String 返回类型
+	 */
+	@RequestMapping(value = "/del")
+	@ResponseBody
+	public Object del(@RequestParam(value = "id") Integer id) {
+		 
+		int count = service.ChargeProject(id);
+		if (count == 0) {  
+			logger.info("删除项目:{}", id);
+			count = service.deleteProject(id);
+			if (count > 0) {
+				count=101;
+			}
+		}
+		return count;
+	}
+
+	 
+	/** 
+	* @Title: 里程碑-项目编辑页面 
+	* @author wangxy 
+	* @param @param request
+	* @param @param response
+	* @param @param id
+	* @param @param model
+	* @param @return      
+	* @return ModelAndView    返回类型  
+	*/
+	@RequestMapping(value = "/edit", method = { RequestMethod.GET, RequestMethod.POST })
+	public ModelAndView edit(HttpServletRequest request, HttpServletResponse response, Integer id, ModelMap model) {
+		Project record;
+		List<Dept> dept = ldapService.findDept("");
+		model.addAttribute("dept", dept);
+		if (id == 0) {
+			model.addAttribute("title", "新增项目");
+			record = new Project();
+			model.addAttribute("type", 1);
+		} else {
+			model.addAttribute("title", "修改项目");
+			model.addAttribute("type", 2);
+			record = service.selectByPrimaryKey(id);
+		}
+		if (record != null) {
+			model.addAttribute("record", record);
+		}
+		return new ModelAndView("project/edit", model);
+	}
+
+	 
+	/** 
+	* @Title: 异步加载新增项目中的责任部门 
+	* @author wangxy 
+	* @param @param request
+	* @param @param response
+	* @param @return      
+	* @return List<User>    返回类型  
+	*/
+	@RequestMapping(value = "/getMember", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public List<User> getMember(HttpServletRequest request, HttpServletResponse response) {
+		String dept = request.getParameter("dept");
+		List<User> list = ldapService.searchUsersByDept(dept);
+		return list;
+	}
+ 
+	/** 
+	* @Title: 里程碑-保存里程碑 
+	* @author wangxy 
+	* @param @param request
+	* @param @param record
+	* @param @param model
+	* @param @return
+	* @param @throws Exception      
+	* @return String    返回类型  
+	*/
+	@RequestMapping(value = "/edit/save", method = { RequestMethod.GET, RequestMethod.POST })
+	public String save(HttpServletRequest request, Project record, Model model) throws Exception {
+		// 获取表单数据
+		int type = Integer.parseInt(request.getParameter("type")); 
+		User loginUser  = (User) request.getSession().getAttribute("loginUser"); 
+		String inChargeAccount = loginUser.getAccount();// 账户
+		String loginUserName =loginUser.getName();// 获取密码
+		record.setCreator(inChargeAccount);
+		record.setCreatorName(loginUserName);
+		Date curDate = new Date();
+		int i = -1;
+		if (type == 2) {// 不修改上级里程碑，只修改时间等参数信息
+			// 修改时，更新修改人等信息
+			int id = Integer.parseInt(request.getParameter("id"));
+			record.setId(id);
+			i = service.updateProject(record);
+		} else {
+			String seriaNo = commonService.getSequnce();
+			record.setSeriaNo(seriaNo);//// 获取新增项目流水号
+			record.setCreateTime(curDate);
+			String path = request.getSession().getServletContext().getRealPath("upload");
+			File targetFile = new File(path, seriaNo); // 创建项目目录
+			if (!targetFile.exists()) {
+				targetFile.mkdirs();
+			}
+			i = service.insertProject(record);
+		}
+		// String msg = "";
+		if (i > 0) {
+			return "redirect:/project/list";
+		} else {
+			return "redirect:/milestone/list";
+		}
+	}
+}

@@ -1,0 +1,21 @@
+package com.bsi.ms.mapper;
+
+import java.util.List;
+
+import com.bsi.ms.model.Dict;
+
+public interface DictMapper {
+	int deleteByPrimaryKey(Integer id);
+
+	int insert(Dict record);
+
+	int insertSelective(Dict record);
+
+	Dict selectByPrimaryKey(Integer id);
+
+	List<Dict> selectByStatus(Integer id);
+
+	int updateByPrimaryKeySelective(Dict record);
+
+	int updateByPrimaryKey(Dict record);
+}

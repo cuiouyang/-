@@ -1,0 +1,293 @@
+package com.bsi.ms.model;
+
+import java.math.BigDecimal;
+import java.util.Date;
+
+public class WorkItem {
+	
+
+	private Integer id;
+
+	private String itemId;
+
+	private String projectName;//项目名称
+
+	private String creatorAccount;
+
+	private String creatorName;
+
+	private String deptId;
+
+	private String deptName;
+
+	private Integer projectId;
+
+	private Integer itemType;
+
+	private Integer milestoneId;
+
+	private String itemTopic;
+
+	private Date planStartTime;
+
+	private Date planEndTime;
+
+	private BigDecimal planHours;
+
+	private Date actStartTime;
+
+	private Date actEndTime;
+
+	private BigDecimal actHours;
+
+	private String sponsorAccount;
+
+	private String sponsorName;
+
+	private String auditorAccount;
+
+	private String auditorName;
+
+	private BigDecimal effectiveHours;
+
+	private Integer point;
+
+	private String attachmentUrl;
+
+	private Integer status;
+
+	private Date createTime;
+
+	private Date lastUpdateTime;
+	
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public String getItemId() {
+		return itemId;
+	}
+
+	public void setItemId(String itemId) {
+		this.itemId = itemId == null ? null : itemId.trim();
+	}
+
+	public String getCreatorAccount() {
+		return creatorAccount;
+	}
+
+	public void setCreatorAccount(String creatorAccount) {
+		this.creatorAccount = creatorAccount == null ? null : creatorAccount.trim();
+	}
+
+	public String getCreatorName() {
+		return creatorName;
+	}
+
+	public void setCreatorName(String creatorName) {
+		this.creatorName = creatorName == null ? null : creatorName.trim();
+	}
+
+	public String getDeptId() {
+		return deptId;
+	}
+
+	public void setDeptId(String deptId) {
+		this.deptId = deptId == null ? null : deptId.trim();
+	}
+
+	public String getDeptName() {
+		return deptName;
+	}
+
+	public void setDeptName(String deptName) {
+		this.deptName = deptName == null ? null : deptName.trim();
+	}
+
+	public Integer getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(Integer projectId) {
+		this.projectId = projectId;
+	}
+
+	public Integer getItemType() {
+		return itemType;
+	}
+
+	public void setItemType(Integer itemType) {
+		this.itemType = itemType;
+	}
+
+	public Integer getMilestoneId() {
+		return milestoneId;
+	}
+
+	public void setMilestoneId(Integer milestoneId) {
+		this.milestoneId = milestoneId;
+	}
+
+	public String getItemTopic() {
+		return itemTopic;
+	}
+
+	public void setItemTopic(String itemTopic) {
+		this.itemTopic = itemTopic == null ? null : itemTopic.trim();
+	}
+
+	public Date getPlanStartTime() {
+		return planStartTime;
+	}
+
+	public void setPlanStartTime(Date planStartTime) {
+		this.planStartTime = planStartTime;
+	}
+
+	public Date getPlanEndTime() {
+		return planEndTime;
+	}
+
+	public void setPlanEndTime(Date planEndTime) {
+		this.planEndTime = planEndTime;
+	}
+
+	public BigDecimal getPlanHours() {
+		return planHours;
+	}
+
+	public void setPlanHours(BigDecimal planHours) {
+		this.planHours = planHours;
+	}
+
+	public Date getActStartTime() {
+		return actStartTime;
+	}
+
+	public void setActStartTime(Date actStartTime) {
+		this.actStartTime = actStartTime;
+	}
+
+	public Date getActEndTime() {
+		return actEndTime;
+	}
+
+	public void setActEndTime(Date actEndTime) {
+		this.actEndTime = actEndTime;
+	}
+
+	public BigDecimal getActHours() {
+		return actHours;
+	}
+
+	public void setActHours(BigDecimal actHours) {
+		this.actHours = actHours;
+	}
+
+	public String getSponsorAccount() {
+		return sponsorAccount;
+	}
+
+	public void setSponsorAccount(String sponsorAccount) {
+		this.sponsorAccount = sponsorAccount == null ? null : sponsorAccount.trim();
+	}
+
+	public String getSponsorName() {
+		return sponsorName;
+	}
+
+	public void setSponsorName(String sponsorName) {
+		this.sponsorName = sponsorName == null ? null : sponsorName.trim();
+	}
+
+	public String getAuditorAccount() {
+		return auditorAccount;
+	}
+
+	public void setAuditorAccount(String auditorAccount) {
+		this.auditorAccount = auditorAccount == null ? null : auditorAccount.trim();
+	}
+
+	public String getAuditorName() {
+		return auditorName;
+	}
+
+	public void setAuditorName(String auditorName) {
+		this.auditorName = auditorName == null ? null : auditorName.trim();
+	}
+
+	public BigDecimal getEffectiveHours() {
+		return effectiveHours;
+	}
+
+	public void setEffectiveHours(BigDecimal effectiveHours) {
+		this.effectiveHours = effectiveHours;
+	}
+
+	public Integer getPoint() {
+		return point;
+	}
+
+	public void setPoint(Integer point) {
+		this.point = point;
+	}
+
+	public String getAttachmentUrl() {
+		return attachmentUrl;
+	}
+
+	public void setAttachmentUrl(String attachmentUrl) {
+		this.attachmentUrl = attachmentUrl == null ? null : attachmentUrl.trim();
+	}
+
+	public Integer getStatus() {
+		return status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
+
+	public Date getCreateTime() {
+		return createTime;
+	}
+
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
+	}
+
+	public Date getLastUpdateTime() {
+		return lastUpdateTime;
+	}
+
+	public void setLastUpdateTime(Date lastUpdateTime) {
+		this.lastUpdateTime = lastUpdateTime;
+	}
+
+	public String getProjectName() {
+		return projectName;
+	}
+
+	public void setProjectName(String projectName) {
+		this.projectName = projectName;
+	}
+
+	@Override
+	public String toString() {
+		return "WorkItem [id=" + id + ", itemId=" + itemId + ", projectName=" + projectName + ", creatorAccount="
+				+ creatorAccount + ", creatorName=" + creatorName + ", deptId=" + deptId + ", deptName=" + deptName
+				+ ", projectId=" + projectId + ", itemType=" + itemType + ", milestoneId=" + milestoneId
+				+ ", itemTopic=" + itemTopic + ", planStartTime=" + planStartTime + ", planEndTime=" + planEndTime
+				+ ", planHours=" + planHours + ", actStartTime=" + actStartTime + ", actEndTime=" + actEndTime
+				+ ", actHours=" + actHours + ", sponsorAccount=" + sponsorAccount + ", sponsorName=" + sponsorName
+				+ ", auditorAccount=" + auditorAccount + ", auditorName=" + auditorName + ", effectiveHours="
+				+ effectiveHours + ", point=" + point + ", attachmentUrl=" + attachmentUrl + ", status=" + status
+				+ ", createTime=" + createTime + ", lastUpdateTime=" + lastUpdateTime + "]";
+	}
+
+	
+}

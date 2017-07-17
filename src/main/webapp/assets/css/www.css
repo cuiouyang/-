@@ -1,0 +1,22 @@
+/**
+ *
+ * Apply your custom CSS here
+ *
+*/
+
+.btn-cls:hover, .btn-cls:focus, .btn-cls:active, .btn-cls:visited, .btn-cls.active, .open > .dropdown-toggle.btn-cls {
+    color: #ffffff;
+    background-color: rgb(255, 187, 0);
+    border-color: #ffba00;
+}
+.btn-cls1 {
+    color: #ffffff;
+    background-color: rgb(255, 187, 0);
+    border-color: #ffba00;
+}
+input.inp{
+	background:none;
+}
+#star{
+	width:100% ! important;
+}

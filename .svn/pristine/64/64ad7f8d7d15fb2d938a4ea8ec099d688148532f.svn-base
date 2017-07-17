@@ -1,0 +1,60 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<!-- User Info, Notifications and Menu Bar -->
+<nav class="navbar user-info-navbar" role="navigation">
+	<!-- Left links for user info navbar -->
+	<ul class="user-info-menu left-links list-inline list-unstyled">
+		<li class="hidden-sm hidden-xs">
+			<a href="#" data-toggle="sidebar">
+				<i class="fa-bars"></i>
+			</a>
+		</li>
+	</ul>
+	<!-- Right links for user info navbar -->
+	<ul class="user-info-menu right-links list-inline list-unstyled" style="width:auto;">
+		<li class="dropdown user-profile">
+			<a href="#" data-toggle="dropdown">
+				<%-- <img src="${pageContext.request.contextPath}/assets/images/user-4.png" alt="user-image" class="img-circle img-inline userpic-32" width="28" /> --%>
+				<span>${loginUserName }<i class="fa-angle-down"></i></span>
+			</a>
+		</li>
+	</ul>	
+</nav>
+<script type="text/javascript">
+	jQuery(document).ready(function($)
+	{	
+		// Notifications
+		setTimeout(function()
+		{			
+			var opts = {
+				"closeButton": true,
+				"debug": false,
+				"positionClass": "toast-top-right toast-default",
+				"toastClass": "black",
+				"onclick": null,
+				"showDuration": "100",
+				"hideDuration": "1000",
+				"timeOut": "5000",
+				"extendedTimeOut": "1000",
+				"showEasing": "swing",
+				"hideEasing": "linear",
+				"showMethod": "fadeIn",
+				"hideMethod": "fadeOut"
+			};	
+			toastr.info("欢迎登录项目管理系统!", "", opts);
+		}, 3000);		
+		// Resize charts
+		$(window).on('xenon.resize', function()
+		{
+			/* $("#pageviews-visitors-chart").data("dxChart").render();
+			$("#server-uptime-chart").data("dxChart").render();
+			$("#realtime-network-stats").data("dxChart").render();
+			
+			$('.first-month').data("dxSparkline").render();
+			$('.second-month').data("dxSparkline").render();
+			$('.third-month').data("dxSparkline").render(); */
+		});		
+	});	
+</script>

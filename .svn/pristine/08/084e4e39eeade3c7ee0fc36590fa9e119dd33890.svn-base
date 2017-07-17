@@ -1,0 +1,67 @@
+package com.bsi.ms.service.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.bsi.ms.mapper.ProjectMilestoneMapper;
+import com.bsi.ms.model.ProjectMilestone;
+import com.bsi.ms.service.MilestoneService;
+
+@Service
+@Transactional
+public class MilestoneServiceImpl implements MilestoneService {
+
+	@Autowired
+	ProjectMilestoneMapper mapper;
+
+	@Override
+	public List<ProjectMilestone> getMilestoneNameOne(String id) {
+		return mapper.getMilestoneNameOne(id);
+	}
+
+	@Override
+	public List<ProjectMilestone> getMilestoneName(String id) {
+		return mapper.getMilestoneName(id);
+	}
+
+	@Override
+	public List<ProjectMilestone> getList(Map<String, Object> map) {
+		// TODO 自动生成的方法存根
+		return mapper.selectByProject(map);
+	}
+
+	@Override
+	public ProjectMilestone selectByPrimaryKey(Integer id) {
+		// TODO 自动生成的方法存根
+		return mapper.selectByPrimaryKey(id);
+	}
+
+	@Override
+	public int update(ProjectMilestone record) {
+		// TODO 自动生成的方法存根
+		return mapper.updateByPrimaryKeySelective(record);
+	}
+
+	@Override
+	public int insert(ProjectMilestone record) {
+		// TODO 自动生成的方法存根
+		return mapper.insertSelective(record);
+	}
+
+	@Override
+	public int delete(Integer id) {
+		// TODO 自动生成的方法存根
+		return mapper.deleteByPrimaryKey(id);
+	}
+
+	@Override
+	public int hasChild(Integer id) {
+		// TODO 自动生成的方法存根
+		return mapper.getChildCount(id);
+	}
+
+}
